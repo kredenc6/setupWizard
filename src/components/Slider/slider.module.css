@@ -1,0 +1,19 @@
+.slider {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+  padding-bottom: 2rem;
+}
+
+.sliderDotConnector {
+  align-self: center;
+  width: 60px;
+  height: 5px;
+  margin: 0 1rem;
+  background-color: #000;
+}
+
+/* .sliderDot > p {
+  position: absolute
+} */
