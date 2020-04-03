@@ -17,3 +17,7 @@ export interface ColorObj {
     secondary: string | null;
   }
 };
+
+export interface Classes {
+  [propName: string]: string;
+};
