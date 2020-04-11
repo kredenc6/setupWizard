@@ -17,7 +17,7 @@ const createTableRow = (colorName: string, shades: Shades, classes: Classes, onC
   for(const [key, value] of Object.entries(shades)) {
     //skip repeating colors
     if(["brown", "grey", "blueGrey"].includes(colorName) && ["A100", "A200", "A400", "A700"].includes(key)) {
-      TableCellComponents.push(<div key={`${colorName}${key}`}></div>); {/*empty cell*/}
+      TableCellComponents.push(<div key={`${colorName}${key}`}></div>); // empty cell
       continue;
     }
     TableCellComponents.push(createColorTableCell(colorName, value, classes, onClick));
@@ -43,10 +43,8 @@ const createColorTableCell = (colorName: string, background: string, classes: Cl
   );
 };
 
-const TableHeadComponent = ({ colorName, shades, classes, onClick }: Props) => {
-  return(
-    createTableRow(colorName, shades, classes, onClick)
-  );
+const TableRowComponent = ({ colorName, shades, classes, onClick }: Props) => {
+  return createTableRow(colorName, shades, classes, onClick);
 };
 
-export default TableHeadComponent;
+export default TableRowComponent;

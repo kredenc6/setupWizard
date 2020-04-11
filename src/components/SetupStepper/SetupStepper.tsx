@@ -1,18 +1,15 @@
-import React from 'react';
-import SteppDescription from "./Steppinstruction/SteppInstruction";
-import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-import { Stepper, Step, StepButton, Button, Typography } from '@material-ui/core';
+import React, { useCallback, useEffect, useState } from 'react';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { Stepper} from '@material-ui/core';
+import SwStepperButtons from "./SwStepperButtons/SwStepperButtons";
+import SwStepConnector from "./SwStepConnector/SwStepConnector";
+import SwStep from "./SwStep/SwStep";
 
 interface Props {
-  menusInfo: Array<
-    { 
-      label: string,
-      instruction: string,
-      isOptional: boolean
-    }
-  >;
-  mediaModules: {};
   activeStep: number;
+  mediaModules: {};
+  menuLabels: string[];
+  isNextStepAllowed: boolean;
   setActiveStep: React.Dispatch<React.SetStateAction<number>>;
 }
 
@@ -20,58 +17,18 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       width: '100%',
-    },
-    button: {
-      marginRight: theme.spacing(1),
-    },
-    backButton: {
-      marginRight: theme.spacing(1),
-    },
-    completed: {
-      display: 'inline-block',
-    },
-    instructions: {
-      marginTop: theme.spacing(1),
-      marginBottom: theme.spacing(1)
+      paddingTop: theme.spacing(1),
+      borderTop: `1px solid ${theme.palette.divider}`
     }
   })
 );
 
-function createSteps(arr: any[]) {
-  return arr.map((_, i) => i + 1);
-}
-
-const SetupStepper = ({ menusInfo, mediaModules, activeStep, setActiveStep }: Props) => {
+const SetupStepper = ({ activeStep, mediaModules, menuLabels, isNextStepAllowed, setActiveStep }: Props) => {
   const classes = useStyles();
-  const [completed, setCompleted] = React.useState(new Set<number>());
-  const [skipped, setSkipped] = React.useState(new Set<number>());
-  const steps = createSteps(menusInfo);
+  const [completed, setCompleted] = useState(new Set<number>());
 
   const totalSteps = () => {
-    return menusInfo.length;
-  };
-
-  const isStepOptional = (step: number) => {
-    return step === 1;
-  };
-
-  const handleSkip = () => {
-    if (!isStepOptional(activeStep)) {
-      // You probably want to guard against something like this
-      // it should never occur unless someone's actively trying to break something.
-      throw new Error("You can't skip a step that isn't optional.");
-    }
-
-    setActiveStep(prevActiveStep => prevActiveStep + 1);
-    setSkipped(prevSkipped => {
-      const newSkipped = new Set(prevSkipped.values());
-      newSkipped.add(activeStep);
-      return newSkipped;
-    });
-  };
-
-  const skippedSteps = () => {
-    return skipped.size;
+    return menuLabels.length;
   };
 
   const completedSteps = () => {
@@ -79,22 +36,20 @@ const SetupStepper = ({ menusInfo, mediaModules, activeStep, setActiveStep }: Pr
   };
 
   const allStepsCompleted = () => {
-    return completedSteps() === totalSteps() - skippedSteps();
+    return completedSteps() === totalSteps();
   };
 
+  const isFirstStep = () => {
+    return activeStep === 1;
+  }
+
   const isLastStep = () => {
-    return activeStep === totalSteps() - 1;
+    return activeStep === totalSteps();
   };
 
   const handleNext = () => {
-    const newActiveStep =
-      isLastStep() && !allStepsCompleted()
-        ? // It's the last step, but not all steps have been completed
-          // find the first step that has been completed
-          steps.findIndex((step, i) => !completed.has(i))
-        : activeStep + 1;
-
-    setActiveStep(newActiveStep);
+    if(isLastStep()) return;
+    setActiveStep(activeStep + 1);
   };
 
   const handleBack = () => {
@@ -105,148 +60,83 @@ const SetupStepper = ({ menusInfo, mediaModules, activeStep, setActiveStep }: Pr
     setActiveStep(step);
   };
 
-  const handleComplete = () => {
-    const newCompleted = new Set(completed);
-    newCompleted.add(activeStep);
-    setCompleted(newCompleted);
-
-    /**
-     * Sigh... it would be much nicer to replace the following if conditional with
-     * `if (!this.allStepsComplete())` however state is not set when we do this,
-     * thus we have to resort to not being very DRY.
-     */
-    if (completed.size !== totalSteps() - skippedSteps()) {
-      handleNext();
-    }
-  };
+  const isStepComplete = useCallback(
+    (step: number) => completed.has(step),
+    [completed]
+  );
 
   const handleReset = () => {
-    setActiveStep(0);
+    setActiveStep(1);
     setCompleted(new Set<number>());
-    setSkipped(new Set<number>());
   };
 
-  const isStepSkipped = (step: number) => {
-    return skipped.has(step);
-  };
+  const nextStepToBeCompleted = () => {
+    if(completed.size === 0) return 1;
 
-  function isStepComplete(step: number) {
-    return completed.has(step);
+    const sortedArr = Array.from(completed).sort((a, b) => a - b); // sort completed steps array from min to max
+    const nextStep = sortedArr.find((step, i, arr) => step + 1 !== arr[i + 1]) as number + 1; // ...
+    // ...find the last completed step in a row and add 1 to it(the next step)
+    return nextStep;
   }
 
-  return (
+  const isNextStepToBeCompleted = (index: number) => {
+    if(nextStepToBeCompleted() === index + 1) return true;
+    
+    return false;
+  };
+
+  // handling setting steps as complete/not-complete
+  useEffect(() => {
+    // add step as complete
+    if(isNextStepAllowed && !isStepComplete(activeStep)) {
+      setCompleted(prevCompleted => {
+        const newCompleted = new Set(prevCompleted);
+        newCompleted.add(activeStep);
+        return newCompleted;
+      });
+    }
+    // remove step as complete
+    if(!isNextStepAllowed && isStepComplete(activeStep)) {
+      setCompleted(prevCompleted => {
+        const newCompleted = new Set(prevCompleted);
+        newCompleted.delete(activeStep);
+        return newCompleted;
+      });
+    }
+  },[activeStep, isNextStepAllowed, isStepComplete]);
+
+  return(
     <div className={ classes.root }>
-      <Stepper alternativeLabel nonLinear activeStep={ activeStep }>
-        { menusInfo.map((menuInfo, index) => {
-          const stepProps: { completed?: boolean } = {};
-          const buttonProps: { optional?: React.ReactNode } = {};
-          if (menuInfo.isOptional) {
-            buttonProps.optional = <Typography variant="caption">Optional</Typography>;
-          }
-          if (isStepSkipped(index)) {
-            stepProps.completed = false;
-          }
+      <SwStepperButtons 
+        allStepsCompleted={allStepsCompleted}
+        handleBack={handleBack}
+        handleNext={handleNext}
+        handleReset={handleReset}
+        isFirstStep={isFirstStep}
+        isLastStep={isLastStep}
+        isNextStepAllowed={isNextStepAllowed} />
+      <Stepper
+        alternativeLabel
+        connector={<SwStepConnector />}
+        nonLinear
+      >
+        {menuLabels.map((menuLabel, index) => {
           return (
-            <Step key={ menuInfo.label } { ...stepProps }>
-              <StepButton
-                onClick={ handleStep(index) }
-                completed={ isStepComplete(index) }
-                { ...buttonProps }
-              >
-                { menuInfo.label }
-              </StepButton>
-            </Step>
+            <SwStep
+              activeStep={activeStep}
+              handleStep={handleStep}
+              index={index}
+              isNextStepAllowed={isNextStepAllowed}
+              isNextStepToBeCompleted={isNextStepToBeCompleted}
+              isStepComplete={isStepComplete}
+              key={menuLabel}
+              menuLabel={menuLabel}
+              nextStepToBeCompleted={nextStepToBeCompleted} />
           );
         })}
       </Stepper>
-      <div>
-        { allStepsCompleted() ? (
-          <div>
-            <SteppDescription
-              className={ classes.instructions }
-              instruction="All steps completed - you're finished." />
-            <Button onClick={ handleReset }>Reset</Button>
-          </div>
-        ) : (
-          <div>
-            <SteppDescription
-              className={ classes.instructions }
-              instruction={ menusInfo[activeStep].instruction } />
-            <div>
-              <Button disabled={ activeStep === 0 } onClick={ handleBack } className={ classes.button }>
-                Back
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={ handleNext }
-                className={ classes.button }
-              >
-                Next
-              </Button>
-              {isStepOptional(activeStep) && !completed.has(activeStep) && (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleSkip}
-                  className={classes.button}
-                >
-                  Skip
-                </Button>
-              )}
-              {activeStep !== steps.length &&
-                (completed.has(activeStep) ? (
-                  <Typography variant="caption" className={classes.completed}>
-                    Step {activeStep + 1} already completed
-                  </Typography>
-                ) : (
-                  <Button variant="contained" color="primary" onClick={handleComplete}>
-                    {completedSteps() === totalSteps() - 1 ? 'Finish' : 'Complete Step'}
-                  </Button>
-                ))}
-            </div>
-          </div>
-        )}
-      </div>
     </div>
   );
 };
 
 export default SetupStepper;
-
-
-// import React from "react";
-// import { Stepper as MaterialStepper, Step } from "@material-ui/core";
-
-// interface Props {
-//   menus: Array<
-//     { 
-//       description: string,
-//       component: JSX.Element
-//     }
-//   >;
-//   mediaModules: {};
-// }
-
-// const Stepper = ({ menus, mediaModules }: Props) => {
-//   // const stepComponents = menus.map(menu => <Step />);
-//   const stepperComponents = menus.map((menu, i) => {
-//     if(i !== menus.length - 1) {
-//       return(
-//         <React.Fragment key={ menu.description }>
-//           <Step description={ menu.description } />
-//           <div className={ classes.sliderDotConnector }></div>
-//         </React.Fragment>
-//       );
-//     }
-//   return(
-//     <section>
-//       <MaterialStepper alternativeLabel>
-//         <Step />
-//         <Step />
-//       </MaterialStepper>
-//     </section>
-//   );
-// };
-
-// export default Stepper;

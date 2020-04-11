@@ -1,19 +1,23 @@
-import React, { useState } from "react";
-import { makeStyles, Theme, darken, lighten, rgbToHex  } from "@material-ui/core/styles";
+import React, { useEffect, useState } from "react";
+import { makeStyles, Theme, } from "@material-ui/core/styles";
 import ColorScheme from "./ColorScheme/ColorScheme";
 import ColorPalette from "./ColorPalette/ColorPalette";
-import PaletteHeading from "./PaletteHeading";
-import { ColorObj } from "../../interfaces/interfaces";
-
+import ColorToolHeading from "./ColorToolHeading";
 import UI1 from "./UserInterfaces/UI1";
+import createScheme from "../../miscellaneous/createScheme";
+import { SchemeObj } from "../../interfaces/interfaces";
+import { UserInputKeys } from "../../SetupWizard";
 
 interface Props {
+  handleSchemeChange: <T>(propName: UserInputKeys, value: T) => void
+  schemeObj: SchemeObj;
+  setIsNextStepAllowed: React.Dispatch<React.SetStateAction<boolean>>;
   theme: Theme;
 };
 
 const styles = {
   menuStyles: {
-    height: "100vh",
+    width: "100%",
     display: "flex",
     justifyContent: "center"
   },
@@ -24,10 +28,10 @@ const styles = {
     justifyContent: "center"
   },
   right: {
-    alignSelf: "flex-end",
     width: "600px",
-    display: "flex",
-    flexFlow: "row wrap"
+    display: "grid",
+    gridTemplateRows: "min-content auto min-content 280px",
+    overflow: "hidden"
   },
   userInterface: {
     alignSelf: "flex-start"
@@ -36,65 +40,49 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
-const createColorObj: (theme: Theme) => ColorObj = theme => {
-  return {
-    primary: createScheme(theme.palette.primary.main, theme.palette.getContrastText),
-    secondary: createScheme(theme.palette.secondary.main, theme.palette.getContrastText),
-    textColorOverride: {
-      primary: null,
-      secondary: null
-    }
-  };
-};
-
-const createScheme = (background: string, getContrastText: (background: string) => string) => {
-  const lightbackground = rgbToHex( lighten(background, 0.2) ),
-        darkbackground = rgbToHex( darken(background, 0.3) );
-  return {
-    light: lightbackground,
-    main: background,
-    dark: darkbackground,
-    contrastText: {
-      light: getContrastText(lightbackground),
-      main: getContrastText(background),
-      dark: getContrastText(darkbackground)
-    }
-  };
-};
-
-const MenuStyles = ({ theme }: Props) => {
+const MenuStyles = ({ handleSchemeChange, schemeObj, setIsNextStepAllowed, theme }: Props) => {
   const classes = useStyles();
   const [schemeProperty, setSchemeProperty] = useState<"background" | "text">("background");
   const [selectedScheme, setSelectedScheme] = useState<"primary" | "secondary">("primary");
-  const [colorObj, setColorObj] = useState(createColorObj(theme));
   const getContrastText = theme.palette.getContrastText;
 
   const assignColor = (color: string | null) => {
     // change background scheme
     if(schemeProperty === "background" && color !== null) {
       const newScheme = createScheme(color, getContrastText);
-      setColorObj(prevColorObj => {
-        return { ...prevColorObj, [selectedScheme]: newScheme }
-      });
+      handleSchemeChange(
+        "schemeObj",
+        {
+         ...schemeObj, [selectedScheme]: newScheme
+        });
     }
     // change text color override
     else {
-      setColorObj(prevColorObj => {
-        return { ...prevColorObj, textColorOverride: { ...prevColorObj.textColorOverride, [selectedScheme]: color} }
-      });
+      handleSchemeChange(
+        "schemeObj",
+        {
+          ...schemeObj, textColorOverride: { ...schemeObj.textColorOverride, [selectedScheme]: color }
+        });
     }
   };
+
+  // always allow next step
+  useEffect(() => {
+    setIsNextStepAllowed(true);
+  });
 
   return(
     <section className={classes.menuStyles}>
       <div className={classes.left}>
-        <PaletteHeading text="user interfaces" />
-        <UI1 className={classes.userInterface} colorObj={colorObj} />
+        <ColorToolHeading text="user interfaces" />
+        <UI1 className={classes.userInterface} schemeObj={schemeObj} />
       </div>
       <div className={classes.right}>
+        <ColorToolHeading text="color palette" />
         <ColorPalette onClick={assignColor} />
+        <ColorToolHeading text="current scheme" />
         <ColorScheme
-          colorObj={colorObj}
+          schemeObj={schemeObj}
           schemeProperty={schemeProperty}
           setSchemeProperty={setSchemeProperty}
           selectedScheme={selectedScheme}

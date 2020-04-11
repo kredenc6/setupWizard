@@ -1,7 +1,6 @@
-import React,{ useState, useCallback } from "react";
+import React from "react";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
 import * as colors from "@material-ui/core/colors";
-import PaletteHeading from "../PaletteHeading";
 import TableHeadComponent from "./TableHeadComponent";
 import TableRowComponent from "./TableRowComponent";
 
@@ -10,24 +9,20 @@ interface Props {
 };
 
 interface StylesProps {
-  headingHeight: string;
-  columnCount: string;
-}
+  columnCount: number;
+};
 
 const styles = createStyles(
   {
-    colorPalette: {
-      width: "100%"
+    paletteWrapper: {
+      minHeight: "100px",
+      "overflow-y": "auto"
     },
     table: {
-      maxHeight: ({ headingHeight }: StylesProps) => `calc(100vh - 400px - ${headingHeight})`,
-      minHeight: "100px",
-      width: "100%",
       display: "grid",
       gridTemplateColumns: ({ columnCount }: StylesProps) =>`2fr repeat(${columnCount}, 1fr)`,
       gridGap: "1px",
-      fontSize: "12px",
-      "overflow-y": "auto"
+      fontSize: "12px"
     },
     tableCell: {
       display: "flex",
@@ -60,19 +55,8 @@ const useStyles = makeStyles(styles);
 
 
 const ColorPalette = ({ onClick }: Props) => {
-  const [headingHeight, setHeadingHeight] = useState("0px");
-  const measuredRef = useCallback((node: HTMLDivElement | null) => {
-    if (node !== null) {
-      setHeadingHeight(window.getComputedStyle(node).height);
-    }
-  }, []);
   const colorShades = Object.keys(colors["red"]); // take shade key names from red color obj(any color obj would do)
-  const classes = useStyles(
-    {
-      headingHeight,
-      columnCount: `${colorShades.length}`
-    }
-  );
+  const classes = useStyles({ columnCount: colorShades.length });
 
   const TableHeadComponents = colorShades.map(shade => {
     return <TableHeadComponent key={`tHead${shade}`} shade={shade} classes={classes} />
@@ -82,11 +66,9 @@ const ColorPalette = ({ onClick }: Props) => {
     if(key === "common") return null;
     return <TableRowComponent key={key} colorName={key} shades={value} classes={classes} onClick={onClick} />;
   });
-  
 
   return(
-    <article className={classes.colorPalette}>
-      <PaletteHeading text="color palette" ref={measuredRef} />
+    <article className={classes.paletteWrapper}>
       <div className={classes.table}>
         <div className={`${classes.tableCell} ${classes.tableRowHeader}`}></div> {/*upper left corner*/}
         {TableHeadComponents}

@@ -1,31 +1,29 @@
-import React, { useState, useCallback } from "react";
+import React from "react";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
-import PaletteHeading from "../PaletteHeading";
 import SchemeContainerLarge from "./SchemeContainerLarge/SchemeContainerLarge";
 import SchemeContainerNarrow from "./SchemeContainerNarrow/SchemeContainerNarrow";
-import { ColorObj } from "../../../interfaces/interfaces";
+import { SchemeObj } from "../../../interfaces/interfaces";
 
 interface Props {
-  colorObj: ColorObj;
-  selectedScheme: "primary" | "secondary";
-  setSelectedScheme: React.Dispatch<React.SetStateAction<"primary" | "secondary">>;
-  schemeProperty: "background" | "text";
-  setSchemeProperty: React.Dispatch<React.SetStateAction<"background" | "text">>;
   reset: (color: string | null) => void;
+  schemeObj: SchemeObj;
+  schemeProperty: "background" | "text";
+  selectedScheme: "primary" | "secondary";
+  setSchemeProperty: React.Dispatch<React.SetStateAction<"background" | "text">>;
+  setSelectedScheme: React.Dispatch<React.SetStateAction<"primary" | "secondary">>;
 };
 
 const styles = createStyles(
   {
     colorSchemeWrapper: {
       width: "100%",
-      height: "400px",
       display: "flex",
       flexFlow: "row wrap",
-      alignContent: "flex-start",
+      alignContent: "flex-start"
     },
     colorSchemes: {
       width: "100%",
-      height: ({ headingHeight }: ({ headingHeight: string; })) => `calc(400px - ${headingHeight})`,
+      height: "100%",
       display: "flex", 
     },
     narrowSchemeWrapper: {
@@ -36,60 +34,53 @@ const styles = createStyles(
 
 const useStyles = makeStyles(styles);
 
-const ColorScheme = ({ colorObj, selectedScheme, setSelectedScheme, schemeProperty, setSchemeProperty, reset }: Props) => {
-  const [headingHeight, setHeadingHeight] = useState("0px");
-  const measuredRef = useCallback((node: HTMLDivElement | null) => {
-    if (node !== null) {
-      setHeadingHeight(window.getComputedStyle(node).height);
-    }
-  }, []);
-  const classes = useStyles({ headingHeight });
+const ColorScheme = ({ reset, schemeObj, schemeProperty, selectedScheme, setSchemeProperty, setSelectedScheme }: Props) => {
+  const classes = useStyles();
 
   return(
     <article className={classes.colorSchemeWrapper}>
-      <PaletteHeading text="current scheme" ref={measuredRef} />
       <div className={classes.colorSchemes}>
         <SchemeContainerLarge
-          title="Primary"
-          palette={colorObj.primary}
           active={selectedScheme === "primary" && schemeProperty === "background" ? true : false}
-          reset={reset}
           onClick={() => {
             setSelectedScheme("primary");
             setSchemeProperty("background");
-          }} />
-        <SchemeContainerLarge
-          title="Secondary"
-          palette={colorObj.secondary}
-          active={selectedScheme === "secondary" && schemeProperty === "background" ? true : false}
+          }}
+          palette={schemeObj.primary}
           reset={reset}
+          title="Primary" />
+        <SchemeContainerLarge
+          active={selectedScheme === "secondary" && schemeProperty === "background" ? true : false}
           onClick={() => {
             setSelectedScheme("secondary");
             setSchemeProperty("background");
-          }} />
+          }}
+          palette={schemeObj.secondary}
+          reset={reset}
+          title="Secondary" />
         <div className={classes.narrowSchemeWrapper}>
           <SchemeContainerNarrow
-            title="Text on P"
-            background={colorObj.primary.main}
-            contrastText={colorObj.textColorOverride.primary ?
-              colorObj.textColorOverride.primary : colorObj.primary.contrastText.main}
             active={selectedScheme === "primary" && schemeProperty === "text" ? true : false}
-            reset={reset}
+            background={schemeObj.primary.main}
+            contrastText={schemeObj.textColorOverride.primary ?
+              schemeObj.textColorOverride.primary : schemeObj.primary.contrastText.main}
             onClick={() => {
               setSelectedScheme("primary");
               setSchemeProperty("text");
-            }} />
-          <SchemeContainerNarrow
-            title="Text on S"
-            background={colorObj.secondary.main}
-            contrastText={colorObj.textColorOverride.secondary ?
-              colorObj.textColorOverride.secondary : colorObj.secondary.contrastText.main}
-            active={selectedScheme === "secondary" && schemeProperty === "text" ? true : false}
+            }}
             reset={reset}
+            title="Text on P" />
+          <SchemeContainerNarrow
+            active={selectedScheme === "secondary" && schemeProperty === "text" ? true : false}
+            background={schemeObj.secondary.main}
+            contrastText={schemeObj.textColorOverride.secondary ?
+              schemeObj.textColorOverride.secondary : schemeObj.secondary.contrastText.main}
             onClick={() => {
               setSelectedScheme("secondary");
               setSchemeProperty("text");
-            }} />
+            }}
+            reset={reset}
+            title="Text on S" />
         </div>
       </div>
     </article>
