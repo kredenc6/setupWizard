@@ -26,6 +26,7 @@ const useStyles = makeStyles((theme: Theme) =>
 const SetupStepper = ({ activeStep, mediaModules, menuLabels, isNextStepAllowed, setActiveStep }: Props) => {
   const classes = useStyles();
   const [completed, setCompleted] = useState(new Set<number>());
+  const [isFinished, setIsFinished] = useState(false);
 
   const totalSteps = () => {
     return menuLabels.length;
@@ -68,6 +69,7 @@ const SetupStepper = ({ activeStep, mediaModules, menuLabels, isNextStepAllowed,
   const handleReset = () => {
     setActiveStep(1);
     setCompleted(new Set<number>());
+    setIsFinished(false);
   };
 
   const nextStepToBeCompleted = () => {
@@ -109,12 +111,14 @@ const SetupStepper = ({ activeStep, mediaModules, menuLabels, isNextStepAllowed,
     <div className={ classes.root }>
       <SwStepperButtons 
         allStepsCompleted={allStepsCompleted}
+        isFinished={isFinished}
         handleBack={handleBack}
         handleNext={handleNext}
         handleReset={handleReset}
         isFirstStep={isFirstStep}
         isLastStep={isLastStep}
-        isNextStepAllowed={isNextStepAllowed} />
+        isNextStepAllowed={isNextStepAllowed}
+        setIsFinished={setIsFinished} />
       <Stepper
         alternativeLabel
         connector={<SwStepConnector />}

@@ -6,13 +6,13 @@ interface Shades {
 };
 
 interface Props {
-  colorName: string;
   classes: Classes;
-  shades: Shades;
+  colorName: string;
   onClick: (color: string) => void;
+  shades: Shades;
 };
 
-const createTableRow = (colorName: string, shades: Shades, classes: Classes, onClick: Props["onClick"]) => {
+const createTableRow = ({ classes, colorName, onClick, shades }: Props) => {
   const TableCellComponents: JSX.Element[] = [];
   for(const [key, value] of Object.entries(shades)) {
     //skip repeating colors
@@ -43,8 +43,8 @@ const createColorTableCell = (colorName: string, background: string, classes: Cl
   );
 };
 
-const TableRowComponent = ({ colorName, shades, classes, onClick }: Props) => {
-  return createTableRow(colorName, shades, classes, onClick);
+const TableRowComponent = (props: Props) => {
+  return createTableRow(props);
 };
 
 export default TableRowComponent;

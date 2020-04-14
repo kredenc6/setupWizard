@@ -2,10 +2,10 @@ import React, { useEffect } from "react";
 import { OutlinedInput } from "@material-ui/core";
 import { makeStyles, styled } from "@material-ui/core/styles";
 import MenuHeading from "../sharedComponents/MenuHeading";
-import { UserInputKeys } from "../../SetupWizard";
+import { UserInput } from "../../interfaces/interfaces";
 
 interface Props {
-  handleTopicChange: <T>(propName: UserInputKeys, value: T) => void;
+  handleTopicChange: <K extends keyof UserInput>(propName: K, value: UserInput[K]) => void
   setIsNextStepAllowed: React.Dispatch<React.SetStateAction<boolean>>;
   value: string;
 };

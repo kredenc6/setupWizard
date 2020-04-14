@@ -8,9 +8,9 @@ interface Props {
   reset: (color: string | null) => void;
   schemeObj: SchemeObj;
   schemeProperty: "background" | "text";
-  selectedScheme: "primary" | "secondary";
+  selectedPalette: "primary" | "secondary";
   setSchemeProperty: React.Dispatch<React.SetStateAction<"background" | "text">>;
-  setSelectedScheme: React.Dispatch<React.SetStateAction<"primary" | "secondary">>;
+  setSelectedPalette: React.Dispatch<React.SetStateAction<"primary" | "secondary">>;
 };
 
 const styles = createStyles(
@@ -34,25 +34,33 @@ const styles = createStyles(
 
 const useStyles = makeStyles(styles);
 
-const ColorScheme = ({ reset, schemeObj, schemeProperty, selectedScheme, setSchemeProperty, setSelectedScheme }: Props) => {
+const ColorScheme = (props: Props) => {
+  const {
+    reset,
+    schemeObj,
+    schemeProperty,
+    selectedPalette,
+    setSchemeProperty,
+    setSelectedPalette
+  } = props;
   const classes = useStyles();
 
   return(
     <article className={classes.colorSchemeWrapper}>
       <div className={classes.colorSchemes}>
         <SchemeContainerLarge
-          active={selectedScheme === "primary" && schemeProperty === "background" ? true : false}
+          active={selectedPalette === "primary" && schemeProperty === "background" ? true : false}
           onClick={() => {
-            setSelectedScheme("primary");
+            setSelectedPalette("primary");
             setSchemeProperty("background");
           }}
           palette={schemeObj.primary}
           reset={reset}
           title="Primary" />
         <SchemeContainerLarge
-          active={selectedScheme === "secondary" && schemeProperty === "background" ? true : false}
+          active={selectedPalette === "secondary" && schemeProperty === "background" ? true : false}
           onClick={() => {
-            setSelectedScheme("secondary");
+            setSelectedPalette("secondary");
             setSchemeProperty("background");
           }}
           palette={schemeObj.secondary}
@@ -60,23 +68,23 @@ const ColorScheme = ({ reset, schemeObj, schemeProperty, selectedScheme, setSche
           title="Secondary" />
         <div className={classes.narrowSchemeWrapper}>
           <SchemeContainerNarrow
-            active={selectedScheme === "primary" && schemeProperty === "text" ? true : false}
+            active={selectedPalette === "primary" && schemeProperty === "text" ? true : false}
             background={schemeObj.primary.main}
             contrastText={schemeObj.textColorOverride.primary ?
               schemeObj.textColorOverride.primary : schemeObj.primary.contrastText.main}
             onClick={() => {
-              setSelectedScheme("primary");
+              setSelectedPalette("primary");
               setSchemeProperty("text");
             }}
             reset={reset}
             title="Text on P" />
           <SchemeContainerNarrow
-            active={selectedScheme === "secondary" && schemeProperty === "text" ? true : false}
+            active={selectedPalette === "secondary" && schemeProperty === "text" ? true : false}
             background={schemeObj.secondary.main}
             contrastText={schemeObj.textColorOverride.secondary ?
               schemeObj.textColorOverride.secondary : schemeObj.secondary.contrastText.main}
             onClick={() => {
-              setSelectedScheme("secondary");
+              setSelectedPalette("secondary");
               setSchemeProperty("text");
             }}
             reset={reset}

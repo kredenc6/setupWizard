@@ -1,0 +1,54 @@
+[
+  {
+    "name": "brown",
+    "primaryColor": "#6c4327",
+    "primaryLightColor": "#9d6e50",
+    "primaryDarkColor": "#3f1b00",
+    "primaryTextColor": "#ffffff",
+    "secondaryColor": "#ba8d4d",
+    "secondaryLightColor": "",
+    "secondaryDarkColor": "",
+    "secondaryTextColor": "#FFFFFF",
+    "accent": "#FF4081",
+    "fab": "#ba8d4d"
+  },
+  {
+    "name": "purple",
+    "primaryColor": "#7e458e",
+    "primaryLightColor": "#af72bf",
+    "primaryDarkColor": "#501960",
+    "primaryTextColor": "#ffffff",
+    "secondaryColor": "#ba8d4d",
+    "secondaryLightColor": "",
+    "secondaryDarkColor": "",
+    "secondaryTextColor": "#FFFFFF",
+    "accent": "#FF4081",
+    "fab": "#ba8d4d"
+  },
+  {
+    "name": "blue",
+    "primaryColor": "#405e9a",
+    "primaryLightColor": "#718bcb",
+    "primaryDarkColor": "#00356b",
+    "primaryTextColor": "#ffffff",
+    "secondaryColor": "#ba8d4d",
+    "secondaryLightColor": "",
+    "secondaryDarkColor": "",
+    "secondaryTextColor": "#FFFFFF",
+    "accent": "#FF4081",
+    "fab": "#ba8d4d"
+  },
+  {
+    "name": "silver light brown",
+    "primaryColor": "#dacab1",
+    "primaryLightColor": "#fffde3",
+    "primaryDarkColor": "#a89981",
+    "primaryTextColor": "#000000",
+    "secondaryColor": "#ba8d4d",
+    "secondaryLightColor": "",
+    "secondaryDarkColor": "",
+    "secondaryTextColor": "#FFFFFF",
+    "accent": "#FF4081",
+    "fab": "#ba8d4d"
+  }
+]

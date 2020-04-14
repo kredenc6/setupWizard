@@ -37,3 +37,17 @@ export interface UserInput {
     websites: boolean;
   }
 };
+
+export interface PresetScheme {
+  name: string;
+  primaryColor: string;
+  primaryLightColor: string;
+  primaryDarkColor: string;
+  primaryTextColor: string;
+  secondaryColor: string;
+  secondaryLightColor: string;
+  secondaryDarkColor: string;
+  secondaryTextColor: string;
+  accent: string;
+  fab: string;
+};

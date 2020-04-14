@@ -1,22 +1,16 @@
-// Checkbox vs Toggle Switch: https://uxplanet.org/checkbox-vs-toggle-switch-7fc6e83f10b8?
-
-import React from "react";
+import React, { useEffect } from "react";
 import { Checkbox, FormControlLabel, FormGroup } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import MenuHeading from "../sharedComponents/MenuHeading";
 import { UserInput } from "../../interfaces/interfaces";
-import { UserInputKeys } from "../../SetupWizard";
 
 interface Props {
-  handleModuleChange: <T>(propName: UserInputKeys, value: T) => void;
+  handleModuleChange: <K extends keyof UserInput>(propName: K, value: UserInput[K]) => void;
   selectedModules: UserInput["selectedModules"];
   setIsNextStepAllowed: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const styles = {
-  // menuSearch: {
-  //   "text-align": "center"
-  // },
   formWrapper: {
     display: "flex"
   },
@@ -33,12 +27,19 @@ const sortObjEntriesAlphabetically = (entries: [string, boolean][]) => {
     if (keyA.toLocaleLowerCase() > keyB.toLocaleLowerCase()) return 1;
     return 0;
   });
+};
+
+const isAtLeastOneModuleSelected = (modules: Props["selectedModules"]) => {
+  return Object.entries(modules).some(([_,value]) => {
+    console.log(value);
+    return value;
+  });
 }
+
 
 const MenuSearch = ({ handleModuleChange, selectedModules, setIsNextStepAllowed }: Props) => {
   const classes = useStyles();
-  setIsNextStepAllowed(false);
-  
+
   const FormLabelComponents = sortObjEntriesAlphabetically(Object.entries(selectedModules))
     .map(([key, value]) => (
       <FormControlLabel
@@ -51,6 +52,11 @@ const MenuSearch = ({ handleModuleChange, selectedModules, setIsNextStepAllowed 
         label={key} />
     )
   );
+
+  useEffect(() => {
+    console.log("sdlkfjsldkfj");
+    setIsNextStepAllowed(isAtLeastOneModuleSelected(selectedModules));
+  },[selectedModules, setIsNextStepAllowed]);
 
   return(
     <section>

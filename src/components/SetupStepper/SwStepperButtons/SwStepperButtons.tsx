@@ -1,16 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@material-ui/core";
 import { createStyles, makeStyles, Theme, withStyles } from "@material-ui/core/styles";
 import SteppDescription from "../Steppinstruction/SteppInstruction";
 
 interface Props {
   allStepsCompleted: () => boolean;
+  isFinished: boolean;
   handleBack: () => void;
   handleNext: () => void;
   handleReset: () => void;
   isFirstStep: () => boolean;
   isLastStep: () => boolean;
   isNextStepAllowed: boolean;
+  setIsFinished: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -43,17 +45,19 @@ const SwStepperButtonsWrapper = (props: Props) => {
   const classes = useStyles();
   const {
     allStepsCompleted,
+    isFinished,
     handleBack,
     handleNext,
     handleReset,
     isFirstStep,
     isLastStep,
-    isNextStepAllowed
+    isNextStepAllowed,
+    setIsFinished
   } = props;
 
   return(
     <div className={classes.stepperButtonsWrapper}>
-      {allStepsCompleted() ?
+      {isFinished ?
           <>
             <SteppDescription
               className={classes.instructions}
@@ -70,7 +74,7 @@ const SwStepperButtonsWrapper = (props: Props) => {
               Back
             </BackButton>
             {isLastStep() ?
-                <Button color="primary" disabled={!allStepsCompleted()} onClick={handleNext} variant="contained">
+                <Button color="primary" disabled={!allStepsCompleted()} onClick={() => setIsFinished(true)} variant="contained">
                   Finish
                 </Button>
               : 

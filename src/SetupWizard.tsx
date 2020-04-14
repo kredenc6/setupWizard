@@ -40,19 +40,15 @@ const initialUserInput: UserInput = {
   }
 };
 
-// https://stackoverflow.com/questions/56312165/using-the-keys-of-an-object-literal-as-a-typescript-type
-const frozenObjCopy = Object.freeze(initialUserInput);
-export type UserInputKeys = keyof typeof frozenObjCopy;
-
-
 const SetupWizard = () => {
   const classes = useStyles();
-  const [activeStep, setActiveStep] = useState(1);
+  const [activeStep, setActiveStep] = useState(2);
   const [isNextStepAllowed, setIsNextStepAllowed] = useState(false);
   const [userInput, setUserInput] = useState(initialUserInput);
+  const [selectedScheme, setSelectedScheme] = useState("custom");
   const [mediaModules, setMediaModules] = useState({});
   
-  function handleChange<T>(propName: UserInputKeys, value: T): void {
+  function handleChange<K extends keyof UserInput>(propName: K, value: UserInput[K]): void {
     setUserInput(prev => ({ ...prev, [propName]: value }));
   }
 
@@ -65,15 +61,16 @@ const SetupWizard = () => {
           setIsNextStepAllowed={setIsNextStepAllowed}
           value={userInput.appTopic}
         />
-      },
-      {
-        label: "Select color scheme",
-        component: 
+    },
+    {
+      label: "Select color scheme",
+      component: 
         <MenuStyles
           handleSchemeChange={handleChange}
           schemeObj={userInput.schemeObj}
+          selectedScheme={selectedScheme}
           setIsNextStepAllowed={setIsNextStepAllowed}
-          theme={theme}
+          setSelectedScheme={setSelectedScheme}
         />
     },
     {
