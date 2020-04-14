@@ -1,21 +1,22 @@
 
 import React from "react";
-import { Typography } from "@material-ui/core";
-import { useTheme, withStyles } from "@material-ui/core/styles";
+import { Typography, TypographyProps } from "@material-ui/core";
+import { withStyles } from "@material-ui/core/styles";
 
-interface Props {
+interface Props extends TypographyProps {
   text: string;
 };
 
-const MenuHeading = ({ text }:Props) => {
-  const theme = useTheme();
-  const StyledHeading = withStyles({
-    root: {
-      marginBottom: theme.spacing(3)
-    }
-  })(Typography);
+const StyledHeading = withStyles(({ spacing }) => ({
+  root: {
+    marginBottom: spacing(3)
+  }
+}))(Typography);
 
-  return <StyledHeading align="center" children={text} variant="h2" />;
+const MenuHeading = (props: Props) => {
+  const { text, ...typographyProps } = props;
+
+  return <StyledHeading align="center" children={text} variant="h2" {...typographyProps} />;
 };
 
 export default MenuHeading;

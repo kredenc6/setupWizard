@@ -1,8 +1,9 @@
 import React, { useEffect } from "react";
-import { OutlinedInput } from "@material-ui/core";
-import { makeStyles, styled } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import MenuHeading from "../sharedComponents/MenuHeading";
+import SwTextField from "../sharedComponents/SwTextField";
 import { UserInput } from "../../interfaces/interfaces";
+
 
 interface Props {
   handleTopicChange: <K extends keyof UserInput>(propName: K, value: UserInput[K]) => void
@@ -15,12 +16,6 @@ const styles = {
     "text-align": "center"
   }
 };
-
-const TopicInput = styled(OutlinedInput)({
-  width: "80%",
-  marginTop: "2rem"
-});
-
 const useStyles = makeStyles(styles);
 
 const MenuTopic = ({ handleTopicChange, setIsNextStepAllowed, value }: Props) => {
@@ -34,7 +29,7 @@ const MenuTopic = ({ handleTopicChange, setIsNextStepAllowed, value }: Props) =>
   return(
     <section className={classes.menuTopic}>
       <MenuHeading text="What is the app topic?" />
-      <TopicInput
+      <SwTextField
         autoFocus
         onChange={(e) => handleTopicChange("appTopic", e.target.value)}
         placeholder="Type your app topic here (min. 2 characters)"

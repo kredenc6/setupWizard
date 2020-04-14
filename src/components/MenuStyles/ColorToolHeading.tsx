@@ -1,19 +1,19 @@
 import React from "react";
 import { Typography } from "@material-ui/core";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import { createStyles, makeStyles } from "@material-ui/core/styles";
 
 interface Props {
   text: string;
 };
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(({ palette }) =>
   createStyles({
     schemeHeading: {
       padding: ".7rem 2rem",
       fontSize: "1rem",
       color: "#666",
       "text-transform": "uppercase",
-      borderBottom: `1px solid ${theme.palette.divider}`
+      borderBottom: `1px solid ${palette.divider}`
     }
   })
 );
