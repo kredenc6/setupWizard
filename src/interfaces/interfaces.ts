@@ -3,6 +3,7 @@ export interface Classes {
 };
 
 export interface SchemeObj {
+  name: string;
   primary: Palette;
   secondary: Palette;
   textColorOverride: {
@@ -22,7 +23,7 @@ export interface Palette {
   }
 };
 
-export interface PresetScheme {
+export interface JsonScheme {
   name: string;
   primaryColor: string;
   primaryLightColor: string;
@@ -47,7 +48,7 @@ export interface UserInput {
     instagram: Module;
     reddit: Module;
     twitter: Module;
-    video: Module;
+    videos: Module;
     websites: Module;
   }
 };
@@ -63,3 +64,61 @@ export interface Menu {
   label: string;
   component: JSX.Element;
 }
+
+export interface JSONResultObj {
+  title: string;
+  app_topic: string;
+  apk_suffix: string;
+  show_add_free_privacy_policy: boolean;
+  feedback_email_address: string;
+  youtube_api_key: string;
+  youtube_fallback_api_key: string;
+  ad_settings: {
+    ad_mob_app_id: string;
+    ad_mob_ad_unit_id: string;
+  };
+  ui_colors: JsonScheme;
+  visible_components: {
+    [propName: number]: keyof UserInput["modules"];
+  };
+  facebook?: {
+    channel: string;
+  };
+  instagram?: {
+    main_channel: string;
+    other_channels: string[];
+  };
+  reddit?: {
+    sub_reddit: string;
+    search_query: string;
+  };
+  websites?: string[];
+  videos?: Videos[];
+  audio?: Audio[];
+  books?: Books[];
+  twitter?: Array<{
+    channel_name: string;
+    url: string;
+    main_feed: boolean;
+    show_in_app: boolean;
+  }>,
+  events?: string;
+};
+
+interface Medium {
+  source: string;
+  show_in_app: boolean;
+  queries: string[];
+};
+
+interface Audio extends Medium {
+  blocked_tracks: string[];
+};
+
+interface Books extends Medium {
+  blocked_book_ids: string[];
+};
+
+interface Videos extends Medium {
+  blocked_videos: string[];
+};

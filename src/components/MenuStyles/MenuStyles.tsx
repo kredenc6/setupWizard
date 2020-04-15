@@ -4,7 +4,7 @@ import ColorScheme from "./ColorScheme/ColorScheme";
 import ColorPalette from "./ColorPalette/ColorPalette";
 import ColorToolHeading from "./ColorToolHeading";
 import UI1 from "./UserInterfaces/UI1";
-import { createPaletteFromColor } from "../../miscellaneous/createScheme";
+import { createPaletteFromColor } from "../../miscellaneous/colorSchemeFunctions";
 import { SchemeObj, UserInput } from "../../interfaces/interfaces";
 
 import PresetSchemes from "./ColorScheme/PresetSchemes/PresetSchemes";

@@ -3,35 +3,33 @@ import { makeStyles, ThemeProvider } from "@material-ui/core/styles";
 import MenuTopic from "./components/MenuTopic/MenuTopic";
 import MenuStyles from "./components/MenuStyles/MenuStyles";
 import MenuSearch from "./components/MenuSearch/MenuSearch";
+import MenuJson from "./components/MenuJson/MenuJson";
+import SelectedModule from "./components/SelectedModule/SelectedModule";
 import SetupStepper from "./components/SetupStepper/SetupStepper";
 import theme from "./theme/theme";
-import createColorObj from "./miscellaneous/createColorObj";
+import { createSchemeObjFromTheme } from "./miscellaneous/colorSchemeFunctions";
 import sortObjEntriesAlphabetically from "./miscellaneous/sortObjEntriesAlphabetically";
 import { Menu, Module, UserInput } from "./interfaces/interfaces";
 
-import SelectedModule from "./components/SelectedModule/SelectedModule";
-import WizardPageFacebook from "./components/WizardPageFacebook/WizardPageFacebook";
-import WizardPageInstagram from "./components/WizardPageInstagram/WizardPageInstagram";
 
 const styles = {
   wizardWrapper: {
-    width: "100%",
+    width: "100wv",
     height: "100vh",
     display: "grid",
     gridTemplateColumns: "100%",
-    gridTemplateRows: `calc(100vh - 150px - ${theme.spacing(1) * 2}px) 150px`, // row structure: ...
+    gridTemplateRows: `calc(100% - 150px - ${theme.spacing(1) * 2}px) 150px`, // row structure: ...
     // ... `calc(100vh - stepper height - wizardWrapper padding) stepper height`
     justifyContent: "stretch",
     justifyItems: "center",
     padding: `${theme.spacing(1)}px`
   }
 };
-
 const useStyles = makeStyles(styles);
 
 const initialUserInput: UserInput = {
-  appTopic: "",
-  schemeObj: createColorObj(theme),
+  appTopic: "placeholder",
+  schemeObj: createSchemeObjFromTheme(theme),
   modules: {
     audio: {
       selected: false
@@ -56,7 +54,7 @@ const initialUserInput: UserInput = {
     twitter: {
       selected: false
     },
-    video: {
+    videos: {
       selected: false
     },
     websites: {
@@ -71,7 +69,6 @@ const SetupWizard = () => {
   const [isNextStepAllowed, setIsNextStepAllowed] = useState(false);
   const [userInput, setUserInput] = useState(initialUserInput);
   const [selectedScheme, setSelectedScheme] = useState("custom");
-  const [mediaModules, setMediaModules] = useState({});
   
   function handleChange<K extends keyof UserInput>(propName: K, value: UserInput[K]): void {
     setUserInput(prev => ({ ...prev, [propName]: value }));
@@ -118,7 +115,11 @@ const SetupWizard = () => {
         modules={userInput.modules}
         setIsNextStepAllowed={setIsNextStepAllowed} />
     },
-    ...SelectedModuleComponents
+    ...SelectedModuleComponents,
+    {
+      label: "config.json",
+      component: <MenuJson userInput={userInput} />
+    }
   ];
 
   return(
@@ -127,7 +128,6 @@ const SetupWizard = () => {
         {menus[activeStep - 1].component}
         <SetupStepper
           activeStep={activeStep}
-          mediaModules={mediaModules}
           menuLabels={menus.map(({ label }) => label)}
           isNextStepAllowed={isNextStepAllowed}
           setActiveStep= {setActiveStep} />

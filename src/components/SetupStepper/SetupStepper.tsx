@@ -7,7 +7,6 @@ import SwStep from "./SwStep/SwStep";
 
 interface Props {
   activeStep: number;
-  mediaModules: {};
   menuLabels: string[];
   isNextStepAllowed: boolean;
   setActiveStep: React.Dispatch<React.SetStateAction<number>>;
@@ -23,7 +22,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const SetupStepper = ({ activeStep, mediaModules, menuLabels, isNextStepAllowed, setActiveStep }: Props) => {
+const SetupStepper = ({ activeStep, menuLabels, isNextStepAllowed, setActiveStep }: Props) => {
   const classes = useStyles();
   const [completed, setCompleted] = useState(new Set<number>());
   const [isFinished, setIsFinished] = useState(false);

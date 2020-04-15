@@ -1,7 +1,7 @@
-const sortObjEntriesAlphabetically = <V>(entries: [string, V][]) => {
+const sortObjEntriesAlphabetically = <K extends keyof V, V>(entries: [K, V][]): [K, V][] => {
   return entries.sort(([keyA, _A], [keyB, _B]) => {
-    if (keyA.toLocaleLowerCase() < keyB.toLocaleLowerCase()) return -1;
-    if (keyA.toLocaleLowerCase() > keyB.toLocaleLowerCase()) return 1;
+    if (String(keyA).toLocaleLowerCase() < String(keyB).toLocaleLowerCase()) return -1;
+    if (String(keyA).toLocaleLowerCase() > String(keyB).toLocaleLowerCase()) return 1;
     return 0;
   });
 };

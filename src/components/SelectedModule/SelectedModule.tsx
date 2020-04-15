@@ -31,6 +31,7 @@ const SelectedInput = ({ appTopic, handleSelectedModuleChange, module, setIsNext
 
   const classes = useStyles();
   
+  // set webPage value(to appTopic) if it's undefined
   useEffect(() => {
     if(webPage !== undefined) return;
     handleSelectedModuleChange({...module, webPage: appTopic });

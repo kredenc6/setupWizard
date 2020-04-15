@@ -2,8 +2,8 @@ import React from "react";
 import { FormControl, InputLabel, MenuItem, Select } from "@material-ui/core";
 import { createStyles, makeStyles, useTheme, Theme } from "@material-ui/core/styles";
 import presetSchemes from "./presetSchemes.json";
-import { createSchemeObjFromPresetScheme } from "../../../../miscellaneous/createScheme";
-import { PresetScheme, UserInput } from "../../../../interfaces/interfaces";
+import { createSchemeObjFromPresetScheme } from "../../../../miscellaneous/colorSchemeFunctions";
+import { JsonScheme, UserInput } from "../../../../interfaces/interfaces";
 
 interface Props {
   handleSchemeChange: <K extends keyof UserInput>(propName: K, value: UserInput[K]) => void;
@@ -15,13 +15,11 @@ const styles = (theme: Theme) => createStyles({
   presetColorSchemesWrapper: {
     width: "200px",
     margin: `0 ${theme.spacing(1)}px`
-  },
-  presetColorSchemesSelect: {
   }
 });
-const useStyles = makeStyles((theme: Theme) => styles(theme));
+const useStyles = makeStyles(theme => styles(theme));
 
-const findPresetSchemeByName: (name: string) => (PresetScheme | undefined) = (name: string) => {
+const findPresetSchemeByName: (name: string) => (JsonScheme | undefined) = (name: string) => {
   return presetSchemes.find(presetScheme => presetScheme.name === name);
 };
 
@@ -43,7 +41,6 @@ const PresetSchemes = ({ handleSchemeChange, selectedScheme, setSelectedScheme }
       <InputLabel id="presetColorSchemes">preset color schemes</InputLabel>
       <Select
         autoWidth
-        className={classes.presetColorSchemesSelect}
         labelId="presetColorSchemes"
         value={selectedScheme}
         onChange={e => {
