@@ -1,18 +1,32 @@
 import { darken, lighten, rgbToHex, Theme } from "@material-ui/core/styles";
-import { Palette, JsonScheme, SchemeObj } from "../interfaces/interfaces"; 
+import rgbaToHex from "../miscellaneous/rgbaToHex";
+import { Palette, JsonScheme, SchemeObj } from "../interfaces/interfaces";
+
+const normalizeColor = (color: string) => {
+  if(color.startsWith("#")) {
+    if(color.length === 7) return color;
+    return `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`;
+  }
+  if(color.startsWith("rgba")) return rgbaToHex(color);
+  if(color.startsWith("rgb")) return rgbToHex(color);
+  throw new Error("Unknown color format.");
+};
 
 export const createPaletteFromColor = (background: string, getContrastText: (background: string) => string): Palette => {
-  const lightbackground = rgbToHex( lighten(background, 0.2) ),
-        darkbackground  = rgbToHex( darken(background,  0.3) );
+  const lightbackground   = rgbToHex( lighten(background, 0.2) ),
+        darkbackground    = rgbToHex( darken(background,  0.3) ),
+        lightContrastText = normalizeColor( getContrastText(lightbackground) ),
+        mainContrastText  = normalizeColor( getContrastText(background) ),
+        darkContrastText  = normalizeColor( getContrastText(darkbackground) );
   
   return {
     light: lightbackground,
     main:  background,
     dark:  darkbackground,
     contrastText: {
-      light: getContrastText(lightbackground),
-      main:  getContrastText(background),
-      dark:  getContrastText(darkbackground)
+      light: lightContrastText,
+      main:  mainContrastText,
+      dark:  darkContrastText
     }
   };
 };
@@ -80,10 +94,8 @@ export const createJsonSchemeObj = (schemeObj: SchemeObj): JsonScheme => {
     primaryDarkColor: schemeObj.primary.dark,
     primaryTextColor: schemeObj.primary.contrastText.main,
     secondaryColor: schemeObj.secondary.main,
-    secondaryLightColor: schemeObj.secondary.light,
-    secondaryDarkColor: schemeObj.secondary.dark,
     secondaryTextColor: schemeObj.secondary.contrastText.main,
-    accent: "",
-    fab: ""
+    accent: "#FF4081",
+    fab: "#ba8d4d"
   };
 };

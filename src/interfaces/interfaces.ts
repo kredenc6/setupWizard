@@ -30,8 +30,6 @@ export interface JsonScheme {
   primaryDarkColor: string;
   primaryTextColor: string;
   secondaryColor: string;
-  secondaryLightColor: string;
-  secondaryDarkColor: string;
   secondaryTextColor: string;
   accent: string;
   fab: string;
@@ -81,44 +79,44 @@ export interface JSONResultObj {
   visible_components: {
     [propName: number]: keyof UserInput["modules"];
   };
-  facebook?: {
+  facebook: {
     channel: string;
   };
-  instagram?: {
+  instagram: {
     main_channel: string;
     other_channels: string[];
   };
-  reddit?: {
+  reddit: {
     sub_reddit: string;
     search_query: string;
   };
-  websites?: string[];
-  videos?: Videos[];
-  audio?: Audio[];
-  books?: Books[];
-  twitter?: Array<{
+  websites: string[];
+  videos: Videos[];
+  audio: Audio[];
+  books: Books[];
+  twitter: Array<{
     channel_name: string;
     url: string;
     main_feed: boolean;
     show_in_app: boolean;
   }>,
-  events?: string;
+  events: string;
 };
 
-interface Medium {
+interface Media {
   source: string;
   show_in_app: boolean;
   queries: string[];
 };
 
-interface Audio extends Medium {
+interface Audio extends Media {
   blocked_tracks: string[];
 };
 
-interface Books extends Medium {
+interface Books extends Media {
   blocked_book_ids: string[];
 };
 
-interface Videos extends Medium {
+interface Videos extends Media {
   blocked_videos: string[];
 };

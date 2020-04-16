@@ -42,7 +42,7 @@ const SchemeContainerNarrow  = ({ title, background, contrastText, active, reset
     <Box className={classes.narrowSchemeContainer} onClick={onClick} boxShadow={active ? 15 : 0}>
       <p style={{ height: "20%" }}>{title}</p>
       <div className={classes.narrowSchemeContent} style={{ backgroundColor: background }}>
-        <ColorText text={background} contrastText={contrastText} />
+        <ColorText text={contrastText} contrastText={contrastText} />
         <SchemeTextIcon text="T" contrastText={contrastText} background={background} active={active} />
         <SchemeResetButton value="reset" disabled={!active} onClick={() => reset(null)} />
       </div>

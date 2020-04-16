@@ -10,7 +10,7 @@ import theme from "./theme/theme";
 import { createSchemeObjFromTheme } from "./miscellaneous/colorSchemeFunctions";
 import sortObjEntriesAlphabetically from "./miscellaneous/sortObjEntriesAlphabetically";
 import { Menu, Module, UserInput } from "./interfaces/interfaces";
-
+import jsonObjFrame from './jsonObjFrame/jsonObjFrame';
 
 const styles = {
   wizardWrapper: {
@@ -68,6 +68,7 @@ const SetupWizard = () => {
   const [activeStep, setActiveStep] = useState(1);
   const [isNextStepAllowed, setIsNextStepAllowed] = useState(false);
   const [userInput, setUserInput] = useState(initialUserInput);
+  const [jsonObj, setJsonObj] = useState(jsonObjFrame);
   const [selectedScheme, setSelectedScheme] = useState("custom");
   
   function handleChange<K extends keyof UserInput>(propName: K, value: UserInput[K]): void {
@@ -85,9 +86,11 @@ const SetupWizard = () => {
           handleSelectedModuleChange={(changedModule: Module) => handleChange(
             "modules",
             { ...userInput.modules, [key]: changedModule })}
+          jsonObj={jsonObj}
           module={module}
+          moduleName={key}
           setIsNextStepAllowed={setIsNextStepAllowed}
-          title={`Add the ${key} page endpoint:`} />
+          setJsonObj={setJsonObj} />
       };
   });
 

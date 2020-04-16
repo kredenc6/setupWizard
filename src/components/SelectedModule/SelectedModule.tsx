@@ -3,27 +3,29 @@ import { InputAdornment } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import MenuHeading from "../sharedComponents/MenuHeading";
 import SwTextField from "../sharedComponents/SwTextField";
-import { Module } from "../../interfaces/interfaces";
+import { JSONResultObj, Module } from "../../interfaces/interfaces";
+
+import Medium from "./Medium/Medium";
 
 interface Props {
   appTopic: string;
   handleSelectedModuleChange: (changedModule: Module) => void;
+  jsonObj: JSONResultObj;
   module: Module;
+  moduleName: string;
   setIsNextStepAllowed: React.Dispatch<React.SetStateAction<boolean>>;
-  title: string;
+  setJsonObj: React.Dispatch<React.SetStateAction<JSONResultObj>>;
 };
 
 const styles = {
   menuTopic: {
     "text-align": "center"
-  },
-  textField: {
-
   }
 };
 const useStyles = makeStyles(styles);
 
-const SelectedInput = ({ appTopic, handleSelectedModuleChange, module, setIsNextStepAllowed, title }: Props) => {
+const SelectedInput = 
+  ({ appTopic, handleSelectedModuleChange, jsonObj, module, moduleName, setIsNextStepAllowed, setJsonObj }: Props) => {
   const {
     webPrefix,
     webPage
@@ -44,7 +46,7 @@ const SelectedInput = ({ appTopic, handleSelectedModuleChange, module, setIsNext
 
   return (
     <section className={classes.menuTopic}>
-      <MenuHeading text={title}/>
+      <MenuHeading text={moduleName}/>
       <SwTextField
         autoFocus
         InputProps={{
@@ -55,6 +57,9 @@ const SelectedInput = ({ appTopic, handleSelectedModuleChange, module, setIsNext
         required
         value={webPage}
       />
+      {(moduleName === "audio" || moduleName === "books" || moduleName === "videos") &&
+        <Medium appTopic={appTopic} jsonObj={jsonObj} medium={moduleName} setJsonObj={setJsonObj}/>
+      }
     </section>
   );
 };

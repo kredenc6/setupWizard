@@ -22,7 +22,6 @@ const styles = {
 };
 const useStyles = makeStyles(styles);
 
-
 const MenuJson = ({ userInput }: Props) => {
   const classes = useStyles();
   return(
