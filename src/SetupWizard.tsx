@@ -9,7 +9,7 @@ import SetupStepper from "./components/SetupStepper/SetupStepper";
 import theme from "./theme/theme";
 import { createSchemeObjFromTheme } from "./miscellaneous/colorSchemeFunctions";
 import sortObjEntriesAlphabetically from "./miscellaneous/sortObjEntriesAlphabetically";
-import { Menu, Module, UserInput } from "./interfaces/interfaces";
+import { JsonObjModule, JsonObjKey, JsonResultObj, Menu, Module, UserInput } from "./interfaces/interfaces";
 import jsonObjFrame from './jsonObjFrame/jsonObjFrame';
 
 const styles = {
@@ -71,8 +71,12 @@ const SetupWizard = () => {
   const [jsonObj, setJsonObj] = useState(jsonObjFrame);
   const [selectedScheme, setSelectedScheme] = useState("custom");
   
-  function handleChange<K extends keyof UserInput>(propName: K, value: UserInput[K]): void {
+  function handleUserInputChange<K extends keyof UserInput>(propName: K, value: UserInput[K]): void {
     setUserInput(prev => ({ ...prev, [propName]: value }));
+  }
+
+  function handleJsonChange(value: JsonObjModule): void {
+    setJsonObj(prev => ({ ...prev, ...value }));
   }
 
   const SelectedModuleComponents: Menu[] =
@@ -83,14 +87,14 @@ const SetupWizard = () => {
         label: `Module(${key})`,
         component: <SelectedModule 
           appTopic={userInput.appTopic}
-          handleSelectedModuleChange={(changedModule: Module) => handleChange(
+          handleSelectedModuleChange={(changedModule: Module) => handleUserInputChange(
             "modules",
             { ...userInput.modules, [key]: changedModule })}
-          jsonObj={jsonObj}
+          handleJsonChange={(changedModule: JsonObjModule) => handleJsonChange({[key]: changedModule})}
+          jsonModuleObj={jsonObj[key as JsonObjKey] as unknown as JsonObjModule}
           module={module}
           moduleName={key}
-          setIsNextStepAllowed={setIsNextStepAllowed}
-          setJsonObj={setJsonObj} />
+          setIsNextStepAllowed={setIsNextStepAllowed} />
       };
   });
 
@@ -98,14 +102,14 @@ const SetupWizard = () => {
     { 
       label: "Create app topic",
       component: <MenuTopic
-        handleTopicChange={handleChange}
+        handleTopicChange={handleUserInputChange}
         setIsNextStepAllowed={setIsNextStepAllowed}
         value={userInput.appTopic} />
     },
     {
       label: "Select color scheme",
       component: <MenuStyles
-        handleSchemeChange={handleChange}
+        handleSchemeChange={handleUserInputChange}
         schemeObj={userInput.schemeObj}
         selectedScheme={selectedScheme}
         setIsNextStepAllowed={setIsNextStepAllowed}
@@ -114,7 +118,7 @@ const SetupWizard = () => {
     {
       label: "Select modules",
       component: <MenuSearch
-        handleModuleChange={handleChange}
+        handleModuleChange={handleUserInputChange}
         modules={userInput.modules}
         setIsNextStepAllowed={setIsNextStepAllowed} />
     },

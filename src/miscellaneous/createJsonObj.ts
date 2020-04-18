@@ -1,10 +1,10 @@
 import { createJsonSchemeObj } from "../miscellaneous/colorSchemeFunctions";
 import sortObjEntriesAlphabetically from "../miscellaneous/sortObjEntriesAlphabetically";
-import { JSONResultObj, UserInput } from "../interfaces/interfaces";
+import { JsonResultObj, UserInputModuleKeys,  UserInput } from "../interfaces/interfaces";
 
-type ModuleKeys = keyof UserInput["modules"];
+// type ModuleKeys = keyof UserInput["modules"];
 
-const createJsonObj = (userInput: UserInput): JSONResultObj => {
+const createJsonObj = (userInput: UserInput): JsonResultObj => {
  const {
   audio,
   books,
@@ -19,7 +19,7 @@ const createJsonObj = (userInput: UserInput): JSONResultObj => {
 
   const visibleComponents = sortObjEntriesAlphabetically(Object.entries(userInput.modules))
     .filter(([_, module]) => module.selected)
-    .map(([key, _]) => key) as ModuleKeys[];
+    .map(([key, _]) => key) as UserInputModuleKeys[];
   
   return {
     "title": "title_placeholder",
@@ -49,7 +49,7 @@ const createJsonObj = (userInput: UserInput): JSONResultObj => {
 
 export default createJsonObj;
 
-const createJsonModuleDataFromUserInput = (userInput: UserInput): Pick<JSONResultObj, ModuleKeys> => {
+const createJsonModuleDataFromUserInput = (userInput: UserInput): Pick<JsonResultObj, UserInputModuleKeys> => {
   return {
     audio: createAudioJsonObj(userInput),
     books: createBooksJsonObj(userInput),

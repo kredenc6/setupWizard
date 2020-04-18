@@ -58,12 +58,14 @@ export interface Module {
   webPage?: string;
 }
 
+export type UserInputModuleKeys = keyof UserInput["modules"];
+
 export interface Menu {
   label: string;
   component: JSX.Element;
 }
 
-export interface JSONResultObj {
+export interface JsonResultObj {
   title: string;
   app_topic: string;
   apk_suffix: string;
@@ -91,32 +93,40 @@ export interface JSONResultObj {
     search_query: string;
   };
   websites: string[];
-  videos: Videos[];
-  audio: Audio[];
-  books: Books[];
+  videos: VideoItem[];
+  audio: AudioItem[];
+  books: BookItem[];
   twitter: Array<{
     channel_name: string;
     url: string;
     main_feed: boolean;
     show_in_app: boolean;
   }>,
-  events: string;
+  events: {
+
+  };
 };
 
-interface Media {
+interface MediaItem {
   source: string;
   show_in_app: boolean;
   queries: string[];
 };
 
-interface Audio extends Media {
+export interface AudioItem extends MediaItem {
   blocked_tracks: string[];
 };
 
-interface Books extends Media {
+export interface BookItem extends MediaItem {
   blocked_book_ids: string[];
 };
 
-interface Videos extends Media {
+export interface VideoItem extends MediaItem {
   blocked_videos: string[];
 };
+
+export type JsonObjKey = keyof JsonResultObj;
+
+// export type JsonObjModules = Pick<JsonResultObj, UserInputModuleKeys>;
+
+export type JsonObjModule = JsonResultObj[UserInputModuleKeys];

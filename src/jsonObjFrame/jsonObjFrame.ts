@@ -1,6 +1,6 @@
-import { JSONResultObj } from "../interfaces/interfaces";
+import { JsonResultObj } from "../interfaces/interfaces";
 
-const jsonObjFrame: JSONResultObj = {
+const jsonObjFrame: JsonResultObj = {
   "title": "",
   "app_topic": "",
   "apk_suffix": "",
@@ -41,7 +41,7 @@ const jsonObjFrame: JSONResultObj = {
     {
       "source": "youtube",
       "show_in_app": false,
-      "queries": [],
+      "queries": ["placeholder1","placeholder2", "placeholder3"],
       "blocked_videos": []
     },
     {
@@ -55,8 +55,8 @@ const jsonObjFrame: JSONResultObj = {
     {
       "source": "soundcloud",
       "show_in_app": false,
-      "queries": [],
-      "blocked_tracks": []
+      "queries": ["placeholder1","placeholder2"],
+      "blocked_tracks": ["placeholders", ";-p", ":-D"]
     }
   ],
   "books": [
@@ -65,6 +65,18 @@ const jsonObjFrame: JSONResultObj = {
       "show_in_app": false,
       "queries": [],
       "blocked_book_ids": []
+    },
+    {
+      "source": "PH_Amazon",
+      "show_in_app": false,
+      "queries": [],
+      "blocked_book_ids": []
+    },
+    {
+      "source": "PH_Tarzan",
+      "show_in_app": false,
+      "queries": ["one", "two", "three"],
+      "blocked_book_ids": ["10", "14"]
     }
   ],
   "twitter": [
@@ -75,7 +87,7 @@ const jsonObjFrame: JSONResultObj = {
       "show_in_app": false
     }
   ],
-  "events": ""
+  "events": {}
 };
 
 export default jsonObjFrame;
