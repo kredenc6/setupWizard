@@ -4,8 +4,10 @@ import MenuHeading from "../sharedComponents/MenuHeading";
 import SwTextField from "../sharedComponents/SwTextField";
 import { UserInput } from "../../interfaces/interfaces";
 
+//TODO handle function redundancy
 
 interface Props {
+  handleJsonChange: (value: string) => void;
   handleTopicChange: <K extends keyof UserInput>(propName: K, value: UserInput[K]) => void
   setIsNextStepAllowed: React.Dispatch<React.SetStateAction<boolean>>;
   value: string;
@@ -18,7 +20,7 @@ const styles = {
 };
 const useStyles = makeStyles(styles);
 
-const MenuTopic = ({ handleTopicChange, setIsNextStepAllowed, value }: Props) => {
+const MenuTopic = ({ handleJsonChange, handleTopicChange, setIsNextStepAllowed, value }: Props) => {
   const classes = useStyles();
   const isValueValid = value.trim().length >= 2;
 
@@ -31,7 +33,10 @@ const MenuTopic = ({ handleTopicChange, setIsNextStepAllowed, value }: Props) =>
       <MenuHeading text="What is the app topic?" />
       <SwTextField
         autoFocus
-        onChange={(e) => handleTopicChange("appTopic", e.target.value)}
+        onChange={(e) => {
+          handleTopicChange("appTopic", e.target.value);
+          handleJsonChange(e.target.value);
+        }}
         placeholder="Type your app topic here (min. 2 characters)"
         required
         value={value}

@@ -6,6 +6,7 @@ import sortObjEntriesAlphabetically from "../../miscellaneous/sortObjEntriesAlph
 import { UserInput } from "../../interfaces/interfaces";
 
 interface Props {
+  handleJsonChange: (value: string[]) => void;
   handleModuleChange: <K extends keyof UserInput>(propName: K, value: UserInput[K]) => void;
   modules: UserInput["modules"];
   setIsNextStepAllowed: React.Dispatch<React.SetStateAction<boolean>>;
@@ -27,7 +28,7 @@ const isAtLeastOneModuleSelected = (modules: Props["modules"]) => {
   });
 };
 
-const MenuSearch = ({ handleModuleChange, modules, setIsNextStepAllowed }: Props) => {
+const MenuSearch = ({ handleJsonChange, handleModuleChange, modules, setIsNextStepAllowed }: Props) => {
   const classes = useStyles();
 
   const FormLabelComponents = sortObjEntriesAlphabetically(Object.entries(modules))
@@ -36,18 +37,26 @@ const MenuSearch = ({ handleModuleChange, modules, setIsNextStepAllowed }: Props
         control={
           <Checkbox
             checked={module.selected}
-            onChange={(e) => handleModuleChange(
-              "modules",
-              { ...modules, [e.target.name]: { ...module, selected: e.target.checked } })
-            }
+            onChange={(e) => {
+              handleModuleChange(
+                "modules",
+                { ...modules, [e.target.name]: { ...module, selected: e.target.checked } }
+              );
+            }}
             name={key} />}
         key={key}
         label={key} />
     )
   );
 
+  //BUG? it's possible to have module prop "shwow_in_app" value true and the "visible_components" json prop
+  // without the module
+  //BUG handleJsonChange in the useEffect dependency causes an infinite loop
   useEffect(() => {
     setIsNextStepAllowed(isAtLeastOneModuleSelected(modules));
+    handleJsonChange(Object.entries(modules)
+      .filter(([_, value]) => value.selected)
+      .map(([key, _]) => key));
   },[modules, setIsNextStepAllowed]);
 
   return(

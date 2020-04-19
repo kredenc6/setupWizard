@@ -87,12 +87,11 @@ const SetupWizard = () => {
         label: `Module(${key})`,
         component: <SelectedModule 
           appTopic={userInput.appTopic}
-          handleSelectedModuleChange={(changedModule: Module) => handleUserInputChange(
-            "modules",
-            { ...userInput.modules, [key]: changedModule })}
+          // handleSelectedModuleChange={(changedModule: Module) => handleUserInputChange(
+          //   "modules",
+          //   { ...userInput.modules, [key]: changedModule })}
           handleJsonChange={(changedModule: JsonObjModule) => handleJsonChange({[key]: changedModule})}
           jsonModuleObj={jsonObj[key as JsonObjKey] as unknown as JsonObjModule}
-          module={module}
           moduleName={key}
           setIsNextStepAllowed={setIsNextStepAllowed} />
       };
@@ -102,6 +101,7 @@ const SetupWizard = () => {
     { 
       label: "Create app topic",
       component: <MenuTopic
+        handleJsonChange={(value: string) => handleJsonChange({"app_topic": value})}
         handleTopicChange={handleUserInputChange}
         setIsNextStepAllowed={setIsNextStepAllowed}
         value={userInput.appTopic} />
@@ -109,15 +109,16 @@ const SetupWizard = () => {
     {
       label: "Select color scheme",
       component: <MenuStyles
-        handleSchemeChange={handleUserInputChange}
-        schemeObj={userInput.schemeObj}
-        selectedScheme={selectedScheme}
-        setIsNextStepAllowed={setIsNextStepAllowed}
+      handleSchemeChange={handleUserInputChange}
+      schemeObj={userInput.schemeObj}
+      selectedScheme={selectedScheme}
+      setIsNextStepAllowed={setIsNextStepAllowed}
         setSelectedScheme={setSelectedScheme} />
     },
     {
       label: "Select modules",
       component: <MenuSearch
+        handleJsonChange={(value: string[]) => handleJsonChange({"visible_components": value})}
         handleModuleChange={handleUserInputChange}
         modules={userInput.modules}
         setIsNextStepAllowed={setIsNextStepAllowed} />
@@ -125,7 +126,10 @@ const SetupWizard = () => {
     ...SelectedModuleComponents,
     {
       label: "config.json",
-      component: <MenuJson userInput={userInput} />
+      component: <MenuJson
+        handleJsonChange={(key: JsonObjKey,changedModule: JsonResultObj[JsonObjKey]) => handleJsonChange({[key]: changedModule})}
+        jsonObj={jsonObj}
+        userInput={userInput} />
     }
   ];
 

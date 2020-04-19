@@ -70,7 +70,7 @@ const jsonObjFrame: JsonResultObj = {
       "source": "PH_Amazon",
       "show_in_app": false,
       "queries": [],
-      "blocked_book_ids": []
+      "blocked_book_ids": ["aaa", "bbb"]
     },
     {
       "source": "PH_Tarzan",

@@ -127,6 +127,4 @@ export interface VideoItem extends MediaItem {
 
 export type JsonObjKey = keyof JsonResultObj;
 
-// export type JsonObjModules = Pick<JsonResultObj, UserInputModuleKeys>;
-
 export type JsonObjModule = JsonResultObj[UserInputModuleKeys];

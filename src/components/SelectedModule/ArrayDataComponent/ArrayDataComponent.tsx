@@ -62,8 +62,8 @@ const ArrayDataComponent = ({ dataArr, handleJsonChange }: Props) => {
   });
 
   useEffect(() => {
-    setTabPosition(0);
-  },[dataArr]);
+    if(dataArr[tabPosition] === undefined) setTabPosition(0);
+  },[dataArr, tabPosition]);
 
   return(
     <div>

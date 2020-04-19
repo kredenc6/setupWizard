@@ -1,34 +1,52 @@
 import React from "react";
-import createJSONObj from "../../miscellaneous/createJsonObj";
-import { makeStyles } from "@material-ui/core/styles";
-import { UserInput } from "../../interfaces/interfaces";
+import { makeStyles, Theme } from "@material-ui/core/styles";
+import RestJsonPropsComponent from "./RestJsonPropsComponent/RestJsonPropsComponent";
+import { JsonObjKey, JsonResultObj, UserInput } from "../../interfaces/interfaces";
 
 interface Props {
+  handleJsonChange: (key: JsonObjKey, changedModule: JsonResultObj[JsonObjKey]) => void;
+  jsonObj: JsonResultObj;
   userInput: UserInput;
 };
 
-const styles = {
+const styles = (theme: Theme) => ({
   menuJson: {
-    "overflow-y": "auto"
+    width: "100%",
+    display: "flex",
+    justifyContent: "space-between"
   },
   jsonWrapper: {
-    padding: "1rem"
+    minWidth: "25rem",
+    maxHeight: "100%",
+    padding: "1rem",
+    borderLeft: `1px solid ${theme.palette.divider}`,
+    "overflow-y": "auto"
   },
   json: {
     "&:hover": {
       cursor: "text"
     }
   }
-};
-const useStyles = makeStyles(styles);
+});
+const useStyles = makeStyles(theme => styles(theme));
 
-const MenuJson = ({ userInput }: Props) => {
+const MenuJson = ({ handleJsonChange, jsonObj, userInput }: Props) => {
   const classes = useStyles();
+  const restJsonProps = Object.entries(jsonObj)
+    .filter(([key,_]) => {
+      return !Object.keys(userInput.modules)
+        .concat(["visible_components", "app_topic"])
+        .includes(key);
+    });
+
   return(
     <section className={classes.menuJson}>
+      <div>
+        <RestJsonPropsComponent handleJsonChange={handleJsonChange} restJson={restJsonProps} />
+      </div>
       <pre className={classes.jsonWrapper}>
         <code className={classes.json}>
-          {JSON.stringify(createJSONObj(userInput), null, 2)}
+          {JSON.stringify(jsonObj, null, 2)}
         </code>
       </pre>
     </section>

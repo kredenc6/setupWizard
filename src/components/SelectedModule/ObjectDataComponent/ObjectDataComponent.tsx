@@ -73,7 +73,11 @@ function turnObjToFormComponents(obj: object, handleChange: (key: string, value:
     };
     if(Array.isArray(value)) {
       StringArrayInputComponents.push(
-        <StringArrayInput arr={value} key={`strArr${key}`} label={key} />
+        <StringArrayInput
+          arr={value}
+          handleChange={handleChange}
+          key={`strArr${key}`}
+          label={key} />
       );
     }
   }
