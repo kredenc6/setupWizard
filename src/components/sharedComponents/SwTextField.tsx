@@ -4,8 +4,7 @@ import { withStyles } from "@material-ui/core/styles";
 
 const StyledTextField = withStyles(({ spacing }) => ({
   root: {
-    width: "80%",
-    marginTop: spacing(4)
+    margin: `${spacing(1)}px ${spacing(1) / 4}px`
   }
 }))(TextField);
 

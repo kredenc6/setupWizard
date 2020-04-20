@@ -1,5 +1,8 @@
-import React, { Fragment } from "react";
+import React from "react";
+import { Paper } from "@material-ui/core";
+import { makeStyles, Theme } from "@material-ui/core/styles";
 import ObjectDataComponent from "../../SelectedModule/ObjectDataComponent/ObjectDataComponent";
+import PropertyHeading from "./PropertyHeading";
 import { JsonObjKey, JsonResultObj } from "../../../interfaces/interfaces";
 
 interface Props {
@@ -7,7 +10,17 @@ interface Props {
   restJson: [string, any][];
 };
 
+const styles = (theme: Theme) => ({
+  paperItem: {
+    marginRight: theme.spacing(1),
+    marginBottom: theme.spacing(1),
+    padding: theme.spacing(2)
+  }
+});
+const useStyles = makeStyles(theme => styles(theme));
+
 const RestJsonPropsComponent = ({ handleJsonChange, restJson }: Props) => {
+  const classes = useStyles();
   const handleGroupedPropsChange = (_: object, key: string, value: any) => {
     handleJsonChange(key as JsonObjKey, value);
   };
@@ -23,21 +36,24 @@ const RestJsonPropsComponent = ({ handleJsonChange, restJson }: Props) => {
 
   const ObjectDataComponents = objectArray.map(([key, value], i) => {
     return(
-      <Fragment key={`${key}${i}`}>
-        <p>{key}</p>
+      <Paper className={classes.paperItem} key={`${key}${i}`} variant="outlined">
+        <PropertyHeading text={key} />
         <ObjectDataComponent
           dataObj={value}
           handleJsonObjChange={(dataObj: object, keyToValue: string, value: any) => handleJsonChange(
             key as JsonObjKey,
             { ...dataObj, [keyToValue]: value }
           )} />
-      </Fragment>
+      </Paper>
     );
   });
 
   return(
     <div>
-      <ObjectDataComponent dataObj={stringAndBooleanObj} handleJsonObjChange={handleGroupedPropsChange} />
+      <Paper className={classes.paperItem} variant="outlined">
+        <PropertyHeading text="various" />
+        <ObjectDataComponent dataObj={stringAndBooleanObj} handleJsonObjChange={handleGroupedPropsChange} />
+      </Paper>
       <div>
         {ObjectDataComponents}
       </div>

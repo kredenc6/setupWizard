@@ -1,7 +1,7 @@
 import React from "react";
-import { Checkbox, FormControlLabel, TextField } from "@material-ui/core";
-import { withStyles } from "@material-ui/core/styles";
+import { Checkbox, FormControlLabel } from "@material-ui/core";
 import StringArrayInput from "../StringArrayInput/StringArrayInput";
+import SwTextField from "../../sharedComponents/SwTextField";
 
 interface Props {
   dataObj: object;
@@ -9,18 +9,11 @@ interface Props {
   skipProperties?: string[];
 };
 
-const StyledTextField = withStyles(({ spacing }) => ({
-  root: {
-    marginTop: spacing(2)
-  }
-}))(TextField);
-
 const ObjectDataComponent = ({ dataObj, handleJsonObjChange, skipProperties }: Props) => {
   const handleChange = (key: string, value: any) => {
     handleJsonObjChange(dataObj, key, value);
   };
   const Components = turnObjToFormComponents(dataObj, handleChange, skipProperties);
-
 
   return(
     <div>
@@ -47,8 +40,7 @@ function turnObjToFormComponents(obj: object, handleChange: (key: string, value:
     if(skipProperties && skipProperties.includes(key)) continue;
     if(typeof value === "string") {
       TextFieldComponents.push(
-        <StyledTextField
-          variant="outlined"
+        <SwTextField
           key={`textField${key}`}
           onChange={(e) => handleChange(key, e.target.value)}
           label={key}

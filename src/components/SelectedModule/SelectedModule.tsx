@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import MenuHeading from "../sharedComponents/MenuHeading";
-import { JsonObjModule } from "../../interfaces/interfaces";
-
 import ObjectDataComponent from "./ObjectDataComponent/ObjectDataComponent";
 import ArrayDataComponent from "./ArrayDataComponent/ArrayDataComponent";
 import ArrayComponent from "./ArrayComponent/ArrayComponent";
+import AppTopicParagraph from "../sharedComponents/AppTopicParagraph";
+import { JsonObjModule } from "../../interfaces/interfaces";
 
 interface Props {
   appTopic: string;
@@ -17,6 +17,7 @@ interface Props {
 
 const styles = {
   menuTopic: {
+    minWidth: "70%",
     "text-align": "center"
   }
 };
@@ -34,14 +35,15 @@ const SelectedInput =
   const classes = useStyles();
   const handleJsonObjChange = (dataObj: object, key: string, value: any) => handleJsonChange({ ...dataObj, [key]: value });
 
+  // always allow next step
   useEffect(() => {
     setIsNextStepAllowed(true);
-  },[setIsNextStepAllowed]);
+  });
     
   return (
     <section className={classes.menuTopic}>
       <MenuHeading text={moduleName} />
-      <p>App topic: {appTopic}</p>
+      <AppTopicParagraph topic={appTopic} />
       {Array.isArray(jsonModuleObj) ?
         isArrObjectArr(jsonModuleObj) ?
           <ArrayDataComponent dataArr={jsonModuleObj} handleJsonChange={handleJsonChange} />

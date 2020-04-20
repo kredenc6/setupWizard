@@ -33,10 +33,10 @@ const useStyles = makeStyles(theme => styles(theme));
 const MenuJson = ({ handleJsonChange, jsonObj, userInput }: Props) => {
   const classes = useStyles();
   const restJsonProps = Object.entries(jsonObj)
-    .filter(([key,_]) => {
-      return !Object.keys(userInput.modules)
-        .concat(["visible_components", "app_topic"])
-        .includes(key);
+    .filter(([key, _]) => {
+      return !Object.keys(userInput.modules) // skip modules...
+        .concat(["visible_components", "app_topic", "ui_colors"]) // and these properties
+        .includes(key); // condition or filter method
     });
 
   return(

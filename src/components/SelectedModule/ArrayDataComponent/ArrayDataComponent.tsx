@@ -67,8 +67,8 @@ const ArrayDataComponent = ({ dataArr, handleJsonChange }: Props) => {
 
   return(
     <div>
-      <AppBar position="static">
-        <Tabs value={tabPosition} onChange={(_, newValue: number) => setTabPosition(newValue)}>
+      <AppBar position="static" style={{ borderRadius: "10px" }}>
+        <Tabs onChange={(_, newValue: number) => setTabPosition(newValue)} value={tabPosition} variant="fullWidth" >
           {TabComponents}
         </Tabs>
       </AppBar>

@@ -3,7 +3,7 @@ import { Checkbox, FormControlLabel, FormGroup } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import MenuHeading from "../sharedComponents/MenuHeading";
 import sortObjEntriesAlphabetically from "../../miscellaneous/sortObjEntriesAlphabetically";
-import { UserInput } from "../../interfaces/interfaces";
+import { UserInput, Module } from "../../interfaces/interfaces";
 
 interface Props {
   handleJsonChange: (value: string[]) => void;
@@ -30,6 +30,18 @@ const isAtLeastOneModuleSelected = (modules: Props["modules"]) => {
 
 const MenuSearch = ({ handleJsonChange, handleModuleChange, modules, setIsNextStepAllowed }: Props) => {
   const classes = useStyles();
+  const handleChange = (checked: boolean, moduleName: string, module: Module) => {
+    const updatedModules = { ...modules, [moduleName]: { ...module, selected: checked } };
+    // change userInput
+    handleModuleChange("modules", updatedModules);
+
+    // change jsonObject
+    const selectedModules = Object.entries(updatedModules)
+      .filter(([_, module]) => module.selected)
+      .map(([key, _]) => key);
+
+    handleJsonChange(selectedModules);
+  };
 
   const FormLabelComponents = sortObjEntriesAlphabetically(Object.entries(modules))
     .map(([key, module]) => (
@@ -37,12 +49,7 @@ const MenuSearch = ({ handleJsonChange, handleModuleChange, modules, setIsNextSt
         control={
           <Checkbox
             checked={module.selected}
-            onChange={(e) => {
-              handleModuleChange(
-                "modules",
-                { ...modules, [e.target.name]: { ...module, selected: e.target.checked } }
-              );
-            }}
+            onChange={(e) => handleChange(e.target.checked, e.target.name, module)}
             name={key} />}
         key={key}
         label={key} />
@@ -51,12 +58,8 @@ const MenuSearch = ({ handleJsonChange, handleModuleChange, modules, setIsNextSt
 
   //BUG? it's possible to have module prop "shwow_in_app" value true and the "visible_components" json prop
   // without the module
-  //BUG handleJsonChange in the useEffect dependency causes an infinite loop
   useEffect(() => {
     setIsNextStepAllowed(isAtLeastOneModuleSelected(modules));
-    handleJsonChange(Object.entries(modules)
-      .filter(([_, value]) => value.selected)
-      .map(([key, _]) => key));
   },[modules, setIsNextStepAllowed]);
 
   return(

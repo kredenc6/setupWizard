@@ -1,5 +1,16 @@
 [
   {
+    "name": "default",
+    "primaryColor": "#52a9ba",
+    "primaryLightColor": "#86dbec",
+    "primaryDarkColor": "#127a8a",
+    "primaryTextColor": "#000000",
+    "secondaryColor": "#bcaaa4",
+    "secondaryTextColor": "#fafafa",
+    "accent": "#FF4081",
+    "fab": "#ba8d4d"
+  },
+  {
     "name": "brown",
     "primaryColor": "#6c4327",
     "primaryLightColor": "#9d6e50",

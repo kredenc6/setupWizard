@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TextField } from "@material-ui/core";
+import SwTextField from "../../sharedComponents/SwTextField";
 
 // *
 // TextFileds loose focus on change(don't know why). arrColumnPosition state allows to keep track of which TextField is
@@ -42,25 +42,23 @@ const StringArrayInput = ({ arr, handleChange, label }: Props) => {
   const StringArrayInputComponents = (arr: string[]) => {
     const TextFields = arr.map((value, i) => {
       return(
-        <TextField
+        <SwTextField
           autoFocus={i === arrColumnPosition}
           color="secondary"
           key={`${i}${value}${i}`}
           label={label}
           onChange={e => handleTextFieldChange(i, e.target.value)}
           onBlur={e => handleTextFieldBlur(i, e.target.value)}
-          value={value}
-          variant="outlined" />
+          value={value} />
       );
     });
     TextFields.push(
-      <TextField
+      <SwTextField
         value=""
         color="secondary"
         key="nextInput"
         label={`new ${label}`}
-        onChange={e => addToJsonArr(arr.length, e.target.value)}
-        variant="outlined" />
+        onChange={e => addToJsonArr(arr.length, e.target.value)} />
     );
     return TextFields;
   };

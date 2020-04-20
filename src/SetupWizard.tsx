@@ -7,9 +7,9 @@ import MenuJson from "./components/MenuJson/MenuJson";
 import SelectedModule from "./components/SelectedModule/SelectedModule";
 import SetupStepper from "./components/SetupStepper/SetupStepper";
 import theme from "./theme/theme";
-import { createSchemeObjFromTheme } from "./miscellaneous/colorSchemeFunctions";
+import { createSchemeObjFromPresetScheme } from "./miscellaneous/colorSchemeFunctions";
 import sortObjEntriesAlphabetically from "./miscellaneous/sortObjEntriesAlphabetically";
-import { JsonObjModule, JsonObjKey, JsonResultObj, Menu, Module, UserInput } from "./interfaces/interfaces";
+import { JsonObjModule, JsonObjKey, JsonResultObj, JsonScheme, Menu, UserInput } from "./interfaces/interfaces";
 import jsonObjFrame from './jsonObjFrame/jsonObjFrame';
 
 const styles = {
@@ -29,7 +29,7 @@ const useStyles = makeStyles(styles);
 
 const initialUserInput: UserInput = {
   appTopic: "placeholder",
-  schemeObj: createSchemeObjFromTheme(theme),
+  schemeObj: createSchemeObjFromPresetScheme(jsonObjFrame.ui_colors, theme.palette.getContrastText),
   modules: {
     audio: {
       selected: false
@@ -65,11 +65,11 @@ const initialUserInput: UserInput = {
 
 const SetupWizard = () => {
   const classes = useStyles();
-  const [activeStep, setActiveStep] = useState(1);
+  const [activeStep, setActiveStep] = useState(3);
   const [isNextStepAllowed, setIsNextStepAllowed] = useState(false);
   const [userInput, setUserInput] = useState(initialUserInput);
   const [jsonObj, setJsonObj] = useState(jsonObjFrame);
-  const [selectedScheme, setSelectedScheme] = useState("custom");
+  const [selectedScheme, setSelectedScheme] = useState("default");
   
   function handleUserInputChange<K extends keyof UserInput>(propName: K, value: UserInput[K]): void {
     setUserInput(prev => ({ ...prev, [propName]: value }));
@@ -90,7 +90,7 @@ const SetupWizard = () => {
           // handleSelectedModuleChange={(changedModule: Module) => handleUserInputChange(
           //   "modules",
           //   { ...userInput.modules, [key]: changedModule })}
-          handleJsonChange={(changedModule: JsonObjModule) => handleJsonChange({[key]: changedModule})}
+          handleJsonChange={(changedModule: JsonObjModule) => handleJsonChange({ [key]: changedModule })}
           jsonModuleObj={jsonObj[key as JsonObjKey] as unknown as JsonObjModule}
           moduleName={key}
           setIsNextStepAllowed={setIsNextStepAllowed} />
@@ -101,7 +101,7 @@ const SetupWizard = () => {
     { 
       label: "Create app topic",
       component: <MenuTopic
-        handleJsonChange={(value: string) => handleJsonChange({"app_topic": value})}
+        handleJsonChange={(value: string) => handleJsonChange({ "app_topic": value })}
         handleTopicChange={handleUserInputChange}
         setIsNextStepAllowed={setIsNextStepAllowed}
         value={userInput.appTopic} />
@@ -109,16 +109,17 @@ const SetupWizard = () => {
     {
       label: "Select color scheme",
       component: <MenuStyles
-      handleSchemeChange={handleUserInputChange}
-      schemeObj={userInput.schemeObj}
-      selectedScheme={selectedScheme}
-      setIsNextStepAllowed={setIsNextStepAllowed}
+        handleJsonChange={(value: JsonScheme) => handleJsonChange({ "ui_colors": value })}
+        handleSchemeChange={handleUserInputChange}
+        schemeObj={userInput.schemeObj}
+        selectedScheme={selectedScheme}
+        setIsNextStepAllowed={setIsNextStepAllowed}
         setSelectedScheme={setSelectedScheme} />
     },
     {
       label: "Select modules",
       component: <MenuSearch
-        handleJsonChange={(value: string[]) => handleJsonChange({"visible_components": value})}
+        handleJsonChange={(value: string[]) => handleJsonChange({ "visible_components": value })}
         handleModuleChange={handleUserInputChange}
         modules={userInput.modules}
         setIsNextStepAllowed={setIsNextStepAllowed} />
@@ -127,7 +128,7 @@ const SetupWizard = () => {
     {
       label: "config.json",
       component: <MenuJson
-        handleJsonChange={(key: JsonObjKey,changedModule: JsonResultObj[JsonObjKey]) => handleJsonChange({[key]: changedModule})}
+        handleJsonChange={(key: JsonObjKey,changedModule: JsonResultObj[JsonObjKey]) => handleJsonChange({ [key]: changedModule })}
         jsonObj={jsonObj}
         userInput={userInput} />
     }

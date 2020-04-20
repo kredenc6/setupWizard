@@ -4,12 +4,13 @@ import ColorScheme from "./ColorScheme/ColorScheme";
 import ColorPalette from "./ColorPalette/ColorPalette";
 import ColorToolHeading from "./ColorToolHeading";
 import UI1 from "./UserInterfaces/UI1";
-import { createPaletteFromColor } from "../../miscellaneous/colorSchemeFunctions";
-import { SchemeObj, UserInput } from "../../interfaces/interfaces";
+import { createJsonSchemeObj, createPaletteFromColor } from "../../miscellaneous/colorSchemeFunctions";
+import { JsonScheme, SchemeObj, UserInput } from "../../interfaces/interfaces";
 
 import PresetSchemes from "./ColorScheme/PresetSchemes/PresetSchemes";
 
 interface Props {
+  handleJsonChange: (value: JsonScheme) => void;
   handleSchemeChange: <K extends keyof UserInput>(propName: K, value: UserInput[K]) => void;
   schemeObj: SchemeObj;
   selectedScheme: string;
@@ -41,7 +42,8 @@ const styles = {
 };
 const useStyles = makeStyles(styles);
 
-const MenuStyles = ({ handleSchemeChange, schemeObj, selectedScheme, setIsNextStepAllowed, setSelectedScheme }: Props) => {
+const MenuStyles = (
+  { handleJsonChange, handleSchemeChange, schemeObj, selectedScheme, setIsNextStepAllowed, setSelectedScheme }: Props) => {
   const classes = useStyles();
   const [schemeProperty, setSchemeProperty] = useState<"background" | "text">("background");
   const [selectedPalette, setSelectedPalette] = useState<"primary" | "secondary">("primary");
@@ -51,19 +53,15 @@ const MenuStyles = ({ handleSchemeChange, schemeObj, selectedScheme, setIsNextSt
     // change background scheme
     if(schemeProperty === "background" && color !== null) {
       const newScheme = createPaletteFromColor(color, getContrastText);
-      handleSchemeChange(
-        "schemeObj",
-        {
-         ...schemeObj, [selectedPalette]: newScheme
-        });
+      const newSchemeObj = { ...schemeObj, [selectedPalette]: newScheme };
+      handleSchemeChange("schemeObj", newSchemeObj);
+      handleJsonChange( createJsonSchemeObj(newSchemeObj) );
     }
     // change text color override
     else {
-      handleSchemeChange(
-        "schemeObj",
-        {
-          ...schemeObj, textColorOverride: { ...schemeObj.textColorOverride, [selectedPalette]: color }
-        });
+      const newSchemeObj = { ...schemeObj, textColorOverride: { ...schemeObj.textColorOverride, [selectedPalette]: color } };
+      handleSchemeChange("schemeObj", newSchemeObj);
+      handleJsonChange( createJsonSchemeObj(newSchemeObj) );
     }
   };
 
@@ -105,6 +103,7 @@ const MenuStyles = ({ handleSchemeChange, schemeObj, selectedScheme, setIsNextSt
 };
 
 export default MenuStyles;
+
 
 // TODO: any click on reset button or click on color on color palette triggers setting the "selectedScheme" as 'custom'
 // no matter if the resulting "schemeObj" still equals any selected(or not-selected*) preset "schemeObj"

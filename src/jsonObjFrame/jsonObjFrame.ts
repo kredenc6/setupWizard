@@ -14,7 +14,7 @@ const jsonObjFrame: JsonResultObj = {
     "ad_mob_ad_unit_id": ""
   },
   "ui_colors": {
-    "name": "preset",
+    "name": "default",
     "primaryColor": "#52a9ba",
     "primaryLightColor": "#86dbec",
     "primaryDarkColor": "#127a8a",
