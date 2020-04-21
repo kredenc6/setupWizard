@@ -2,6 +2,7 @@ import React from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import RestJsonPropsComponent from "./RestJsonPropsComponent/RestJsonPropsComponent";
 import { JsonObjKey, JsonResultObj, UserInput } from "../../interfaces/interfaces";
+import { Button } from "@material-ui/core";
 
 interface Props {
   handleJsonChange: (key: JsonObjKey, changedModule: JsonResultObj[JsonObjKey]) => void;
@@ -44,6 +45,9 @@ const MenuJson = ({ handleJsonChange, jsonObj, userInput }: Props) => {
       <div>
         <RestJsonPropsComponent handleJsonChange={handleJsonChange} restJson={restJsonProps} />
       </div>
+      <Button color="primary" onClick={() => downloadJson(jsonObj)} variant="contained">
+                  Download Json
+                </Button>
       <pre className={classes.jsonWrapper}>
         <code className={classes.json}>
           {JSON.stringify(jsonObj, null, 2)}
@@ -52,5 +56,18 @@ const MenuJson = ({ handleJsonChange, jsonObj, userInput }: Props) => {
     </section>
   );
 };
+
+const downloadJson = async (jsonObj: JsonResultObj) => {
+  const fileName = "testfile";
+  const json = JSON.stringify(jsonObj);
+  const blob = new Blob([json],{type:'application/json'});
+  const href = await URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = href;
+  link.download = fileName + ".json";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
 
 export default MenuJson;
