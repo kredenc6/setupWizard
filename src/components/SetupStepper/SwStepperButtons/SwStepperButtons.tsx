@@ -8,7 +8,6 @@ interface Props {
   isFinished: boolean;
   handleBack: () => void;
   handleNext: () => void;
-  downloadJson: () => void;
   handleReset: () => void;
   isFirstStep: () => boolean;
   isLastStep: () => boolean;
@@ -49,7 +48,6 @@ const SwStepperButtonsWrapper = (props: Props) => {
     isFinished,
     handleBack,
     handleNext,
-    downloadJson,
     handleReset,
     isFirstStep,
     isLastStep,
@@ -90,12 +88,7 @@ const SwStepperButtonsWrapper = (props: Props) => {
                   Next
                 </Button>
             }
-            {isLastStep() ?
-                <Button color="primary" onClick={() => downloadJson()} variant="contained">
-                  Download Json
-                </Button>
-              : null
-            }
+        
           </>
       }
     </div>

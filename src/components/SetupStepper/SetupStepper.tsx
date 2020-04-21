@@ -52,10 +52,6 @@ const SetupStepper = ({ activeStep, menuLabels, isNextStepAllowed, setActiveStep
     setActiveStep(activeStep + 1);
   };
 
-  const downloadJson = () => {
-    
-  }
-
   const handleBack = () => {
     setActiveStep(prevActiveStep => prevActiveStep - 1);
   };
@@ -117,7 +113,6 @@ const SetupStepper = ({ activeStep, menuLabels, isNextStepAllowed, setActiveStep
         isFinished={isFinished}
         handleBack={handleBack}
         handleNext={handleNext}
-        downloadJson={downloadJson}
         handleReset={handleReset}
         isFirstStep={isFirstStep}
         isLastStep={isLastStep}
