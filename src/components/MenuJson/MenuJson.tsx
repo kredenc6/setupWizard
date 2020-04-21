@@ -59,7 +59,7 @@ const MenuJson = ({ handleJsonChange, jsonObj, userInput }: Props) => {
 
 const downloadJson = async (jsonObj: JsonResultObj) => {
   const fileName = "testfile";
-  const json = JSON.stringify(jsonObj);
+  const json = JSON.stringify(jsonObj, null, 2);
   const blob = new Blob([json],{type:'application/json'});
   const href = await URL.createObjectURL(blob);
   const link = document.createElement('a');
