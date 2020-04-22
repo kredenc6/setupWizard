@@ -28,7 +28,7 @@ const isAtLeastOneModuleSelected = (modules: Props["modules"]) => {
   });
 };
 
-const MenuSearch = ({ handleJsonChange, handleModuleChange, modules, setIsNextStepAllowed }: Props) => {
+const MenuSelectModules = ({ handleJsonChange, handleModuleChange, modules, setIsNextStepAllowed }: Props) => {
   const classes = useStyles();
   const handleChange = (checked: boolean, moduleName: string, module: Module) => {
     const updatedModules = { ...modules, [moduleName]: { ...module, selected: checked } };
@@ -75,4 +75,4 @@ const MenuSearch = ({ handleJsonChange, handleModuleChange, modules, setIsNextSt
   );
 };
 
-export default MenuSearch;
+export default MenuSelectModules;

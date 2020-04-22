@@ -33,7 +33,7 @@ const determineLabel = (obj: any, i: number, keysToLabels: string[]) => {
   for(const key of keysToLabels) {
     if(obj[key]) return obj[key] as string;
   }
-  return `noLabel${i}`;
+  return `index ${i}`;
 };
 
 const ArrayDataComponent = ({ dataArr, handleJsonChange }: Props) => {

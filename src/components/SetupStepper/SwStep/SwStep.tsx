@@ -81,10 +81,9 @@ const SwStep = (props: Props) => {
       completed={isStepComplete(index + 1)}
       disabled={shouldDisableStepperButton(index)}
     >
-        <StepButton icon={index + 1} onClick={handleStep(index + 1)}>
-          {menuLabel}
-        </StepButton>
-      
+      <StepButton icon={index + 1} onClick={handleStep(index + 1)}>
+        {menuLabel}
+      </StepButton>
     </Step>
   );
 };

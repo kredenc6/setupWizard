@@ -15,9 +15,13 @@ interface Props {
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      width: '100%',
+      width: "100%",
       paddingTop: theme.spacing(1),
-      borderTop: `1px solid ${theme.palette.divider}`
+      borderTop: `1px solid ${theme.palette.divider}`,
+      border: "1px solid pink"
+    },
+    stepper: {
+      backgroundColor: `${theme.palette.background.default}`
     }
   })
 );
@@ -120,6 +124,7 @@ const SetupStepper = ({ activeStep, menuLabels, isNextStepAllowed, setActiveStep
         setIsFinished={setIsFinished} />
       <Stepper
         alternativeLabel
+        className={classes.stepper}
         connector={<SwStepConnector />}
         nonLinear
       >
