@@ -7,7 +7,7 @@ interface Props {
 
 const style = (theme: Theme) => ({
   topicParagraph: {
-    margin: `${theme.spacing(1)}px 0`
+    margin: `${theme.spacing(1)}px 0 ${theme.spacing(2)}px`
   }
 });
 const useStyle = makeStyles(theme => style(theme));

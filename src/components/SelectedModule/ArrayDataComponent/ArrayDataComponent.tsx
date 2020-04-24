@@ -56,7 +56,10 @@ const ArrayDataComponent = ({ dataArr, handleJsonChange }: Props) => {
     TabComponents.push( <Tab key={`Tab${label}`} label={label} /> );
     TabPanelComponents.push(
       <TabPanel index={i} key={`TabPanel${label}`} value={tabPosition}>
-        <ObjectDataComponent dataObj={dataItem} handleJsonObjChange={handleJsonObjChange} skipProperties={KEYS_TO_LABELS} />
+        <ObjectDataComponent
+          dataObj={dataItem}
+          handleJsonObjChange={handleJsonObjChange}
+          skipProperties={KEYS_TO_LABELS} />
       </TabPanel>
     );
   });

@@ -1,14 +1,15 @@
 import React from "react";
 import StringArrayInput from "../StringArrayInput/StringArrayInput";
-import { JsonObjModule } from "../../../interfaces/interfaces";
+import { JsonObjModule, Module } from "../../../interfaces/interfaces";
 
 interface Props {
   array: string[];
   handleJsonChange: (changedModule: JsonObjModule) => void;
   label: string;
+  moduleSettings: Module | undefined;
 };
 
-const ArrayComponent = ({ array, handleJsonChange, label}: Props) => {
+const ArrayComponent = ({ array, handleJsonChange, label, moduleSettings }: Props) => {
   const handleChange = (_: string, newArray: string[] | number[]) => {
     handleJsonChange(newArray);
   };
@@ -18,7 +19,8 @@ const ArrayComponent = ({ array, handleJsonChange, label}: Props) => {
       <StringArrayInput
         arr={array}
         handleChange={handleChange}
-        label={label} />
+        label={label}
+        moduleSettings={moduleSettings} />
     </div>
   );
 };

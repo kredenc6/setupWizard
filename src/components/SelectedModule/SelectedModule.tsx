@@ -5,13 +5,14 @@ import ObjectDataComponent from "./ObjectDataComponent/ObjectDataComponent";
 import ArrayDataComponent from "./ArrayDataComponent/ArrayDataComponent";
 import ArrayComponent from "./ArrayComponent/ArrayComponent";
 import AppTopicParagraph from "../sharedComponents/AppTopicParagraph";
-import { JsonObjModule } from "../../interfaces/interfaces";
+import { JsonObjModule, Module } from "../../interfaces/interfaces";
 
 interface Props {
   appTopic: string;
   handleJsonChange: (changedModule: JsonObjModule) => void;
   jsonModuleObj: JsonObjModule;
   moduleName: string;
+  moduleSettings: Module;
   setIsNextStepAllowed: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
@@ -30,7 +31,7 @@ const isArrObjectArr = (arr: any[]) => {
 };
 
 const SelectedInput = 
-  ({ appTopic, handleJsonChange, jsonModuleObj, moduleName, setIsNextStepAllowed }: Props) => {
+  ({ appTopic, handleJsonChange, jsonModuleObj, moduleName, moduleSettings, setIsNextStepAllowed }: Props) => {
 
   const classes = useStyles();
   const handleJsonObjChange = (dataObj: object, key: string, value: any) => handleJsonChange({ ...dataObj, [key]: value });
@@ -48,9 +49,9 @@ const SelectedInput =
         isArrObjectArr(jsonModuleObj) ?
           <ArrayDataComponent dataArr={jsonModuleObj} handleJsonChange={handleJsonChange} />
           :
-          <ArrayComponent array={jsonModuleObj as string[]} handleJsonChange={handleJsonChange} label={moduleName} />
+          <ArrayComponent array={jsonModuleObj as string[]} handleJsonChange={handleJsonChange} label={moduleName} moduleSettings={moduleSettings} />
         :
-        <ObjectDataComponent dataObj={jsonModuleObj} handleJsonObjChange={handleJsonObjChange} />
+        <ObjectDataComponent dataObj={jsonModuleObj} handleJsonObjChange={handleJsonObjChange} moduleSettings={moduleSettings} />
       }
     </section>
   );

@@ -53,17 +53,17 @@ export interface UserInput {
 
 export interface Module {
   [propName: string]: any;
-  webPrefix?: string;
   selected: boolean;
-  webPage?: string;
-}
+  VERIFY_BY_PROXY?: string[];
+  WEB_PREFIX?: string;
+};
 
 export type UserInputModuleKeys = keyof UserInput["modules"];
 
 export interface Menu {
   label: string;
   component: JSX.Element;
-}
+};
 
 export interface JsonResultObj {
   title: string;

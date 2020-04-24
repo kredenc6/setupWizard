@@ -13,8 +13,6 @@ import sortObjEntriesAlphabetically from "./miscellaneous/sortObjEntriesAlphabet
 import jsonObjFrame from './jsonObjFrame/jsonObjFrame';
 import { JsonObjModule, JsonObjKey, JsonResultObj, JsonScheme, Menu, UserInput } from "./interfaces/interfaces";
 
-import VerifyUrlInput from "./components/SelectedModule/ObjectDataComponent/VerifyUrlInput";
-
 const styles = {
   wizardWrapper: {
     maxWidth: "1980px",
@@ -46,12 +44,14 @@ const initialUserInput: UserInput = {
       selected: false
     },
     instagram: {
-      webPrefix: "www.instagram.com/",
-      selected: false
+      selected: false,
+      VERIFY_BY_PROXY: ["main_channel", "other_channels"],
+      WEB_PREFIX: "https://"
     },
     facebook: {
-      webPrefix: "www.facebook.com/",
-      selected: false
+      selected: false,
+      VERIFY_BY_PROXY: ["channel"],
+      WEB_PREFIX: "https://"
     },
     reddit: {
       selected: false
@@ -63,7 +63,9 @@ const initialUserInput: UserInput = {
       selected: false
     },
     websites: {
-      selected: false
+      selected: false,
+      VERIFY_BY_PROXY: ["SELF"],
+      WEB_PREFIX: "https://"
     }
   }
 };
@@ -94,6 +96,7 @@ const SetupWizard = () => {
           appTopic={userInput.appTopic}
           handleJsonChange={(changedModule: JsonObjModule) => handleJsonChange({ [key]: changedModule })}
           jsonModuleObj={jsonObj[key as JsonObjKey] as unknown as JsonObjModule}
+          moduleSettings={userInput.modules[key as keyof UserInput["modules"]]}
           moduleName={key}
           setIsNextStepAllowed={setIsNextStepAllowed} />
       };
@@ -141,7 +144,6 @@ const SetupWizard = () => {
       <ThemeProvider theme={ theme }>
          <main className={classes.wizardWrapper}>
            {menus[activeStep - 1].component}
-           <VerifyUrlInput />
            <SetupStepper
             activeStep={activeStep}
             menuLabels={menus.map(({ label }) => label)}
