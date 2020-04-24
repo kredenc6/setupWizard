@@ -17,8 +17,7 @@ const useStyles = makeStyles((theme: Theme) =>
     root: {
       width: "100%",
       paddingTop: theme.spacing(1),
-      borderTop: `1px solid ${theme.palette.divider}`,
-      border: "1px solid pink"
+      borderTop: `1px solid ${theme.palette.divider}`
     },
     stepper: {
       backgroundColor: `${theme.palette.background.default}`

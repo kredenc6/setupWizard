@@ -13,6 +13,8 @@ import sortObjEntriesAlphabetically from "./miscellaneous/sortObjEntriesAlphabet
 import jsonObjFrame from './jsonObjFrame/jsonObjFrame';
 import { JsonObjModule, JsonObjKey, JsonResultObj, JsonScheme, Menu, UserInput } from "./interfaces/interfaces";
 
+import VerifyUrlInput from "./components/SelectedModule/ObjectDataComponent/VerifyUrlInput";
+
 const styles = {
   wizardWrapper: {
     maxWidth: "1980px",
@@ -137,9 +139,10 @@ const SetupWizard = () => {
   return(
     <CssBaseline>
       <ThemeProvider theme={ theme }>
-        <main className={classes.wizardWrapper}>
-          {menus[activeStep - 1].component}
-          <SetupStepper
+         <main className={classes.wizardWrapper}>
+           {menus[activeStep - 1].component}
+           <VerifyUrlInput />
+           <SetupStepper
             activeStep={activeStep}
             menuLabels={menus.map(({ label }) => label)}
             isNextStepAllowed={isNextStepAllowed}
