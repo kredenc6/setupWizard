@@ -5,6 +5,7 @@ import ObjectDataComponent from "./ObjectDataComponent/ObjectDataComponent";
 import ArrayDataComponent from "./ArrayDataComponent/ArrayDataComponent";
 import ArrayComponent from "./ArrayComponent/ArrayComponent";
 import AppTopicParagraph from "../sharedComponents/AppTopicParagraph";
+import ServerStatus from "../sharedComponents/ServerStatus";
 import { JsonObjModule, Module } from "../../interfaces/interfaces";
 
 interface Props {
@@ -13,6 +14,7 @@ interface Props {
   jsonModuleObj: JsonObjModule;
   moduleName: string;
   moduleSettings: Module;
+  serverStatus: string;
   setIsNextStepAllowed: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
@@ -31,7 +33,7 @@ const isArrObjectArr = (arr: any[]) => {
 };
 
 const SelectedInput = 
-  ({ appTopic, handleJsonChange, jsonModuleObj, moduleName, moduleSettings, setIsNextStepAllowed }: Props) => {
+  ({ appTopic, handleJsonChange, jsonModuleObj, moduleName, moduleSettings, serverStatus, setIsNextStepAllowed }: Props) => {
 
   const classes = useStyles();
   const handleJsonObjChange = (dataObj: object, key: string, value: any) => handleJsonChange({ ...dataObj, [key]: value });
@@ -44,6 +46,7 @@ const SelectedInput =
   return (
     <section className={classes.menuTopic}>
       <MenuHeading text={moduleName} />
+      <ServerStatus serverStatus={serverStatus} />
       <AppTopicParagraph topic={appTopic} />
       {Array.isArray(jsonModuleObj) ?
         isArrObjectArr(jsonModuleObj) ?

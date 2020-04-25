@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CssBaseline } from "@material-ui/core";
 import { makeStyles, ThemeProvider } from "@material-ui/core/styles";
 import MenuTopic from "./components/MenuTopic/MenuTopic";
@@ -12,6 +12,8 @@ import { createSchemeObjFromPresetScheme } from "./miscellaneous/colorSchemeFunc
 import sortObjEntriesAlphabetically from "./miscellaneous/sortObjEntriesAlphabetically";
 import jsonObjFrame from './jsonObjFrame/jsonObjFrame';
 import { JsonObjModule, JsonObjKey, JsonResultObj, JsonScheme, Menu, UserInput } from "./interfaces/interfaces";
+
+const CHECK_SERVER_STATUS_INTERVAL = 30000;
 
 const styles = {
   wizardWrapper: {
@@ -72,11 +74,23 @@ const initialUserInput: UserInput = {
 
 const SetupWizard = () => {
   const classes = useStyles();
-  const [activeStep, setActiveStep] = useState(1);
+  const [activeStep, setActiveStep] = useState(3);
   const [isNextStepAllowed, setIsNextStepAllowed] = useState(false);
   const [userInput, setUserInput] = useState(initialUserInput);
   const [jsonObj, setJsonObj] = useState(jsonObjFrame);
   const [selectedScheme, setSelectedScheme] = useState("default");
+  const [serverStatus, setServerStatus] = useState("offline");
+
+  useEffect(() => {
+    const intervalID = window.setInterval( () => {
+      getServerStatus()
+      .then(status => {
+        setServerStatus(status);
+      });
+    }, CHECK_SERVER_STATUS_INTERVAL);
+
+    return () => window.clearInterval(intervalID);
+  },[]);
   
   function handleUserInputChange<K extends keyof UserInput>(propName: K, value: UserInput[K]): void {
     setUserInput(prev => ({ ...prev, [propName]: value }));
@@ -98,6 +112,7 @@ const SetupWizard = () => {
           jsonModuleObj={jsonObj[key as JsonObjKey] as unknown as JsonObjModule}
           moduleSettings={userInput.modules[key as keyof UserInput["modules"]]}
           moduleName={key}
+          serverStatus={serverStatus}
           setIsNextStepAllowed={setIsNextStepAllowed} />
       };
   });
@@ -127,6 +142,7 @@ const SetupWizard = () => {
         handleJsonChange={(value: string[]) => handleJsonChange({ "visible_components": value })}
         handleModuleChange={handleUserInputChange}
         modules={userInput.modules}
+        serverStatus={serverStatus}
         setIsNextStepAllowed={setIsNextStepAllowed} />
     },
     ...SelectedModuleComponents,
@@ -156,3 +172,15 @@ const SetupWizard = () => {
 };
 
 export default SetupWizard;
+
+async function getServerStatus() {
+  if (!navigator.onLine) return "no connection";
+
+  // return await fetch("https://damp-bayou-55824.herokuapp.com/", { method: "HEADER" })
+  return await fetch("https://damp-bayou-55824.herokuapp.com/")
+  .then(response => response.status === 200 ? "online" : "offline")
+  .catch(err => {
+    console.log(err.message);
+    return "offline";
+  });
+}
