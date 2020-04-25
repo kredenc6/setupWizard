@@ -74,7 +74,7 @@ const initialUserInput: UserInput = {
 
 const SetupWizard = () => {
   const classes = useStyles();
-  const [activeStep, setActiveStep] = useState(3);
+  const [activeStep, setActiveStep] = useState(1);
   const [isNextStepAllowed, setIsNextStepAllowed] = useState(false);
   const [userInput, setUserInput] = useState(initialUserInput);
   const [jsonObj, setJsonObj] = useState(jsonObjFrame);
@@ -82,11 +82,10 @@ const SetupWizard = () => {
   const [serverStatus, setServerStatus] = useState("offline");
 
   useEffect(() => {
+    getServerStatus().then(status => setServerStatus(status));
+
     const intervalID = window.setInterval( () => {
-      getServerStatus()
-      .then(status => {
-        setServerStatus(status);
-      });
+      getServerStatus().then(status => setServerStatus(status));
     }, CHECK_SERVER_STATUS_INTERVAL);
 
     return () => window.clearInterval(intervalID);
@@ -176,7 +175,6 @@ export default SetupWizard;
 async function getServerStatus() {
   if (!navigator.onLine) return "no connection";
 
-  // return await fetch("https://damp-bayou-55824.herokuapp.com/", { method: "HEADER" })
   return await fetch("https://damp-bayou-55824.herokuapp.com/")
   .then(response => response.status === 200 ? "online" : "offline")
   .catch(err => {
