@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { AppBar, Box, Tab, Tabs, Typography } from "@material-ui/core";
 import ObjectDataComponent from "../ObjectDataComponent/ObjectDataComponent";
-import { JsonObjModule } from "../../../interfaces/interfaces";
+import { JsonObjModule, Module } from "../../../interfaces/interfaces";
 
 interface Props {
   dataArr: any[];
   handleJsonChange: (changedModule: JsonObjModule) => void;
+  isVerificationEnabled: boolean;
+  moduleSettings: Module | undefined;
 };
 
 interface TabPanelProps {
@@ -36,7 +38,7 @@ const determineLabel = (obj: any, i: number, keysToLabels: string[]) => {
   return `index ${i}`;
 };
 
-const ArrayDataComponent = ({ dataArr, handleJsonChange }: Props) => {
+const ArrayDataComponent = ({ dataArr, handleJsonChange, isVerificationEnabled, moduleSettings }: Props) => {
   const [tabPosition, setTabPosition] = useState(0);
 
   let TabComponents: (JSX.Element | null)[] = [];
@@ -59,6 +61,8 @@ const ArrayDataComponent = ({ dataArr, handleJsonChange }: Props) => {
         <ObjectDataComponent
           dataObj={dataItem}
           handleJsonObjChange={handleJsonObjChange}
+          isVerificationEnabled={isVerificationEnabled}
+          moduleSettings={moduleSettings}
           skipProperties={KEYS_TO_LABELS} />
       </TabPanel>
     );

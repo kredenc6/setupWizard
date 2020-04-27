@@ -48,12 +48,12 @@ const initialUserInput: UserInput = {
     instagram: {
       selected: false,
       VERIFY_BY_PROXY: ["main_channel", "other_channels"],
-      WEB_PREFIX: "https://"
+      WEB_PREFIX: "https://www.instagram.com/"
     },
     facebook: {
       selected: false,
       VERIFY_BY_PROXY: ["channel"],
-      WEB_PREFIX: "https://"
+      WEB_PREFIX: "https://www.facebook.com/"
     },
     reddit: {
       selected: false
@@ -74,7 +74,7 @@ const initialUserInput: UserInput = {
 
 const SetupWizard = () => {
   const classes = useStyles();
-  const [activeStep, setActiveStep] = useState(1);
+  const [activeStep, setActiveStep] = useState(3);
   const [isNextStepAllowed, setIsNextStepAllowed] = useState(false);
   const [userInput, setUserInput] = useState(initialUserInput);
   const [jsonObj, setJsonObj] = useState(jsonObjFrame);
@@ -150,6 +150,7 @@ const SetupWizard = () => {
       component: <MenuJson
         handleJsonChange={(key: JsonObjKey,changedModule: JsonResultObj[JsonObjKey]) => handleJsonChange({ [key]: changedModule })}
         jsonObj={jsonObj}
+        serverStatus={serverStatus}
         userInput={userInput} />
     }
   ];

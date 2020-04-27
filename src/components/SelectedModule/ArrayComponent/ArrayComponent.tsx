@@ -5,11 +5,12 @@ import { JsonObjModule, Module } from "../../../interfaces/interfaces";
 interface Props {
   array: string[];
   handleJsonChange: (changedModule: JsonObjModule) => void;
+  isVerificationEnabled: boolean;
   label: string;
   moduleSettings: Module | undefined;
 };
 
-const ArrayComponent = ({ array, handleJsonChange, label, moduleSettings }: Props) => {
+const ArrayComponent = ({ array, handleJsonChange, isVerificationEnabled, label, moduleSettings }: Props) => {
   const handleChange = (_: string, newArray: string[] | number[]) => {
     handleJsonChange(newArray);
   };
@@ -19,6 +20,7 @@ const ArrayComponent = ({ array, handleJsonChange, label, moduleSettings }: Prop
       <StringArrayInput
         arr={array}
         handleChange={handleChange}
+        isVerificationEnabled={isVerificationEnabled}
         label={label}
         moduleSettings={moduleSettings} />
     </div>

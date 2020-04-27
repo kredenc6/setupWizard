@@ -9,15 +9,16 @@ import { Module } from "../../../interfaces/interfaces";
 interface Props {
   dataObj: object;
   handleJsonObjChange: (dataObj: object, key: string, value: any) => void
+  isVerificationEnabled: boolean;
   moduleSettings?: Module;
   skipProperties?: string[];
 };
 
-const ObjectDataComponent = ({ dataObj, handleJsonObjChange, moduleSettings, skipProperties }: Props) => {
+const ObjectDataComponent = ({ dataObj, handleJsonObjChange, isVerificationEnabled, moduleSettings, skipProperties }: Props) => {
   const handleChange = (key: string, value: any) => {
     handleJsonObjChange(dataObj, key, value);
   };
-  const Components = turnObjToFormComponents(dataObj, handleChange, moduleSettings, skipProperties);
+  const Components = turnObjToFormComponents(dataObj, handleChange, moduleSettings, skipProperties, isVerificationEnabled);
 
   return(
     <div>
@@ -32,7 +33,7 @@ export default ObjectDataComponent;
 
 function turnObjToFormComponents
   (obj: object, handleChange: (key: string, value: any) => void, moduleSettings: Module | undefined,
-  skipProperties: string[] | undefined) {
+  skipProperties: string[] | undefined, isVerificationEnabled: boolean) {
   const TextFieldComponents: JSX.Element[] = [];
   const CheckboxComponents: JSX.Element[] = [];
   const StringArrayInputComponents: JSX.Element[] = [];
@@ -44,6 +45,8 @@ function turnObjToFormComponents
           <VerifyUrlTextField
             key={`textField${key}`}
             handleTextFieldChange={value => handleChange(key, value)}
+            webPrefix={moduleSettings?.WEB_PREFIX}
+            isVerificationEnabled={isVerificationEnabled}
             label={key}
             name={key}
             value={value} />
@@ -76,6 +79,7 @@ function turnObjToFormComponents
         <StringArrayInput
           arr={value}
           handleChange={handleChange}
+          isVerificationEnabled={isVerificationEnabled}
           key={`strArr${key}`}
           label={key}
           moduleSettings={moduleSettings} />

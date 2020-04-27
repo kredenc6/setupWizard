@@ -7,6 +7,7 @@ import { JsonObjKey, JsonResultObj } from "../../../interfaces/interfaces";
 
 interface Props {
   handleJsonChange: (key: JsonObjKey, changedModule: JsonResultObj[JsonObjKey]) => void;
+  isVerificationEnabled: boolean;
   restJson: [string, any][];
 };
 
@@ -19,7 +20,7 @@ const styles = (theme: Theme) => ({
 });
 const useStyles = makeStyles(theme => styles(theme));
 
-const RestJsonPropsComponent = ({ handleJsonChange, restJson }: Props) => {
+const RestJsonPropsComponent = ({ handleJsonChange, isVerificationEnabled, restJson }: Props) => {
   const classes = useStyles();
   const handleGroupedPropsChange = (_: object, key: string, value: any) => {
     handleJsonChange(key as JsonObjKey, value);
@@ -43,7 +44,8 @@ const RestJsonPropsComponent = ({ handleJsonChange, restJson }: Props) => {
           handleJsonObjChange={(dataObj: object, keyToValue: string, value: any) => handleJsonChange(
             key as JsonObjKey,
             { ...dataObj, [keyToValue]: value }
-          )} />
+          )}
+          isVerificationEnabled={isVerificationEnabled} />
       </Paper>
     );
   });
@@ -52,7 +54,10 @@ const RestJsonPropsComponent = ({ handleJsonChange, restJson }: Props) => {
     <div>
       <Paper className={classes.paperItem} variant="outlined">
         <PropertyHeading text="various" />
-        <ObjectDataComponent dataObj={stringAndBooleanObj} handleJsonObjChange={handleGroupedPropsChange} />
+        <ObjectDataComponent
+          dataObj={stringAndBooleanObj}
+          handleJsonObjChange={handleGroupedPropsChange}
+          isVerificationEnabled={isVerificationEnabled} />
       </Paper>
       <div>
         {ObjectDataComponents}

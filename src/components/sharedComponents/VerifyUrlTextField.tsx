@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { TextFieldProps } from "@material-ui/core";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import SwTextField from "./SwTextField";
@@ -9,12 +9,15 @@ const MIN_LENGTH_FOR_VERIF = 4;
 
 interface Props {
   handleTextFieldChange: (value: string) => void;
+  webPrefix?: string;
+  isVerificationEnabled: boolean;
 };
 
 type SendToVerify = (
   url: string,
   setSentToBeVerified: React.Dispatch<React.SetStateAction<boolean>>,
-  setVerification: React.Dispatch<React.SetStateAction<Verification>>
+  setVerification: React.Dispatch<React.SetStateAction<Verification>>,
+  webPrefix?: string
 ) => void;
 
 const useStyles = makeStyles(({ palette }) => 
@@ -68,8 +71,8 @@ const useStyles = makeStyles(({ palette }) =>
   })
 );
 
-const sendToVerify: SendToVerify = (url, setSentToBeVerified, setVerification) => {
-  const prefixedAndEncoded = `https://${encodeURI(url)}`;
+const sendToVerify: SendToVerify = (url, setSentToBeVerified, setVerification, webPrefix) => {
+  const prefixedAndEncoded = `${webPrefix}${encodeURI(url)}`;
   console.log(`${prefixedAndEncoded} send to be verified.`);
   setSentToBeVerified(true);
 
@@ -90,28 +93,45 @@ const sendToVerify: SendToVerify = (url, setSentToBeVerified, setVerification) =
 const VerifyUrlTextField = (props: Props & TextFieldProps) => {
   const {
     handleTextFieldChange,
+    webPrefix,
+    isVerificationEnabled,
     ...textFieldProps
   } = props;
   const [timeoutID, setTimeoutID] = useState(-1);
   const [sentToBeVerified, setSentToBeVerified] = useState(false);
   const [verification, setVerification] = useState<Verification>(null);
-  const isVerifying = (sentToBeVerified || timeoutID !== -1 ) ? true : false;
+  const isVerifying = (sentToBeVerified || timeoutID !== -1) ? true : false;
   const classes = useStyles({ verifying: isVerifying });
 
   const handleChange = (value: string) => {
     handleTextFieldChange(value);
     setVerification(null);
     if(timeoutID !== -1) window.clearTimeout(timeoutID);
+    if(!isVerificationEnabled) return;
     if(value.length < MIN_LENGTH_FOR_VERIF) {
       setTimeoutID(-1);
       return;
     }
     
     setTimeoutID(window.setTimeout(() => {
-      sendToVerify(value, setSentToBeVerified, setVerification);
+      sendToVerify(value, setSentToBeVerified, setVerification, webPrefix);
       setTimeoutID(-1);
     }, VERIFICATION_DELAY));
   };
+
+  const SwTextFieldRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { // re-verify on mount
+    const value = SwTextFieldRef.current?.getElementsByTagName("input")[0].value || "";
+    if(value.length >= MIN_LENGTH_FOR_VERIF && isVerificationEnabled) {
+      sendToVerify(value, setSentToBeVerified, setVerification, webPrefix);
+    }
+  },[isVerificationEnabled, webPrefix]);
+
+  useEffect(() => {
+    return () => {
+      if(timeoutID !== -1) clearTimeout(timeoutID);
+    }
+  },[timeoutID]);
 
   return(
     <SwTextField
@@ -120,7 +140,9 @@ const VerifyUrlTextField = (props: Props & TextFieldProps) => {
         verification === "OK" ? classes.valid : classes.invalid
         :
         classes.toBeVerified}
-      onChange={e => handleChange(e.target.value)} />
+      inputAdornment={webPrefix}
+      onChange={e => handleChange(e.target.value)}
+      ref={SwTextFieldRef} />
   );
 };
 

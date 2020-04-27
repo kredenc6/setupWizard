@@ -13,6 +13,8 @@ const styles = createStyles(
   {
     ui1Wrapper: {
       alignSelf: "center",
+      maxWidth: "300px",
+      maxHeight: "500px",
       width: "40vh",
       height: "80%"
     },

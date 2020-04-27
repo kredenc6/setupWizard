@@ -6,6 +6,7 @@ import ArrayDataComponent from "./ArrayDataComponent/ArrayDataComponent";
 import ArrayComponent from "./ArrayComponent/ArrayComponent";
 import AppTopicParagraph from "../sharedComponents/AppTopicParagraph";
 import ServerStatus from "../sharedComponents/ServerStatus";
+import VerificationStatus from "../sharedComponents/VerificationStatus";
 import { JsonObjModule, Module } from "../../interfaces/interfaces";
 
 interface Props {
@@ -47,14 +48,28 @@ const SelectedInput =
     <section className={classes.menuTopic}>
       <MenuHeading text={moduleName} />
       <ServerStatus serverStatus={serverStatus} />
+      <VerificationStatus status={serverStatus === "online" ? "enabled" : "disabled"} />
       <AppTopicParagraph topic={appTopic} />
       {Array.isArray(jsonModuleObj) ?
         isArrObjectArr(jsonModuleObj) ?
-          <ArrayDataComponent dataArr={jsonModuleObj} handleJsonChange={handleJsonChange} />
+          <ArrayDataComponent
+            dataArr={jsonModuleObj}
+            handleJsonChange={handleJsonChange}
+            isVerificationEnabled={serverStatus === "online"}
+            moduleSettings={moduleSettings} />
           :
-          <ArrayComponent array={jsonModuleObj as string[]} handleJsonChange={handleJsonChange} label={moduleName} moduleSettings={moduleSettings} />
+          <ArrayComponent
+            array={jsonModuleObj as string[]}
+            handleJsonChange={handleJsonChange}
+            isVerificationEnabled={serverStatus === "online"}
+            label={moduleName}
+            moduleSettings={moduleSettings} />
         :
-        <ObjectDataComponent dataObj={jsonModuleObj} handleJsonObjChange={handleJsonObjChange} moduleSettings={moduleSettings} />
+        <ObjectDataComponent
+          dataObj={jsonModuleObj}
+          handleJsonObjChange={handleJsonObjChange}
+          isVerificationEnabled={serverStatus === "online"}
+          moduleSettings={moduleSettings} />
       }
     </section>
   );
