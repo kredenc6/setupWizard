@@ -9,16 +9,10 @@ const MIN_LENGTH_FOR_VERIF = 4;
 
 interface Props {
   handleTextFieldChange: (value: string) => void;
-  webPrefix?: string;
+  isNextInput? : boolean;
   isVerificationEnabled: boolean;
+  webPrefix?: string;
 };
-
-type SendToVerify = (
-  url: string,
-  setSentToBeVerified: React.Dispatch<React.SetStateAction<boolean>>,
-  setVerification: React.Dispatch<React.SetStateAction<Verification>>,
-  webPrefix?: string
-) => void;
 
 const useStyles = makeStyles(({ palette }) => 
   createStyles({
@@ -71,32 +65,16 @@ const useStyles = makeStyles(({ palette }) =>
   })
 );
 
-const sendToVerify: SendToVerify = (url, setSentToBeVerified, setVerification, webPrefix) => {
-  const prefixedAndEncoded = `${webPrefix}${encodeURI(url)}`;
-  console.log(`${prefixedAndEncoded} send to be verified.`);
-  setSentToBeVerified(true);
-
-  fetch("https://damp-bayou-55824.herokuapp.com/", { method: "POST", headers: { "Content-Type": "text/plain" }, body: prefixedAndEncoded})
-  .then(res => res.text())
-  .then(text => {
-    setSentToBeVerified(false);
-    if(text === "OK") setVerification("OK");
-    else setVerification("KO");
-  })
-  .catch(err => {
-    console.log(err.message);
-    setSentToBeVerified(false);
-    setVerification(null);
-  });
-};
-
 const VerifyUrlTextField = (props: Props & TextFieldProps) => {
   const {
     handleTextFieldChange,
-    webPrefix,
+    isNextInput,
     isVerificationEnabled,
+    value,
+    webPrefix,
     ...textFieldProps
   } = props;
+  const [unprefixedValue, setUnprefixedValue] = useState( unprefixValue(webPrefix, value as string) );
   const [timeoutID, setTimeoutID] = useState(-1);
   const [sentToBeVerified, setSentToBeVerified] = useState(false);
   const [verification, setVerification] = useState<Verification>(null);
@@ -104,7 +82,9 @@ const VerifyUrlTextField = (props: Props & TextFieldProps) => {
   const classes = useStyles({ verifying: isVerifying });
 
   const handleChange = (value: string) => {
-    handleTextFieldChange(value);
+    setUnprefixedValue(value);
+    const prefixedValue = prefixValue(webPrefix, value);
+    handleTextFieldChange(prefixedValue);
     setVerification(null);
     if(timeoutID !== -1) window.clearTimeout(timeoutID);
     if(!isVerificationEnabled) return;
@@ -142,8 +122,45 @@ const VerifyUrlTextField = (props: Props & TextFieldProps) => {
         classes.toBeVerified}
       inputAdornment={webPrefix}
       onChange={e => handleChange(e.target.value)}
-      ref={SwTextFieldRef} />
+      ref={SwTextFieldRef}
+      value={isNextInput ? "" : unprefixedValue} />
   );
 };
 
 export default VerifyUrlTextField;
+
+function unprefixValue(prefix: string | undefined, value: string) {
+  if(prefix && value.startsWith(prefix)) return value.substring(prefix.length);
+  return value;
+}
+
+function prefixValue(prefix: string | undefined, value: string) {
+  return value.length > 0 ?
+    (prefix || "") + value
+    :
+    value; // don't prefix the empty value - textField removal logic is based on an empty string
+}
+
+function sendToVerify(
+  url: string,
+  setSentToBeVerified: React.Dispatch<React.SetStateAction<boolean>>,
+  setVerification: React.Dispatch<React.SetStateAction<Verification>>,
+  webPrefix?: string
+  ) {
+  const prefixedAndEncoded = `${webPrefix}${encodeURI(url)}`;
+  console.log(`${prefixedAndEncoded} send to be verified.`);
+  setSentToBeVerified(true);
+
+  fetch("https://damp-bayou-55824.herokuapp.com/", { method: "POST", headers: { "Content-Type": "text/plain" }, body: prefixedAndEncoded})
+  .then(res => res.text())
+  .then(text => {
+    setSentToBeVerified(false);
+    if(text === "OK") setVerification("OK");
+    else setVerification("KO");
+  })
+  .catch(err => {
+    console.log(err.message);
+    setSentToBeVerified(false);
+    setVerification(null);
+  });
+}

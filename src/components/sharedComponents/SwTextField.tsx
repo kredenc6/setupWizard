@@ -14,7 +14,6 @@ const StyledTextField = withStyles(({ spacing }) => ({
 
 const SwTextField = forwardRef((props: TextFieldProps & Props, ref: React.Ref<HTMLDivElement>) => {
   const { inputAdornment, ...textFieldProps } = props
-  // return <StyledTextField {...props} ref={ref} variant="outlined" />;
 
   return <StyledTextField
     {...textFieldProps}

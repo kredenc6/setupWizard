@@ -55,7 +55,7 @@ export interface Module {
   [propName: string]: any;
   selected: boolean;
   VERIFY_BY_PROXY?: string[];
-  WEB_PREFIX?: string;
+  WEB_PREFIX?: string[];
 };
 
 export type UserInputModuleKeys = keyof UserInput["modules"];

@@ -41,7 +41,7 @@ const jsonObjFrame: JsonResultObj = {
     {
       "source": "youtube",
       "show_in_app": false,
-      "queries": ["placeholder1","placeholder2", "placeholder3"],
+      "queries": [],
       "blocked_videos": []
     },
     {
@@ -55,8 +55,8 @@ const jsonObjFrame: JsonResultObj = {
     {
       "source": "soundcloud",
       "show_in_app": false,
-      "queries": ["placeholder1","placeholder2"],
-      "blocked_tracks": ["placeholders", ";-p", ":-D"]
+      "queries": [],
+      "blocked_tracks": []
     }
   ],
   "books": [
@@ -65,18 +65,6 @@ const jsonObjFrame: JsonResultObj = {
       "show_in_app": false,
       "queries": [],
       "blocked_book_ids": []
-    },
-    {
-      "source": "PH_Amazon",
-      "show_in_app": false,
-      "queries": [],
-      "blocked_book_ids": ["aaa", "bbb"]
-    },
-    {
-      "source": "PH_Tarzan",
-      "show_in_app": false,
-      "queries": ["one", "two", "three"],
-      "blocked_book_ids": ["10", "14"]
     }
   ],
   "twitter": [

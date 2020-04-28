@@ -61,6 +61,7 @@ const ArrayDataComponent = ({ dataArr, handleJsonChange, isVerificationEnabled, 
         <ObjectDataComponent
           dataObj={dataItem}
           handleJsonObjChange={handleJsonObjChange}
+          prefixIndex={i}
           isVerificationEnabled={isVerificationEnabled}
           moduleSettings={moduleSettings}
           skipProperties={KEYS_TO_LABELS} />

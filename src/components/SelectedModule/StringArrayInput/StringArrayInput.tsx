@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import SwTextField from "../../sharedComponents/SwTextField";
 import VerifyUrlTextField from "../../sharedComponents/VerifyUrlTextField";
 import isProxyVerifiable from "../helpFunctions/isProxyVerifiable";
+import determineWebPrefix from "../helpFunctions/determinWebPrefix";
 import { Module } from "../../../interfaces/interfaces";
 
 interface Props {
@@ -10,10 +11,11 @@ interface Props {
   isVerificationEnabled: boolean;
   label: string;
   moduleSettings: Module | undefined;
+  prefixIndex?: number;
 };
 export type Verification = null | "OK" | "KO";
 
-const StringArrayInput = ({ arr, handleChange, isVerificationEnabled, label, moduleSettings }: Props) => {
+const StringArrayInput = ({ arr, handleChange, isVerificationEnabled, label, moduleSettings, prefixIndex }: Props) => {
   const isVerifiableArr = isProxyVerifiable(moduleSettings, label);
   const [componentKeys, setComponentsKeys] = useState<string[]>(createComponentKeys([], arr)); // this component needs a way...
   // to hold unique component keys during rerenders(prevents mixing validation results when using index number as a key)
@@ -59,7 +61,7 @@ const StringArrayInput = ({ arr, handleChange, isVerificationEnabled, label, mod
           key={componentKeys[i]}
           label={label}
           handleTextFieldChange={value => handleTextFieldChange(i, value)}
-          webPrefix={moduleSettings?.WEB_PREFIX}
+          webPrefix={determineWebPrefix(moduleSettings, prefixIndex)}
           isVerificationEnabled={isVerificationEnabled}
           onBlur={e => handleTextFieldBlur(i, e.target.value)}
           value={value} />
@@ -78,8 +80,9 @@ const StringArrayInput = ({ arr, handleChange, isVerificationEnabled, label, mod
     <VerifyUrlTextField
       color="secondary"
       handleTextFieldChange={value => addToJsonArr(arr.length, value)}
+      isNextInput={true}
       isVerificationEnabled={isVerificationEnabled}
-      webPrefix={moduleSettings?.WEB_PREFIX}
+      webPrefix={determineWebPrefix(moduleSettings, prefixIndex)}
       key="nextInput"
       label={label}
       value="" />
@@ -107,3 +110,10 @@ function createComponentKeys(keyArr: string[], valueArr: any[]) {
     return i >= keyArr.length ? String(Math.random()) : keyArr[i];
   });
 }
+
+// function determineWebPrefix(moduleSettings: Module | undefined) {
+//   if(moduleSettings && moduleSettings.WEB_PREFIX) {
+//     return moduleSettings.WEB_PREFIX[0];
+//   }
+//   return undefined;
+// }

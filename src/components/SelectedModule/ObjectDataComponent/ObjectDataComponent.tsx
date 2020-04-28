@@ -4,21 +4,24 @@ import StringArrayInput from "../StringArrayInput/StringArrayInput";
 import SwTextField from "../../sharedComponents/SwTextField";
 import VerifyUrlTextField from "../../sharedComponents/VerifyUrlTextField";
 import isProxyVerifiable from "../helpFunctions/isProxyVerifiable";
+import determineWebPrefix from "../helpFunctions/determinWebPrefix";
 import { Module } from "../../../interfaces/interfaces";
 
 interface Props {
   dataObj: object;
   handleJsonObjChange: (dataObj: object, key: string, value: any) => void
+  prefixIndex?: number;
   isVerificationEnabled: boolean;
   moduleSettings?: Module;
   skipProperties?: string[];
 };
 
-const ObjectDataComponent = ({ dataObj, handleJsonObjChange, isVerificationEnabled, moduleSettings, skipProperties }: Props) => {
+const ObjectDataComponent = (
+  { dataObj, handleJsonObjChange, prefixIndex, isVerificationEnabled, moduleSettings, skipProperties }: Props) => {
   const handleChange = (key: string, value: any) => {
     handleJsonObjChange(dataObj, key, value);
   };
-  const Components = turnObjToFormComponents(dataObj, handleChange, moduleSettings, skipProperties, isVerificationEnabled);
+  const Components = turnObjToFormComponents(dataObj, handleChange, moduleSettings, skipProperties, isVerificationEnabled, prefixIndex);
 
   return(
     <div>
@@ -33,7 +36,7 @@ export default ObjectDataComponent;
 
 function turnObjToFormComponents
   (obj: object, handleChange: (key: string, value: any) => void, moduleSettings: Module | undefined,
-  skipProperties: string[] | undefined, isVerificationEnabled: boolean) {
+  skipProperties: string[] | undefined, isVerificationEnabled: boolean, prefixIndex: number | undefined) {
   const TextFieldComponents: JSX.Element[] = [];
   const CheckboxComponents: JSX.Element[] = [];
   const StringArrayInputComponents: JSX.Element[] = [];
@@ -45,7 +48,7 @@ function turnObjToFormComponents
           <VerifyUrlTextField
             key={`textField${key}`}
             handleTextFieldChange={value => handleChange(key, value)}
-            webPrefix={moduleSettings?.WEB_PREFIX}
+            webPrefix={determineWebPrefix(moduleSettings, prefixIndex)}
             isVerificationEnabled={isVerificationEnabled}
             label={key}
             name={key}
@@ -82,7 +85,8 @@ function turnObjToFormComponents
           isVerificationEnabled={isVerificationEnabled}
           key={`strArr${key}`}
           label={key}
-          moduleSettings={moduleSettings} />
+          moduleSettings={moduleSettings}
+          prefixIndex={prefixIndex} />
       );
     }
   }

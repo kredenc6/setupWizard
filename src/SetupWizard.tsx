@@ -48,12 +48,12 @@ const initialUserInput: UserInput = {
     instagram: {
       selected: false,
       VERIFY_BY_PROXY: ["main_channel", "other_channels"],
-      WEB_PREFIX: "https://www.instagram.com/"
+      WEB_PREFIX: ["https://www.instagram.com/"]
     },
     facebook: {
       selected: false,
       VERIFY_BY_PROXY: ["channel"],
-      WEB_PREFIX: "https://www.facebook.com/"
+      WEB_PREFIX: ["https://www.facebook.com/"]
     },
     reddit: {
       selected: false
@@ -62,12 +62,14 @@ const initialUserInput: UserInput = {
       selected: false
     },
     videos: {
-      selected: false
+      selected: false,
+      VERIFY_BY_PROXY: ["queries"],
+      WEB_PREFIX: ["https://www.youtube.com/", "https://vimeo.com/"]
     },
     websites: {
       selected: false,
       VERIFY_BY_PROXY: ["SELF"],
-      WEB_PREFIX: "https://"
+      WEB_PREFIX: ["https://"]
     }
   }
 };
