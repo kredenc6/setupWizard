@@ -6,21 +6,29 @@ interface Shades {
 };
 
 interface Props {
+  activeColor: string;
   classes: Classes;
   colorName: string;
   onClick: (color: string) => void;
   shades: Shades;
 };
 
-const createTableRow = ({ classes, colorName, onClick, shades }: Props) => {
+const TableRowComponent = (props: Props) => {
+  return createTableRow(props);
+};
+
+export default TableRowComponent;
+
+
+function createTableRow({ activeColor, classes, colorName, onClick, shades }: Props) {
   const TableCellComponents: JSX.Element[] = [];
   for(const [key, value] of Object.entries(shades)) {
-    //skip repeating colors
+    //fill repeating colors...
     if(["brown", "grey", "blueGrey"].includes(colorName) && ["A100", "A200", "A400", "A700"].includes(key)) {
-      TableCellComponents.push(<div key={`${colorName}${key}`}></div>); // empty cell
+      TableCellComponents.push(<div key={`${colorName}${key}`}></div>); // ... with empty cells
       continue;
     }
-    TableCellComponents.push(createColorTableCell(colorName, value, classes, onClick));
+    TableCellComponents.push( createColorTableCell(colorName, value, classes, onClick, activeColor) );
   }
 
   return(
@@ -31,11 +39,12 @@ const createTableRow = ({ classes, colorName, onClick, shades }: Props) => {
   );
 };
 
-const createColorTableCell = (colorName: string, background: string, classes: Classes, onClick: Props["onClick"]) => {
+function createColorTableCell(colorName: string, background: string, classes: Classes, onClick: Props["onClick"],
+  activeColor: string) {
   return(
     <div
       key={colorName + background}
-      className={`${classes.squareEmptyCell} ${classes.tableCell}`}
+      className={`${classes.squareEmptyCell} ${classes.tableCell} ${isActiveColor(activeColor, background) ? classes.activeColor : ""}`}
       style={{ backgroundColor: background }}
       onClick={() => onClick(background)}
     >
@@ -43,8 +52,6 @@ const createColorTableCell = (colorName: string, background: string, classes: Cl
   );
 };
 
-const TableRowComponent = (props: Props) => {
-  return createTableRow(props);
-};
-
-export default TableRowComponent;
+function isActiveColor(activeColor: string, paletteColor: string) {
+  return activeColor === paletteColor;
+}

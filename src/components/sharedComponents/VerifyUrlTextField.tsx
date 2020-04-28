@@ -5,7 +5,7 @@ import SwTextField from "./SwTextField";
 import { Verification } from "../SelectedModule/StringArrayInput/StringArrayInput";
 
 const VERIFICATION_DELAY = 2000;
-const MIN_LENGTH_FOR_VERIF = 4;
+const MIN_LENGTH_FOR_VERIF = 3;
 
 interface Props {
   handleTextFieldChange: (value: string) => void;
@@ -99,9 +99,9 @@ const VerifyUrlTextField = (props: Props & TextFieldProps) => {
     }, VERIFICATION_DELAY));
   };
 
-  const SwTextFieldRef = useRef<HTMLDivElement>(null);
+  const SwTextFieldRef = useRef<HTMLInputElement>(null);
   useEffect(() => { // re-verify on mount
-    const value = SwTextFieldRef.current?.getElementsByTagName("input")[0].value || "";
+    const value = SwTextFieldRef.current?.value || "";
     if(value.length >= MIN_LENGTH_FOR_VERIF && isVerificationEnabled) {
       sendToVerify(value, setSentToBeVerified, setVerification, webPrefix);
     }
@@ -138,7 +138,7 @@ function prefixValue(prefix: string | undefined, value: string) {
   return value.length > 0 ?
     (prefix || "") + value
     :
-    value; // don't prefix the empty value - textField removal logic is based on an empty string
+    value; // don't prefix an empty value - textField removal logic is based on an empty string
 }
 
 function sendToVerify(
@@ -148,7 +148,7 @@ function sendToVerify(
   webPrefix?: string
   ) {
   const prefixedAndEncoded = `${webPrefix}${encodeURI(url)}`;
-  console.log(`${prefixedAndEncoded} send to be verified.`);
+  console.log(`${prefixedAndEncoded} was sent to be verified.`);
   setSentToBeVerified(true);
 
   fetch("https://damp-bayou-55824.herokuapp.com/", { method: "POST", headers: { "Content-Type": "text/plain" }, body: prefixedAndEncoded})

@@ -34,14 +34,6 @@ const SetupStepper = ({ activeStep, menuLabels, isNextStepAllowed, setActiveStep
     return menuLabels.length;
   };
 
-  const completedSteps = () => {
-    return completed.size;
-  };
-
-  const allStepsCompleted = () => {
-    return completedSteps() === totalSteps();
-  };
-
   const isFirstStep = () => {
     return activeStep === 1;
   }
@@ -112,15 +104,13 @@ const SetupStepper = ({ activeStep, menuLabels, isNextStepAllowed, setActiveStep
   return(
     <div className={ classes.root }>
       <SwStepperButtons 
-        allStepsCompleted={allStepsCompleted}
         isFinished={isFinished}
         handleBack={handleBack}
         handleNext={handleNext}
         handleReset={handleReset}
         isFirstStep={isFirstStep}
         isLastStep={isLastStep}
-        isNextStepAllowed={isNextStepAllowed}
-        setIsFinished={setIsFinished} />
+        isNextStepAllowed={isNextStepAllowed} />
       <Stepper
         alternativeLabel
         className={classes.stepper}

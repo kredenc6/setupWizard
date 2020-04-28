@@ -36,7 +36,6 @@ export interface JsonScheme {
 };
 
 export interface UserInput {
-  appTopic: string;
   schemeObj: SchemeObj;
   modules: {
     audio: Module;

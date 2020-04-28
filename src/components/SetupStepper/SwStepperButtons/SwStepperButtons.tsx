@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { Button } from "@material-ui/core";
-import { createStyles, makeStyles, Theme, withStyles } from "@material-ui/core/styles";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import SteppDescription from "../Steppinstruction/SteppInstruction";
 
 interface Props {
-  allStepsCompleted: () => boolean;
+  // allStepsCompleted: () => boolean;
   isFinished: boolean;
   handleBack: () => void;
   handleNext: () => void;
@@ -12,7 +12,7 @@ interface Props {
   isFirstStep: () => boolean;
   isLastStep: () => boolean;
   isNextStepAllowed: boolean;
-  setIsFinished: React.Dispatch<React.SetStateAction<boolean>>;
+  // setIsFinished: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -27,24 +27,18 @@ const useStyles = makeStyles((theme: Theme) =>
     stepperButtonsWrapper: {
       display: "flex",
       justifyContent: "center"
+    },
+    invisible: {
+      color: "transparent !important",
+      backgroundColor: "transparent !important",
+      border: "none !important"
     }
   })
 );
 
-const BackButton = withStyles({
-  root: {
-    "&.invisible": {
-      color: "transparent",
-      backgroundColor: "transparent",
-      border: "none"
-    }
-  }
-})(Button);
-
 const SwStepperButtonsWrapper = (props: Props) => {
   const classes = useStyles();
   const {
-    allStepsCompleted,
     isFinished,
     handleBack,
     handleNext,
@@ -52,7 +46,6 @@ const SwStepperButtonsWrapper = (props: Props) => {
     isFirstStep,
     isLastStep,
     isNextStepAllowed,
-    setIsFinished
   } = props;
 
   return(
@@ -66,15 +59,15 @@ const SwStepperButtonsWrapper = (props: Props) => {
           </>
         :
           <>
-            <BackButton
-              className={`${classes.button} ${isFirstStep() ? "invisible" : ""}`}
+            <Button
+              className={`${classes.button} ${isFirstStep() ? classes.invisible : ""}`}
               disabled={isFirstStep()}
               onClick={handleBack}
             >
               Back
-            </BackButton>
+            </Button>
             {isLastStep() ?
-                <Button color="primary" disabled={!allStepsCompleted()} onClick={() => setIsFinished(true)} variant="contained">
+                <Button className={classes.invisible} color="primary" disabled={true} variant="contained">
                   Finish
                 </Button>
               : 

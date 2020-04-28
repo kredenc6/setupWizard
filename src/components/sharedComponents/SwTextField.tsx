@@ -12,16 +12,21 @@ const StyledTextField = withStyles(({ spacing }) => ({
   }
 }))(TextField);
 
-const SwTextField = forwardRef((props: TextFieldProps & Props, ref: React.Ref<HTMLDivElement>) => {
-  const { inputAdornment, ...textFieldProps } = props
+const SwTextField = forwardRef((props: TextFieldProps & Props, ref: React.Ref<HTMLInputElement>) => {
+  const { inputAdornment, ...textFieldProps } = props;
+  const inputProps = {
+    autoComplete: "off",
+    spellCheck: false,
+    startAdornment: inputAdornment ?
+      <InputAdornment position="start">{inputAdornment}</InputAdornment>
+      : 
+      null
+  };
 
   return <StyledTextField
     {...textFieldProps}
-    InputProps={inputAdornment ?
-      { startAdornment: <InputAdornment position="start">{inputAdornment}</InputAdornment> }
-      : 
-      {}}
-    ref={ref}
+    InputProps={inputProps}
+    inputRef={ref}
     variant="outlined" />;
 });
 

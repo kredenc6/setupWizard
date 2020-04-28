@@ -33,7 +33,6 @@ const styles = {
 const useStyles = makeStyles(styles);
 
 const initialUserInput: UserInput = {
-  appTopic: "placeholder",
   schemeObj: createSchemeObjFromPresetScheme(jsonObjFrame.ui_colors, theme.palette.getContrastText),
   modules: {
     audio: {
@@ -76,7 +75,7 @@ const initialUserInput: UserInput = {
 
 const SetupWizard = () => {
   const classes = useStyles();
-  const [activeStep, setActiveStep] = useState(3);
+  const [activeStep, setActiveStep] = useState(1);
   const [isNextStepAllowed, setIsNextStepAllowed] = useState(false);
   const [userInput, setUserInput] = useState(initialUserInput);
   const [jsonObj, setJsonObj] = useState(jsonObjFrame);
@@ -108,7 +107,7 @@ const SetupWizard = () => {
       return {
         label: `Module(${key})`,
         component: <SelectedModule 
-          appTopic={userInput.appTopic}
+          appTopic={jsonObj.app_topic}
           handleJsonChange={(changedModule: JsonObjModule) => handleJsonChange({ [key]: changedModule })}
           jsonModuleObj={jsonObj[key as JsonObjKey] as unknown as JsonObjModule}
           moduleSettings={userInput.modules[key as keyof UserInput["modules"]]}
@@ -123,9 +122,8 @@ const SetupWizard = () => {
       label: "Create app topic",
       component: <MenuTopic
         handleJsonChange={(value: string) => handleJsonChange({ "app_topic": value })}
-        handleTopicChange={handleUserInputChange}
         setIsNextStepAllowed={setIsNextStepAllowed}
-        value={userInput.appTopic} />
+        value={jsonObj.app_topic} />
     },
     {
       label: "Select color scheme",

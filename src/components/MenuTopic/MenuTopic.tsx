@@ -2,13 +2,11 @@ import React, { useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import MenuHeading from "../sharedComponents/MenuHeading";
 import SwTextField from "../sharedComponents/SwTextField";
-import { UserInput } from "../../interfaces/interfaces";
 
-//TODO handle function redundancy
+const PLACEHOLDER = "Type your app topic here (min. 2 characters)";
 
 interface Props {
   handleJsonChange: (value: string) => void;
-  handleTopicChange: <K extends keyof UserInput>(propName: K, value: UserInput[K]) => void
   setIsNextStepAllowed: React.Dispatch<React.SetStateAction<boolean>>;
   value: string;
 };
@@ -16,11 +14,14 @@ interface Props {
 const styles = {
   menuTopic: {
     "text-align": "center"
+  },
+  textField: {
+    minWidth: `${PLACEHOLDER.length / 2}rem`
   }
 };
 const useStyles = makeStyles(styles);
 
-const MenuTopic = ({ handleJsonChange, handleTopicChange, setIsNextStepAllowed, value }: Props) => {
+const MenuTopic = ({ handleJsonChange, setIsNextStepAllowed, value }: Props) => {
   const classes = useStyles();
   const isValueValid = value.trim().length >= 2;
 
@@ -33,11 +34,9 @@ const MenuTopic = ({ handleJsonChange, handleTopicChange, setIsNextStepAllowed, 
       <MenuHeading text="What is the app topic?" />
       <SwTextField
         autoFocus
-        onChange={(e) => {
-          handleTopicChange("appTopic", e.target.value);
-          handleJsonChange(e.target.value);
-        }}
-        placeholder="Type your app topic here (min. 2 characters)"
+        className={classes.textField}
+        onChange={(e) => handleJsonChange(e.target.value)}
+        placeholder={PLACEHOLDER}
         required
         value={value}
       />

@@ -82,10 +82,15 @@ const MenuStyles = (
       </div>
       <div className={classes.right}>
         <ColorToolHeading text="color palette" />
-        <ColorPalette onClick={(color: string) => {
-          assignColor(color);
-          setSelectedScheme("custom");
-        }} />
+        <ColorPalette
+          activeColor={schemeProperty === "text" ?
+            schemeObj["textColorOverride"][selectedPalette] || ""
+           :
+            schemeObj[selectedPalette].main}
+          onClick={(color: string) => {
+            assignColor(color);
+            setSelectedScheme("custom");
+          }} />
         <ColorToolHeading text="current scheme" />
         <ColorScheme
           schemeObj={schemeObj}

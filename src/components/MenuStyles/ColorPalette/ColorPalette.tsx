@@ -5,6 +5,7 @@ import TableHeadComponent from "./TableHeadComponent";
 import TableRowComponent from "./TableRowComponent";
 
 interface Props {
+  activeColor: string;
   onClick: (color: string) => void;
 };
 
@@ -48,13 +49,19 @@ const styles = createStyles(
     },
     squareEmptyCell: {
       paddingTop: "100%"
+    },
+    activeColor: {
+      borderRadius: "50%",
+      "&:hover": {
+        borderRadius: "50%"
+      }
     }
   }
 );
 const useStyles = makeStyles(styles);
 
 
-const ColorPalette = ({ onClick }: Props) => {
+const ColorPalette = ({ activeColor, onClick }: Props) => {
   const colorShades = Object.keys(colors["red"]); // take shade key names from red color obj(any color obj would do)
   const classes = useStyles({ columnCount: colorShades.length });
 
@@ -64,7 +71,7 @@ const ColorPalette = ({ onClick }: Props) => {
 
   const TableRowComponents = Object.entries(colors).map(([key, value]) => {
     if(key === "common") return null;
-    return <TableRowComponent key={key} colorName={key} shades={value} classes={classes} onClick={onClick} />;
+    return <TableRowComponent activeColor={activeColor} key={key} colorName={key} shades={value} classes={classes} onClick={onClick} />;
   });
 
   return(
@@ -79,3 +86,7 @@ const ColorPalette = ({ onClick }: Props) => {
 };
 
 export default ColorPalette;
+
+// function isActiveColor(activeColor: string, paletteColor: string) {
+//   return activeColor === paletteColor;
+// }
