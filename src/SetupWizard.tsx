@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { CssBaseline } from "@material-ui/core";
 import { makeStyles, ThemeProvider } from "@material-ui/core/styles";
 import MenuTopic from "./components/MenuTopic/MenuTopic";
+import MenuLoadedJsons from "./components/MenuLoadedJsons/MenuLoadedJsons";
 import MenuStyles from "./components/MenuStyles/MenuStyles";
 import MenuSelectModules from "./components/MenuSelectModules/MenuSelectModules";
 import MenuJson from "./components/MenuJson/MenuJson";
@@ -33,10 +34,13 @@ const styles = {
 const useStyles = makeStyles(styles);
 
 const initialUserInput: UserInput = {
+  loadedJSONs: [],
   schemeObj: createSchemeObjFromPresetScheme(jsonObjFrame.ui_colors, theme.palette.getContrastText),
   modules: {
     audio: {
-      selected: false
+      selected: false,
+      VERIFY_BY_PROXY: ["queries"],
+      WEB_PREFIX: ["https://www.soundcloud.com/"]
     },
     books: {
       selected: false
@@ -58,7 +62,9 @@ const initialUserInput: UserInput = {
       selected: false
     },
     twitter: {
-      selected: false
+      selected: false,
+      VERIFY_BY_PROXY: ["url"],
+      WEB_PREFIX: ["https://www.twitter.com/"]
     },
     videos: {
       selected: false,
@@ -92,12 +98,39 @@ const SetupWizard = () => {
     return () => window.clearInterval(intervalID);
   },[]);
   
-  function handleUserInputChange<K extends keyof UserInput>(propName: K, value: UserInput[K]): void {
+  function handleUserInputChange<K extends keyof UserInput>(propName: K, value: UserInput[K]) {
     setUserInput(prev => ({ ...prev, [propName]: value }));
   }
 
-  function handleJsonChange(value: JsonObjModule): void {
+  function handleJsonChange(value: JsonObjModule) {
     setJsonObj(prev => ({ ...prev, ...value }));
+  }
+
+  function handleLoadingJsons(fileList: FileList) {
+    new Promise(resolve => {
+      const errorCount = { count: 0 };
+      const JSONs: JsonResultObj[] = [];
+
+      for(let i=0; i < fileList.length; i++) {
+        fetch( URL.createObjectURL(fileList[i]) )
+          .then(response => response.json())
+          .then(json => {
+            JSONs.push(json);
+            if(JSONs.length + errorCount.count >= fileList.length) resolve(JSONs);
+          })
+          .catch(err => {
+            console.log(err.message);
+            errorCount.count++;
+            if(JSONs.length + errorCount.count >= fileList.length) resolve(JSONs);
+          });
+      }
+    })
+    .then(JSONarr => {
+      const JSONs = JSONarr as JsonResultObj[];
+      handleUserInputChange("loadedJSONs", JSONs);
+
+      if(JSONs[0]) setJsonObj(JSONs[0] as JsonResultObj);
+    });
   }
 
   const SelectedModuleComponents: Menu[] =
@@ -117,14 +150,35 @@ const SetupWizard = () => {
       };
   });
 
+  const LoadedJsonsMenuComponent: Menu =
+    {
+      label: "LoadedJsons",
+      component: <MenuLoadedJsons
+        handleClick={(jsonObj: JsonResultObj) => {
+          const newModules: UserInput["modules"] = JSON.parse(JSON.stringify(userInput.modules));
+          for(const moduleName of Object.keys(userInput.modules)) {
+            const isSelected = jsonObj.visible_components.includes(moduleName as keyof UserInput["modules"]);
+            newModules[moduleName as keyof UserInput["modules"]].selected = isSelected;
+          };
+          handleUserInputChange("modules", newModules);
+          setJsonObj(jsonObj);
+        }}
+        jsonObj={jsonObj}
+        loadedJsons={userInput.loadedJSONs}
+        setIsNextStepAllowed={setIsNextStepAllowed} />
+    };
+
   const menus: Menu[] = [
     { 
       label: "Create app topic",
       component: <MenuTopic
-        handleJsonChange={(value: string) => handleJsonChange({ "app_topic": value })}
+        handleJsonChange={(value: string) => handleJsonChange({ "app_topic": value,
+          "twitter": [{ ...jsonObj["twitter"][0], "channel_name": value }]})} // save also as a twitter channel_name
+        handleLoadingJsons={handleLoadingJsons}
         setIsNextStepAllowed={setIsNextStepAllowed}
         value={jsonObj.app_topic} />
     },
+    {...LoadedJsonsMenuComponent},
     {
       label: "Select color scheme",
       component: <MenuStyles

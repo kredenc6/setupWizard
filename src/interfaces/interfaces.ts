@@ -36,6 +36,7 @@ export interface JsonScheme {
 };
 
 export interface UserInput {
+  loadedJSONs: JsonResultObj[];
   schemeObj: SchemeObj;
   modules: {
     audio: Module;
@@ -77,9 +78,7 @@ export interface JsonResultObj {
     ad_mob_ad_unit_id: string;
   };
   ui_colors: JsonScheme;
-  visible_components: {
-    [propName: number]: keyof UserInput["modules"];
-  };
+  visible_components: Array<keyof UserInput["modules"]>
   facebook: {
     channel: string;
   };
