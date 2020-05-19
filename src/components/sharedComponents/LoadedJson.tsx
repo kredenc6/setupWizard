@@ -1,19 +1,18 @@
 import React from "react";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
-import { JsonResultObj } from "../../../interfaces/interfaces";
+import { makeStyles } from "@material-ui/core/styles";
+import { JsonResultObj } from "../../interfaces/interfaces";
 
 interface Props {
   jsonObj: JsonResultObj;
 };
 
-const styles = (theme: Theme) => 
-  createStyles({
+const useStyles = makeStyles({
   LoadedJsonWrapper: {
     minWidth: "25rem",
-    maxWidth: "50%",
-    height: "100%",
+    width: "100%",
+    maxHeight: "100%",
+    height: "75vh",
     padding: "1rem",
-    borderLeft: `1px solid ${theme.palette.divider}`,
     overflow: "auto"
   },
   json: {
@@ -22,18 +21,17 @@ const styles = (theme: Theme) =>
     }
   }
 });
-const useStyles = makeStyles(theme => styles(theme));
 
 const LoadedJson = ({ jsonObj }: Props) => {
   const classes = useStyles();
   return(
-    <aside className={classes.LoadedJsonWrapper}>
+    <article className={classes.LoadedJsonWrapper}>
       <pre>
         <code className={classes.json}>
           {JSON.stringify(jsonObj, null, 2)}
         </code>
       </pre>
-    </aside>
+    </article>
   );
 };
 

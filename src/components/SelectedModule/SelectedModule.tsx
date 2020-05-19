@@ -5,9 +5,9 @@ import ObjectDataComponent from "./ObjectDataComponent/ObjectDataComponent";
 import ArrayDataComponent from "./ArrayDataComponent/ArrayDataComponent";
 import ArrayComponent from "./ArrayComponent/ArrayComponent";
 import AppTopicParagraph from "../sharedComponents/AppTopicParagraph";
-import ServerStatus from "../sharedComponents/ServerStatus";
+import ServerState from "../sharedComponents/ServerState";
 import VerificationStatus from "../sharedComponents/VerificationStatus";
-import { JsonObjModule, Module } from "../../interfaces/interfaces";
+import { JsonObjModule, Module, ServerIs } from "../../interfaces/interfaces";
 
 interface Props {
   appTopic: string;
@@ -15,7 +15,7 @@ interface Props {
   jsonModuleObj: JsonObjModule;
   moduleName: string;
   moduleSettings: Module;
-  serverStatus: string;
+  serverState: ServerIs;
   setIsNextStepAllowed: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
@@ -34,7 +34,7 @@ const isArrObjectArr = (arr: any[]) => {
 };
 
 const SelectedInput = 
-  ({ appTopic, handleJsonChange, jsonModuleObj, moduleName, moduleSettings, serverStatus, setIsNextStepAllowed }: Props) => {
+  ({ appTopic, handleJsonChange, jsonModuleObj, moduleName, moduleSettings, serverState, setIsNextStepAllowed }: Props) => {
 
   const classes = useStyles();
   const handleJsonObjChange = (dataObj: object, key: string, value: any) => handleJsonChange({ ...dataObj, [key]: value });
@@ -47,28 +47,28 @@ const SelectedInput =
   return (
     <section className={classes.menuTopic}>
       <MenuHeading text={moduleName} />
-      <ServerStatus serverStatus={serverStatus} />
-      <VerificationStatus status={serverStatus === "online" ? "enabled" : "disabled"} />
+      <ServerState serverState={serverState} />
+      <VerificationStatus status={serverState === "online" ? "enabled" : "disabled"} />
       <AppTopicParagraph topic={appTopic} />
       {Array.isArray(jsonModuleObj) ?
         isArrObjectArr(jsonModuleObj) ?
           <ArrayDataComponent
             dataArr={jsonModuleObj}
             handleJsonChange={handleJsonChange}
-            isVerificationEnabled={serverStatus === "online"}
+            isVerificationEnabled={serverState === "online"}
             moduleSettings={moduleSettings} />
           :
           <ArrayComponent
             array={jsonModuleObj as string[]}
             handleJsonChange={handleJsonChange}
-            isVerificationEnabled={serverStatus === "online"}
+            isVerificationEnabled={serverState === "online"}
             label={moduleName}
             moduleSettings={moduleSettings} />
         :
         <ObjectDataComponent
           dataObj={jsonModuleObj}
           handleJsonObjChange={handleJsonObjChange}
-          isVerificationEnabled={serverStatus === "online"}
+          isVerificationEnabled={serverState === "online"}
           moduleSettings={moduleSettings} />
       }
     </section>

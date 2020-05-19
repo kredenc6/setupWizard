@@ -13,7 +13,6 @@ interface Props {
   moduleSettings: Module | undefined;
   prefixIndex?: number;
 };
-export type Verification = null | "OK" | "KO";
 
 const StringArrayInput = ({ arr, handleChange, isVerificationEnabled, label, moduleSettings, prefixIndex }: Props) => {
   const isVerifiableArr = isProxyVerifiable(moduleSettings, label);
@@ -110,10 +109,3 @@ function createComponentKeys(keyArr: string[], valueArr: any[]) {
     return i >= keyArr.length ? String(Math.random()) : keyArr[i];
   });
 }
-
-// function determineWebPrefix(moduleSettings: Module | undefined) {
-//   if(moduleSettings && moduleSettings.WEB_PREFIX) {
-//     return moduleSettings.WEB_PREFIX[0];
-//   }
-//   return undefined;
-// }

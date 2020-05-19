@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { TextFieldProps } from "@material-ui/core";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import SwTextField from "./SwTextField";
-import { Verification } from "../SelectedModule/StringArrayInput/StringArrayInput";
+import { SERVER_ADDRESS } from "../../SetupWizard";
 
 const VERIFICATION_DELAY = 2000;
 const MIN_LENGTH_FOR_VERIF = 3;
@@ -13,6 +13,7 @@ interface Props {
   isVerificationEnabled: boolean;
   webPrefix?: string;
 };
+type Verification = null | "OK" | "KO";
 
 const useStyles = makeStyles(({ palette }) => 
   createStyles({
@@ -147,20 +148,18 @@ function sendToVerify(
   setVerification: React.Dispatch<React.SetStateAction<Verification>>,
   webPrefix?: string
   ) {
-  const prefixedAndEncoded = `${webPrefix}${encodeURI(url)}`;
-  console.log(`${prefixedAndEncoded} was sent to be verified.`);
-  setSentToBeVerified(true);
+    const prefixedAndEncoded = `${webPrefix || ""}${encodeURI(url)}`;
+    console.log(`${prefixedAndEncoded} was sent to be verified.`);
+    setSentToBeVerified(true);
 
-  fetch("https://damp-bayou-55824.herokuapp.com/", { method: "POST", headers: { "Content-Type": "text/plain" }, body: prefixedAndEncoded})
-  .then(res => res.text())
-  .then(text => {
-    setSentToBeVerified(false);
-    if(text === "OK") setVerification("OK");
-    else setVerification("KO");
-  })
-  .catch(err => {
-    console.log(err.message);
-    setSentToBeVerified(false);
-    setVerification(null);
-  });
+    fetch(`${SERVER_ADDRESS}/verify`, { method: "POST", headers: { "Content-Type": "text/plain" }, body: prefixedAndEncoded})
+      .then(response => {
+        response.statusText === "OK" ? setVerification("OK") : setVerification("KO");
+        setSentToBeVerified(false);
+      })
+      .catch(err => {
+        console.log(err.message);
+        setSentToBeVerified(false);
+        setVerification(null);
+      });
 }

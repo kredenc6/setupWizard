@@ -1,8 +1,7 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Checkbox, FormControlLabel, FormGroup } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import MenuHeading from "../sharedComponents/MenuHeading";
-import ServerStatus from "../sharedComponents/ServerStatus";
+import SubMenuHeading from "../sharedComponents/SubMenuHeading";
 import sortObjEntriesAlphabetically from "../../miscellaneous/sortObjEntriesAlphabetically";
 import { UserInput, Module } from "../../interfaces/interfaces";
 
@@ -10,27 +9,18 @@ interface Props {
   handleJsonChange: (value: string[]) => void;
   handleModuleChange: <K extends keyof UserInput>(propName: K, value: UserInput[K]) => void;
   modules: UserInput["modules"];
-  serverStatus: string;
-  setIsNextStepAllowed: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const styles = {
+const useStyles = makeStyles({
   formWrapper: {
     display: "flex"
   },
   leftPlaceholder: {
     width: "42%"
   }
-};
-const useStyles = makeStyles(styles);
+});
 
-const isAtLeastOneModuleSelected = (modules: Props["modules"]) => {
-  return Object.entries(modules).some(([_, module]) => {
-    return module.selected;
-  });
-};
-
-const MenuSelectModules = ({ handleJsonChange, handleModuleChange, modules, serverStatus, setIsNextStepAllowed }: Props) => {
+const MenuSelectModules = ({ handleJsonChange, handleModuleChange, modules }: Props) => {
   const classes = useStyles();
   const handleChange = (checked: boolean, moduleName: string, module: Module) => {
     const updatedModules = { ...modules, [moduleName]: { ...module, selected: checked } };
@@ -58,16 +48,9 @@ const MenuSelectModules = ({ handleJsonChange, handleModuleChange, modules, serv
     )
   );
 
-  //BUG? it's possible to have module prop "shwow_in_app" value true and the "visible_components" json prop
-  // without the module
-  useEffect(() => {
-    setIsNextStepAllowed(isAtLeastOneModuleSelected(modules));
-  },[modules, setIsNextStepAllowed]);
-
   return(
     <section>
-      <MenuHeading text="Select visible components." />
-      <ServerStatus serverStatus={serverStatus} />
+      <SubMenuHeading text="Select visible components." />
       <div className={classes.formWrapper}>
         <div className={classes.leftPlaceholder}></div>
         <FormGroup>

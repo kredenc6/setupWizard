@@ -1,51 +1,66 @@
-import React, { useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import MenuHeading from "../sharedComponents/MenuHeading";
+import React from "react";
+import { FormControlLabel, Switch } from "@material-ui/core";
+import { createStyles, makeStyles } from "@material-ui/core/styles";
+import SubMenuHeading from "../sharedComponents/SubMenuHeading";
 import SwTextField from "../sharedComponents/SwTextField";
-import UploadButton from "./UploadButton";
 
 const PLACEHOLDER = "Type your app topic here (min. 2 characters)";
 
 interface Props {
-  handleJsonChange: (value: string) => void;
-  handleLoadingJsons: (value: FileList) => void;
-  setIsNextStepAllowed: React.Dispatch<React.SetStateAction<boolean>>;
+  handleChange: (value: string) => void;
+  handleChannelsSwitch: () => void;
+  handleResetSwitch: () => void;
+  resetOtherValues: boolean;
+  setAsChannelValues: boolean;
   value: string;
 };
 
-const styles = {
-  menuTopic: {
-    "text-align": "center"
-  },
-  textField: {
-    minWidth: `${PLACEHOLDER.length / 2}rem`
-  }
-};
-const useStyles = makeStyles(styles);
+const useStyles = makeStyles(theme =>
+  createStyles({
+    menuTopic: {
+      "text-align": "center"
+    },
+    textField: {
+      minWidth: `${PLACEHOLDER.length / 2}rem`
+    },
+    switchWrapper: {
+      display: "inline-flex",
+      flexDirection: "column",
+      marginLeft: theme.spacing(2)
+    }
+  })
+);
 
-const MenuTopic = ({ handleJsonChange, handleLoadingJsons, setIsNextStepAllowed, value }: Props) => {
+const MenuTopic = (props: Props) => {
+  const {
+    handleChange,
+    handleChannelsSwitch,
+    handleResetSwitch,
+    resetOtherValues,
+    setAsChannelValues,
+    value 
+  } = props;
   const classes = useStyles();
-  const isValueValid = value.trim().length >= 2;
-
-  useEffect(() => {
-    setIsNextStepAllowed(isValueValid);
-  });
 
   return(
     <section className={classes.menuTopic}>
-      <MenuHeading text="What is the app topic?" />
+      <SubMenuHeading text="What is the app topic?"  />
       <SwTextField
         autoFocus
         className={classes.textField}
-        onChange={e => handleJsonChange(e.target.value)}
+        onChange={e => handleChange(e.target.value)}
         placeholder={PLACEHOLDER}
         required
         value={value}
       />
-      <br/>
-      or
-      <br/>
-      <UploadButton handleLoadingJsons={handleLoadingJsons} text="Load JSON(s)" />
+      <div className={classes.switchWrapper}>
+        <FormControlLabel
+          control={<Switch checked={resetOtherValues} onClick={handleResetSwitch} />}
+          label="reset other values with change" />
+        <FormControlLabel
+          control={<Switch checked={setAsChannelValues} onClick={handleChannelsSwitch} />}
+          label="set also as channel values" />
+      </div>
     </section>
   );
 };

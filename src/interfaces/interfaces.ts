@@ -1,3 +1,5 @@
+import Interval from "../classes/Interval";
+
 export interface Classes {
   [propName: string]: string;
 };
@@ -36,7 +38,8 @@ export interface JsonScheme {
 };
 
 export interface UserInput {
-  loadedJSONs: JsonResultObj[];
+  resetJsonOnAppTopicChange: boolean;
+  setAlsoAsChannelValues: boolean;
   schemeObj: SchemeObj;
   modules: {
     audio: Module;
@@ -126,3 +129,14 @@ export interface VideoItem extends MediaItem {
 export type JsonObjKey = keyof JsonResultObj;
 
 export type JsonObjModule = JsonResultObj[UserInputModuleKeys];
+
+export type ServerIs = "online" | "offline";
+
+export interface SaveFileResponse {
+  fileName: string;
+  savedSuccessfully: boolean;
+}
+
+export interface IntervalsObj {
+  [propName: string]: Interval;
+}

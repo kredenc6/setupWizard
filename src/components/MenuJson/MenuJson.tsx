@@ -1,39 +1,51 @@
 import React from "react";
 import { Button } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { createStyles, makeStyles } from "@material-ui/core/styles";
 import RestJsonPropsComponent from "./RestJsonPropsComponent/RestJsonPropsComponent";
-import ServerStatus from "../sharedComponents/ServerStatus";
-import VerificationStatus from "../sharedComponents/VerificationStatus";
-import { JsonObjKey, JsonResultObj, UserInput } from "../../interfaces/interfaces";
+import SaveToRepoBtt from "./SaveToRepoBtt/SaveToRepoBtt";
+import GitStateReport from "../sharedComponents/GitStateReport/GitStateReport";
+import { downloadJson } from "../../fileFunctions/fileFunctions";
+import { JsonObjKey, JsonResultObj, ServerIs, UserInput } from "../../interfaces/interfaces";
+import { FilesState } from "../../interfaces/fileInterfaces";
+import Interval from "../../classes/Interval";
 
 interface Props {
+  jsonFilesState: FilesState;
   handleJsonChange: (key: JsonObjKey, changedModule: JsonResultObj[JsonObjKey]) => void;
   jsonObj: JsonResultObj;
-  serverStatus: string;
+  remoteRepoCheckInterval: Interval;
+  serverState: ServerIs;
   userInput: UserInput;
 };
 
-const styles = {
-  menuJson: {
-    width: "100%",
-    display: "flex",
-    justifyContent: "space-between"
-  },
-  jsonWrapper: {
-    minWidth: "25rem",
-    maxHeight: "100%",
-    padding: "1rem",
-    "overflow-y": "auto"
-  },
-  json: {
-    "&:hover": {
-      cursor: "text"
+const useStyles = makeStyles(theme =>
+  createStyles({
+    menuJson: {
+      width: "100%",
+      display: "flex",
+      justifyContent: "space-between"
+    },
+    jsonWrapper: {
+      minWidth: "25rem",
+      maxHeight: "100%",
+      padding: "1rem",
+      "overflow-y": "auto"
+    },
+    json: {
+      "&:hover": {
+        cursor: "text"
+      }
+    },
+    buttonsWrapper: {
+      height: "100%",
+      display: "grid",
+      gridGap: theme.spacing(1),
+      gridTemplateRows: "auto 1fr 1fr"
     }
-  }
-};
-const useStyles = makeStyles(styles);
+  })
+);
 
-const MenuJson = ({ handleJsonChange, jsonObj, serverStatus, userInput }: Props) => {
+export default function MenuJson({ handleJsonChange, jsonFilesState, jsonObj, remoteRepoCheckInterval, serverState, userInput }: Props) {
   const classes = useStyles();
   const restJsonProps = Object.entries(jsonObj)
     .filter(([key, _]) => {
@@ -45,16 +57,22 @@ const MenuJson = ({ handleJsonChange, jsonObj, serverStatus, userInput }: Props)
   return(
     <section className={classes.menuJson}>
       <div>
-        <ServerStatus serverStatus={serverStatus} />
-        <VerificationStatus status={serverStatus === "online" ? "enabled" : "disabled"} />
         <RestJsonPropsComponent
           handleJsonChange={handleJsonChange}
-          isVerificationEnabled={serverStatus === "online" ? true : false}
+          isVerificationEnabled={serverState === "online" ? true : false}
           restJson={restJsonProps} />
       </div>
-      <Button color="primary" onClick={() => downloadJson(jsonObj)} variant="contained">
-        Download Json
-      </Button>
+      <div className={classes.buttonsWrapper}>
+        <GitStateReport
+          gitState={jsonFilesState.localRepoState}
+          lastRepoUpdate={jsonFilesState.lastRepoUpdate}
+          remoteRepoCheckInterval={remoteRepoCheckInterval}
+          serverState={serverState} />
+        <Button color="primary" onClick={() => downloadJson(jsonObj)} variant="contained">
+          Download as {jsonObj.app_topic}.json
+        </Button>
+        <SaveToRepoBtt jsonObj={jsonObj} />
+      </div>
       <pre className={classes.jsonWrapper}>
         <code className={classes.json}>
           {JSON.stringify(jsonObj, null, 2)}
@@ -63,22 +81,3 @@ const MenuJson = ({ handleJsonChange, jsonObj, serverStatus, userInput }: Props)
     </section>
   );
 };
-
-export default MenuJson;
-
-function normalizeJsonfileName(name: string) {
-  return name.trim().replace(/\s/g, "_").toLowerCase();
-}
-
-function downloadJson(jsonObj: JsonResultObj) {
-  const fileName = normalizeJsonfileName(jsonObj.app_topic);
-  const json = JSON.stringify(jsonObj, null, 2);
-  const blob = new Blob([json],{type:'application/json'});
-  const href = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = href;
-  link.download = fileName + ".json";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
