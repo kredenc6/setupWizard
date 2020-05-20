@@ -5,7 +5,7 @@ import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import SyncIcon from '@material-ui/icons/Sync';
 import PromptCommitMessage from "./PromptCommitMessage/PromptCommitmessage";
 import { commitRepo, mergeRemoteRepo, pushToRemoteRepo } from "../../../../gitFunctions/gitFunctions";
-import { SERVER_ADDRESS } from "../../../../SetupWizard";
+import { SERVER_ADDRESS } from "../../../../initialStates/constants";
 import { ServerIs } from "../../../../interfaces/interfaces";
 import { StatusResult } from "../../../../interfaces/simpleGit";
 import Interval from '../../../../classes/Interval';

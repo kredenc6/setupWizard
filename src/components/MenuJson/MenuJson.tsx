@@ -4,6 +4,7 @@ import { createStyles, makeStyles } from "@material-ui/core/styles";
 import RestJsonPropsComponent from "./RestJsonPropsComponent/RestJsonPropsComponent";
 import SaveToRepoBtt from "./SaveToRepoBtt/SaveToRepoBtt";
 import GitStateReport from "../sharedComponents/GitStateReport/GitStateReport";
+import DataDisplay from "../sharedComponents/DataDisplay";
 import { downloadJson } from "../../fileFunctions/fileFunctions";
 import { JsonObjKey, JsonResultObj, ServerIs, UserInput } from "../../interfaces/interfaces";
 import { FilesState } from "../../interfaces/fileInterfaces";
@@ -30,11 +31,6 @@ const useStyles = makeStyles(theme =>
       maxHeight: "100%",
       padding: "1rem",
       "overflow-y": "auto"
-    },
-    json: {
-      "&:hover": {
-        cursor: "text"
-      }
     },
     buttonsWrapper: {
       height: "100%",
@@ -73,11 +69,7 @@ export default function MenuJson({ handleJsonChange, jsonFilesState, jsonObj, re
         </Button>
         <SaveToRepoBtt jsonObj={jsonObj} />
       </div>
-      <pre className={classes.jsonWrapper}>
-        <code className={classes.json}>
-          {JSON.stringify(jsonObj, null, 2)}
-        </code>
-      </pre>
+      <DataDisplay classes={{ jsonWrapper: classes.jsonWrapper }} data={jsonObj} />
     </section>
   );
 };

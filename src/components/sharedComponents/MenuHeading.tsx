@@ -1,6 +1,7 @@
 import React from "react";
 import { Typography, TypographyProps } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
+import capitalizeFirstLetter from "../../miscellaneous/capitalizeFirstLetter";
 
 interface Props extends TypographyProps {
   text: string;
@@ -15,7 +16,7 @@ const StyledHeading = withStyles(({ spacing }) => ({
 const MenuHeading = (props: Props) => {
   const { text, ...typographyProps } = props;
 
-  return <StyledHeading align="center" children={text} variant="h2" {...typographyProps} />;
+  return <StyledHeading align="center" children={capitalizeFirstLetter(text)} variant="h2" {...typographyProps} />;
 };
 
 export default MenuHeading;

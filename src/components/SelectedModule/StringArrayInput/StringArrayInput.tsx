@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import SwTextField from "../../sharedComponents/SwTextField";
 import VerifyUrlTextField from "../../sharedComponents/VerifyUrlTextField";
 import isProxyVerifiable from "../helpFunctions/isProxyVerifiable";
-import determineWebPrefix from "../helpFunctions/determinWebPrefix";
+import determineWebPrefix from "../helpFunctions/determineWebPrefix";
 import { Module } from "../../../interfaces/interfaces";
 
 interface Props {

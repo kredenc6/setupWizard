@@ -5,8 +5,6 @@ import ObjectDataComponent from "./ObjectDataComponent/ObjectDataComponent";
 import ArrayDataComponent from "./ArrayDataComponent/ArrayDataComponent";
 import ArrayComponent from "./ArrayComponent/ArrayComponent";
 import AppTopicParagraph from "../sharedComponents/AppTopicParagraph";
-import ServerState from "../sharedComponents/ServerState";
-import VerificationStatus from "../sharedComponents/VerificationStatus";
 import { JsonObjModule, Module, ServerIs } from "../../interfaces/interfaces";
 
 interface Props {
@@ -47,8 +45,6 @@ const SelectedInput =
   return (
     <section className={classes.menuTopic}>
       <MenuHeading text={moduleName} />
-      <ServerState serverState={serverState} />
-      <VerificationStatus status={serverState === "online" ? "enabled" : "disabled"} />
       <AppTopicParagraph topic={appTopic} />
       {Array.isArray(jsonModuleObj) ?
         isArrObjectArr(jsonModuleObj) ?

@@ -8,7 +8,7 @@ import { JsonScheme, UserInput } from "../../../../interfaces/interfaces";
 interface Props {
   handleSchemeChange: <K extends keyof UserInput>(propName: K, value: UserInput[K]) => void;
   selectedScheme: string;
-  setSelectedScheme: React.Dispatch<React.SetStateAction<string>>;
+  setSelectedScheme: (value: string) => void;
 };
 
 const styles = (theme: Theme) => createStyles({

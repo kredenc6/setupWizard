@@ -3,6 +3,7 @@ import { Badge, Button, Popover } from "@material-ui/core";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import GitActions from "./GitActions/GitActions";
 import LastUpdate from "./LastUpdate/LastUpdate";
+import DataDisplay from "../DataDisplay";
 import sortObjEntriesAlphabetically from "../../../miscellaneous/sortObjEntriesAlphabetically";
 import { ServerIs } from "../../../interfaces/interfaces";
 import { StatusResult } from "../../../interfaces/simpleGit";
@@ -25,7 +26,7 @@ const useStyles = makeStyles(theme =>
   })
 );
 
-const GitStateReport = ({ gitState, lastRepoUpdate, remoteRepoCheckInterval, serverState }: Props) => {
+export default function GitStateReport ({ gitState, lastRepoUpdate, remoteRepoCheckInterval, serverState }: Props) {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = Boolean(anchorEl);
@@ -43,27 +44,29 @@ const GitStateReport = ({ gitState, lastRepoUpdate, remoteRepoCheckInterval, ser
     <>
       <Badge badgeContent={gitState?.ahead || gitState?.behind ? "!" : 0} color="error">
         <Button
+          color="primary"
           children="git state"
+          disabled={serverState === "offline" || !gitState}
           onClick={e => handleClick(e.currentTarget)}
+          style={{ width: "100%" }}
           variant="outlined" />
       </Badge>
       <Popover
         anchorEl={anchorEl}
         anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
+          vertical: "top",
+          horizontal: "right",
         }}
         classes={{
           paper: classes.paper,
         }}
         className={classes.popover}
         disableRestoreFocus
-        id="gitStatePopover"
         onClose={handlePopoverClose}
         open={open}
         transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
+          vertical: "bottom",
+          horizontal: "left",
         }}
       >
         <div>
@@ -72,18 +75,12 @@ const GitStateReport = ({ gitState, lastRepoUpdate, remoteRepoCheckInterval, ser
             :
               null}
           <LastUpdate timeStamp={lastRepoUpdate} />
-          <pre>
-            <code>
-              {JSON.stringify(normalizeRepoState(gitState), null, 2)}
-            </code>
-          </pre>
+          <DataDisplay data={normalizeRepoState(gitState)} />
         </div>
       </Popover>
     </>
   );
 };
-
-export default GitStateReport;
 
 function normalizeRepoState(repoState: StatusResult | null) {
   if(!repoState) return null;

@@ -40,6 +40,7 @@ export interface JsonScheme {
 export interface UserInput {
   resetJsonOnAppTopicChange: boolean;
   setAlsoAsChannelValues: boolean;
+  selectedScheme: string;
   schemeObj: SchemeObj;
   modules: {
     audio: Module;

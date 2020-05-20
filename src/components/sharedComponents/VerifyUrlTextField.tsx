@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { TextFieldProps } from "@material-ui/core";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import SwTextField from "./SwTextField";
-import { SERVER_ADDRESS } from "../../SetupWizard";
+import { SERVER_ADDRESS } from "../../initialStates/constants";
 
 const VERIFICATION_DELAY = 2000;
 const MIN_LENGTH_FOR_VERIF = 3;

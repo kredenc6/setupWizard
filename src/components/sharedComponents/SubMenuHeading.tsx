@@ -8,7 +8,7 @@ interface Props extends TypographyProps {
 
 const StyledHeading = withStyles(({ spacing, typography }) => ({
   root: {
-    marginBottom: spacing(2),
+    margin: `${spacing(1)}px ${spacing(2)}px 0`,
     fontWeight: typography.fontWeightLight
   }
 }))(Typography);

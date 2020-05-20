@@ -1,7 +1,6 @@
 import React from "react";
 import { Checkbox, FormControlLabel, FormGroup } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
-import SubMenuHeading from "../sharedComponents/SubMenuHeading";
+import { createStyles, makeStyles } from "@material-ui/core/styles";
 import sortObjEntriesAlphabetically from "../../miscellaneous/sortObjEntriesAlphabetically";
 import { UserInput, Module } from "../../interfaces/interfaces";
 
@@ -11,14 +10,16 @@ interface Props {
   modules: UserInput["modules"];
 };
 
-const useStyles = makeStyles({
-  formWrapper: {
-    display: "flex"
-  },
-  leftPlaceholder: {
-    width: "42%"
-  }
-});
+const useStyles = makeStyles(theme => 
+  createStyles({
+    formWrapper: {
+      display: "flex"
+    },
+    leftPlaceholder: {
+      width: "42%"
+    }
+  })
+);
 
 const MenuSelectModules = ({ handleJsonChange, handleModuleChange, modules }: Props) => {
   const classes = useStyles();
@@ -49,15 +50,12 @@ const MenuSelectModules = ({ handleJsonChange, handleModuleChange, modules }: Pr
   );
 
   return(
-    <section>
-      <SubMenuHeading text="Select visible components." />
-      <div className={classes.formWrapper}>
-        <div className={classes.leftPlaceholder}></div>
-        <FormGroup>
-          {FormLabelComponents}
-        </FormGroup>
-      </div>
-    </section>
+    <article className={classes.formWrapper}>
+      <div className={classes.leftPlaceholder}></div>
+      <FormGroup>
+        {FormLabelComponents}
+      </FormGroup>
+    </article>
   );
 };
 

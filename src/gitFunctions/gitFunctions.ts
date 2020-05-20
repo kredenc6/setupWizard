@@ -1,4 +1,5 @@
 import { StatusResult } from "../interfaces/simpleGit";
+import { LocalStorageRepoState } from "../interfaces/fileInterfaces";
 
 export async function fetchRepoStatus(
   serverAddress: string, callback?: (repoState: StatusResult) => void) {
@@ -36,4 +37,9 @@ export async function mergeRemoteRepo(serverAddress: string) {
     .then(response => response.json())
     .then(mergeJson => mergeJson)
     .catch(err => console.log(err.message));
+}
+
+export function getLocalStorageRepoState() {
+  const repoStateString = localStorage.getItem("repoState") || undefined;
+  return repoStateString ? JSON.parse(repoStateString) as LocalStorageRepoState : undefined;
 }

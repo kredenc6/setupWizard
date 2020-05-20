@@ -1,30 +1,37 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import { createStyles, makeStyles } from "@material-ui/core";
 import { ServerIs } from "../../interfaces/interfaces";
 
 interface Props {
   serverState: ServerIs;
 };
 
-const useStyles = makeStyles({
-  serverState: {
-    textAlign: "center",
-    textDecoration: "underline",
-    textDecorationColor: "#777"
-  },
-  statusText: ({ serverState }: Props) => ({
-    color: serverState === "online" ? "green" : "red",
-    fontWeight: 700
-  })
-});
+const useStyles = makeStyles(theme =>
+  createStyles({
+    serverState: {
+      position: "fixed",
+      right: theme.spacing(1),
+      padding: theme.spacing(1),
+      textAlign: "center",
+      border: `1px solid ${theme.palette.divider}`,
+      borderRadius: "20px",
+      "&:hover": {
+        cursor: "default"
+      }
+    },
+    statusText: ({ serverState }: Props) => ({
+      color: serverState === "online" ? "green" : "red",
+      fontWeight: 700
+    })
+  }
+));
 
-const ServerState = ({ serverState }: Props) => {
+export default function ServerState ({ serverState }: Props) {
   const classes = useStyles({ serverState });
   return(
-    <aside className={classes.serverState}>
-      <span>Proxy server is <span className={classes.statusText}>{serverState}</span>.</span>
-    </aside>
+    <div className={classes.serverState}>
+      <p>Server</p>
+      <p><span className={classes.statusText}>{serverState === "online" ? "connected" : "not connected"}</span>.</p>
+    </div>
   );
-};
-
-export default ServerState;
+}

@@ -1,28 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { CssBaseline } from "@material-ui/core";
 import { makeStyles, ThemeProvider } from "@material-ui/core/styles";
+import MainMenu from "./components/MainMenu/MainMenu";
 import MenuStyles from "./components/MenuStyles/MenuStyles";
 import MenuJson from "./components/MenuJson/MenuJson";
 import SelectedModule from "./components/SelectedModule/SelectedModule";
 import SetupStepper from "./components/SetupStepper/SetupStepper";
+import ServerState from "./components/sharedComponents/serverState";
 import theme from "./theme/theme";
-import { createSchemeObjFromPresetScheme } from "./miscellaneous/colorSchemeFunctions";
 import sortObjEntriesAlphabetically from "./miscellaneous/sortObjEntriesAlphabetically";
 import getServerState from "./miscellaneous/getServerState";
+import capitalizeFirstLetter from "./miscellaneous/capitalizeFirstLetter";
 import jsonObjFrame from './jsonObjFrame/jsonObjFrame';
-import { fetchRepoStatus } from "./gitFunctions/gitFunctions";
+import Interval from "./classes/Interval";
+import { initialFilesState, initialUserInput } from "./initialStates/initialStates";
+import { CHECK_SERVER_STATUS_INTERVAL, REMOTE_REPO_CHECK_INTERVAL, SERVER_ADDRESS } from "./initialStates/constants";
+import { fetchRepoStatus, getLocalStorageRepoState } from "./gitFunctions/gitFunctions";
 import { fetchJsonFiles } from "./fileFunctions/fileFunctions";
 import { IntervalsObj, JsonObjModule, JsonObjKey, JsonResultObj, JsonScheme, Menu, ServerIs, UserInput } from "./interfaces/interfaces";
-import { FilesState, LocalStorageRepoState } from "./interfaces/fileInterfaces";
-
-import NewServerState from "./components/sharedComponents/NewServerState";
-import MainMenu from "./components/MainMenu/MainMenu";
-import Interval from "./classes/Interval";
-
-const CHECK_SERVER_STATUS_INTERVAL = 30000; // 30 seconds
-const REMOTE_REPO_CHECK_INTERVAL = 3600000; // 1 hour
-export const SERVER_ADDRESS = "http://localhost:5005";
-// const SERVER_ADDRESS = "https://damp-bayou-55824.herokuapp.com/"; // heroku verification server
 
 const useStyles = makeStyles({
   wizardWrapper: {
@@ -40,75 +35,18 @@ const useStyles = makeStyles({
   }
 });
 
-const initialFilesState: FilesState = {
-  lastRepoUpdate: getLocalStorageRepoState()?.timeStamp || 0,
-  loadedJsons: [],
-  localRepoState: null,
-  isActiveFileModified: false,
-  isActiveFileSaved: null,
-  loadManually: false
-};
-
-const initialUserInput: UserInput = {
-  resetJsonOnAppTopicChange: true,
-  setAlsoAsChannelValues: true,
-  schemeObj: createSchemeObjFromPresetScheme(jsonObjFrame.ui_colors, theme.palette.getContrastText),
-  modules: {
-    audio: {
-      selected: false,
-      VERIFY_BY_PROXY: ["queries"],
-      WEB_PREFIX: ["https://www.soundcloud.com/"]
-    },
-    books: {
-      selected: false
-    },
-    events: {
-      selected: false
-    },
-    instagram: {
-      selected: false,
-      VERIFY_BY_PROXY: ["main_channel", "other_channels"],
-      WEB_PREFIX: ["https://www.instagram.com/"]
-    },
-    facebook: {
-      selected: false,
-      VERIFY_BY_PROXY: ["channel"],
-      WEB_PREFIX: ["https://www.facebook.com/"]
-    },
-    reddit: {
-      selected: false
-    },
-    twitter: {
-      selected: false,
-      VERIFY_BY_PROXY: ["url"],
-      WEB_PREFIX: ["https://www.twitter.com/"]
-    },
-    videos: {
-      selected: false,
-      VERIFY_BY_PROXY: ["queries"],
-      WEB_PREFIX: ["https://www.youtube.com/", "https://vimeo.com/"]
-    },
-    websites: {
-      selected: false,
-      VERIFY_BY_PROXY: ["SELF"]
-    }
-  }
-};
-
 export default function SetupWizard() {
   const classes = useStyles();
   const [activeStep, setActiveStep] = useState(1);
   const [isNextStepAllowed, setIsNextStepAllowed] = useState(false);
   const [userInput, setUserInput] = useState(initialUserInput);
   const [jsonObj, setJsonObj] = useState(jsonObjFrame);
-  const [selectedScheme, setSelectedScheme] = useState("default"); // TODO can be gotten rid of or moved elsewhere?
   const [serverState, setServerState] = useState<ServerIs>("offline");
-  const [isJsonSelectionOpen, setIsJsonSelectionOpen] = useState(false);
   const [jsonFilesState, setJsonFilesState] = useState(initialFilesState);
   const [intervals, setIntervals] = useState<IntervalsObj>({
-    serverCheck: new Interval(CHECK_SERVER_STATUS_INTERVAL, () => getServerState(SERVER_ADDRESS).then(status => setServerState(status))),
+    serverCheck: new Interval(CHECK_SERVER_STATUS_INTERVAL, async () => setServerState(await getServerState(SERVER_ADDRESS))),
     remoteRepoCheck: new Interval(REMOTE_REPO_CHECK_INTERVAL, (serverState: ServerIs, forcedRefresh?: boolean) => {
-      loadLocalRepoState(serverState, forcedRefresh)
+      loadRepoState(serverState, forcedRefresh)
         .then(timeStamp => {
           if(timeStamp !== 0) {
             setJsonFilesState(prevState => ({ ...prevState, lastRepoUpdate: timeStamp }));
@@ -123,7 +61,7 @@ export default function SetupWizard() {
 
   useEffect(() => {
     intervals.serverCheck.start(true);
-    fetchJsonsFromLocalRepo();
+    loadJsonsFromLocalRepo();
 
     return () => intervals.serverCheck.stop();
   },[intervals]);
@@ -194,13 +132,13 @@ export default function SetupWizard() {
     setJsonObj(jsonObj);
   }
 
-  function loadLocalRepoState(serverState: ServerIs, forcedRefresh = false): Promise<number> {
+  function loadRepoState(serverState: ServerIs, forcedRefresh = false): Promise<number> {
     return new Promise((resolve, reject) => {
       const canRefresh = serverState === "online" &&
         ( forcedRefresh || shoudRepoStateBeRefreshed(jsonFilesState.lastRepoUpdate) );
       
       if(canRefresh) {
-        refreshLocalRepoState()
+        refreshRepoState()
           .then(timeStamp => resolve(timeStamp))
           .catch((err: Error) => reject(err));
       } else {
@@ -213,7 +151,7 @@ export default function SetupWizard() {
     });
   }
 
-  function refreshLocalRepoState(): Promise<number> {
+  function refreshRepoState(): Promise<number> {
     return new Promise((resolve, reject) => {
       fetchRepoStatus(SERVER_ADDRESS)
         .then(state => {
@@ -230,7 +168,7 @@ export default function SetupWizard() {
     });
   }
 
-  function fetchJsonsFromLocalRepo() {
+  function loadJsonsFromLocalRepo() {
     fetchJsonFiles(SERVER_ADDRESS, (jsonFiles: JsonResultObj[]) => setJsonFilesState(prevState => {
       return { ...prevState, loadedJsons: jsonFiles }
     }));
@@ -255,7 +193,7 @@ export default function SetupWizard() {
     .filter(([_, module]) => module.selected)
     .map(([key, _]) => {
       return {
-        label: `Module(${key})`,
+        label: capitalizeFirstLetter(key),
         component: <SelectedModule 
           appTopic={jsonObj.app_topic}
           handleJsonChange={(changedModule: JsonObjModule) => handleJsonChange({ [key]: changedModule })}
@@ -271,7 +209,7 @@ export default function SetupWizard() {
     {
       label: "Main menu",
       component: <MainMenu
-        fetchJsonsFromLocalRepo={fetchJsonsFromLocalRepo}
+        fetchJsonsFromLocalRepo={loadJsonsFromLocalRepo}
         handleChannelsSwitch={() => handleUserInputChange("setAlsoAsChannelValues", !userInput.setAlsoAsChannelValues)}
         handleJsonChange={(value: string[]) => handleJsonChange({ "visible_components": value })}
         handleJsonSelection={handleJsonSelection}
@@ -279,13 +217,11 @@ export default function SetupWizard() {
         handleModuleChange={handleUserInputChange}
         handleResetSwitch={() => handleUserInputChange("resetJsonOnAppTopicChange", !userInput.resetJsonOnAppTopicChange)}
         handleTopicChange={handleTopicChange}
-        isJsonSelectionOpen={isJsonSelectionOpen}
         remoteRepoCheckInterval={intervals.remoteRepoCheck}
         jsonFilesState={jsonFilesState}
         jsonObj={jsonObj}
         serverState={serverState}
         setAsChannelValues={userInput.setAlsoAsChannelValues}
-        setIsJsonSelectionOpen={setIsJsonSelectionOpen}
         setIsNextStepAllowed={setIsNextStepAllowed}
         resetOtherValues={userInput.resetJsonOnAppTopicChange}
         userInput={userInput} />
@@ -296,9 +232,8 @@ export default function SetupWizard() {
         handleJsonChange={(value: JsonScheme) => handleJsonChange({ "ui_colors": value })}
         handleSchemeChange={handleUserInputChange}
         schemeObj={userInput.schemeObj}
-        selectedScheme={selectedScheme}
-        setIsNextStepAllowed={setIsNextStepAllowed}
-        setSelectedScheme={setSelectedScheme} />
+        selectedScheme={userInput.selectedScheme}
+        setIsNextStepAllowed={setIsNextStepAllowed} />
     },
     ...SelectedModuleComponents,
     {
@@ -317,7 +252,7 @@ export default function SetupWizard() {
     <CssBaseline>
       <ThemeProvider theme={ theme }>
         <main className={classes.wizardWrapper}>
-          <NewServerState serverState={serverState} />
+          <ServerState serverState={serverState} />
           {menus[activeStep - 1].component}
           <SetupStepper
             activeStep={activeStep}
@@ -333,9 +268,4 @@ export default function SetupWizard() {
 function shoudRepoStateBeRefreshed(lastUpdateTime: number) {
   const isTimeIntervalExceeded = Date.now() - lastUpdateTime > REMOTE_REPO_CHECK_INTERVAL;
   return isTimeIntervalExceeded;
-}
-
-function getLocalStorageRepoState() {
-  const repoStateString = localStorage.getItem("repoState") || undefined;
-  return repoStateString ? JSON.parse(repoStateString) as LocalStorageRepoState : undefined;
 }

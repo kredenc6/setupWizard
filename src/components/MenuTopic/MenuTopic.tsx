@@ -1,7 +1,6 @@
 import React from "react";
 import { FormControlLabel, Switch } from "@material-ui/core";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
-import SubMenuHeading from "../sharedComponents/SubMenuHeading";
 import SwTextField from "../sharedComponents/SwTextField";
 
 const PLACEHOLDER = "Type your app topic here (min. 2 characters)";
@@ -43,8 +42,7 @@ const MenuTopic = (props: Props) => {
   const classes = useStyles();
 
   return(
-    <section className={classes.menuTopic}>
-      <SubMenuHeading text="What is the app topic?"  />
+    <article className={classes.menuTopic}>
       <SwTextField
         autoFocus
         className={classes.textField}
@@ -61,7 +59,7 @@ const MenuTopic = (props: Props) => {
           control={<Switch checked={setAsChannelValues} onClick={handleChannelsSwitch} />}
           label="set also as channel values" />
       </div>
-    </section>
+    </article>
   );
 };
 

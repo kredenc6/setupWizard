@@ -15,7 +15,6 @@ interface Props {
   schemeObj: SchemeObj;
   selectedScheme: string;
   setIsNextStepAllowed: React.Dispatch<React.SetStateAction<boolean>>;
-  setSelectedScheme: React.Dispatch<React.SetStateAction<string>>
 };
 
 const styles = {
@@ -43,13 +42,14 @@ const styles = {
 const useStyles = makeStyles(styles);
 
 const MenuStyles = (
-  { handleJsonChange, handleSchemeChange, schemeObj, selectedScheme, setIsNextStepAllowed, setSelectedScheme }: Props) => {
+  { handleJsonChange, handleSchemeChange, schemeObj, selectedScheme, setIsNextStepAllowed }: Props) => {
   const classes = useStyles();
   const [schemeProperty, setSchemeProperty] = useState<"background" | "text">("background");
   const [selectedPalette, setSelectedPalette] = useState<"primary" | "secondary">("primary");
   const getContrastText = useTheme().palette.getContrastText;
 
   const assignColor = (color: string | null) => {
+    handleSchemeChange("selectedScheme", "custom");
     // change background scheme
     if(schemeProperty === "background" && color !== null) {
       const newScheme = createPaletteFromColor(color, getContrastText);
@@ -77,7 +77,7 @@ const MenuStyles = (
         <PresetSchemes
           handleSchemeChange={handleSchemeChange}
           selectedScheme={selectedScheme}
-          setSelectedScheme={setSelectedScheme} />
+          setSelectedScheme={(value: string) => handleSchemeChange("selectedScheme", value)} />
         <UI1 className={classes.userInterface} schemeObj={schemeObj} />
       </div>
       <div className={classes.right}>
@@ -87,10 +87,7 @@ const MenuStyles = (
             schemeObj["textColorOverride"][selectedPalette] || ""
            :
             schemeObj[selectedPalette].main}
-          onClick={(color: string) => {
-            assignColor(color);
-            setSelectedScheme("custom");
-          }} />
+          onClick={(color: string) => assignColor(color)} />
         <ColorToolHeading text="current scheme" />
         <ColorScheme
           schemeObj={schemeObj}
@@ -98,10 +95,7 @@ const MenuStyles = (
           selectedPalette={selectedPalette}
           setSchemeProperty={setSchemeProperty}
           setSelectedPalette={setSelectedPalette}
-          reset={(color: string | null) => {
-            assignColor(color);
-            setSelectedScheme("custom");
-          }} />
+          reset={(color: string | null) => assignColor(color)} />
       </div>
     </section>
   );

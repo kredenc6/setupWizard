@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@material-ui/core";
 import { saveJson } from "../../../fileFunctions/fileFunctions";
-import { SERVER_ADDRESS } from "../../../SetupWizard";
+import { SERVER_ADDRESS } from "../../../initialStates/constants";
 import { JsonResultObj } from "../../../interfaces/interfaces";
 
 interface Props {

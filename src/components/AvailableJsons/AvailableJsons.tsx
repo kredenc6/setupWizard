@@ -3,7 +3,7 @@ import { Dialog, DialogContent, Paper } from "@material-ui/core";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import AvailableJsonsAppBar from "./AvailableJsonsAppBar/AvailableJsonsAppBar";
 import JsonCard from "./JsonCard/JsonCard";
-import LoadedJson from "../sharedComponents/LoadedJson";
+import DataDisplay from "../sharedComponents/DataDisplay";
 import { JsonResultObj } from "../../interfaces/interfaces";
 import { StatusResult } from "../../interfaces/simpleGit";
 import { FilesState } from "../../interfaces/fileInterfaces";
@@ -31,10 +31,18 @@ const useStyles = makeStyles(theme =>
     jsonObjView: {
       display: "inline-box",
       width: "30%"
+    },
+    jsonWrapper: {
+      minWidth: "25rem",
+      width: "100%",
+      maxHeight: "100%",
+      height: "75vh",
+      padding: "1rem",
+      overflow: "auto"
     }
   }));
 
-const AvaiableJsons = ({ activeJsonObj, handleJsonSelection, jsonFilesState, open, setIsJsonSelectionOpen }: Props) => {
+export default function AvaiableJsons ({ activeJsonObj, handleJsonSelection, jsonFilesState, open, setIsJsonSelectionOpen }: Props) {
   const classes = useStyles();
   const { loadedJsons, localRepoState: gitState } = jsonFilesState;
   const [selectedJsonObj, setSelectedJsonObj] = useState<JsonResultObj>(activeJsonObj)
@@ -74,13 +82,13 @@ const AvaiableJsons = ({ activeJsonObj, handleJsonSelection, jsonFilesState, ope
         <div className={classes.jsonFileCards}>
           {jsonCardComponents}
         </div>
-        <Paper children={<LoadedJson jsonObj={selectedJsonObj} />} className={classes.jsonObjView} />
+        <Paper className={classes.jsonObjView}>
+          <DataDisplay classes={{ jsonWrapper: classes.jsonWrapper }} data={selectedJsonObj} />
+        </Paper>
       </DialogContent>
     </Dialog>
   );
 };
-
-export default AvaiableJsons;
 
 function getFileGitState(fileName: string, gitState: StatusResult | null) {
   if(!gitState) return [];
