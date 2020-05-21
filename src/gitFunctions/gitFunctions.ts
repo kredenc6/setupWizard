@@ -1,5 +1,6 @@
-import { StatusResult } from "../interfaces/simpleGit";
+import { MergeSummary, StatusResult } from "../interfaces/simpleGit";
 import { LocalStorageRepoState } from "../interfaces/fileInterfaces";
+import { CommitResponse, PushResponse } from "../interfaces/gitInterfaces";
 
 export async function fetchRepoStatus(
   serverAddress: string, callback?: (repoState: StatusResult) => void) {
@@ -21,21 +22,21 @@ export async function commitRepo(serverAddress: string, message: string, files: 
   return await fetch(`${serverAddress}/gitRepo/commit`,
     { headers: new Headers({ "Content-Type": "application/json" }), method: "POST", body })
       .then(response => response.json())
-      .then(commitJson => commitJson)
+      .then((commitResponse: CommitResponse) => commitResponse)
       .catch(err => console.log(err.message));
 }
 
 export async function pushToRemoteRepo(serverAddress: string) {
   return await fetch(`${serverAddress}/gitRepo/push`, { method: "POST" })
     .then(response => response.json())
-    .then(pushJson => pushJson)
+    .then((pushResponse: PushResponse) => pushResponse.success)
     .catch(err => console.log(err.message));
 }
 
 export async function mergeRemoteRepo(serverAddress: string) {
   return await fetch(`${serverAddress}/gitRepo/merge`)
     .then(response => response.json())
-    .then(mergeJson => mergeJson)
+    .then((mergeResponse: MergeSummary | null) => mergeResponse)
     .catch(err => console.log(err.message));
 }
 

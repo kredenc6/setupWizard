@@ -1,6 +1,6 @@
 import React from "react";
 import { Chip } from "@material-ui/core";
-import { createStyles, makeStyles, Typography } from "@material-ui/core";
+import { createStyles, makeStyles } from "@material-ui/core";
 
 interface Props {
   fileGitState: string[];

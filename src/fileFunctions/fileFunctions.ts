@@ -1,4 +1,5 @@
-import { JsonResultObj, SaveFileResponse } from "../interfaces/interfaces";
+import { JsonResultObj } from "../interfaces/interfaces";
+import { SaveFileResponse } from "../interfaces/fileInterfaces";
 
 export async function fetchJsonFiles(serverAddress: string, callback?: (jsonObjs: JsonResultObj[]) => void) {
   // TODO: there should probably be a check whether the jsonObj is JsonResultObj
@@ -59,4 +60,26 @@ export function downloadJson(jsonObj: JsonResultObj) {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+}
+
+export function loadJsons(fileList: FileList) {
+  const fetchedJsons: Promise<JsonResultObj | undefined>[] = [];
+
+  for(let i=0; i < fileList.length; i++) {
+    fetchedJsons.push(
+      fetch( URL.createObjectURL(fileList[i]) )
+        .then(response => response.json())
+        .then(json => json)
+        .catch(err => console.log(err.message))
+    )
+  }
+
+  return Promise.all(fetchedJsons)
+    .then(resolvedJsons => {
+      return resolvedJsons.filter(resolvedJson => resolvedJson) as JsonResultObj[]; // am I missing somethig? It should work without the type assertion
+    })
+    .catch(err => {
+      console.log(err.message);
+      return [] as JsonResultObj[];
+    });
 }

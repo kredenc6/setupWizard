@@ -16,7 +16,7 @@ import Interval from "./classes/Interval";
 import { initialFilesState, initialUserInput } from "./initialStates/initialStates";
 import { CHECK_SERVER_STATUS_INTERVAL, REMOTE_REPO_CHECK_INTERVAL, SERVER_ADDRESS } from "./initialStates/constants";
 import { fetchRepoStatus, getLocalStorageRepoState } from "./gitFunctions/gitFunctions";
-import { fetchJsonFiles } from "./fileFunctions/fileFunctions";
+import { fetchJsonFiles, loadJsons } from "./fileFunctions/fileFunctions";
 import { IntervalsObj, JsonObjModule, JsonObjKey, JsonResultObj, JsonScheme, Menu, ServerIs, UserInput } from "./interfaces/interfaces";
 
 const useStyles = makeStyles({
@@ -103,23 +103,10 @@ export default function SetupWizard() {
     }
   }
 
-  function handleManualJsonLoading(fileList: FileList) {
-    const fetchedJsons: Promise<JsonResultObj | undefined>[] = [];
-
-    for(let i=0; i < fileList.length; i++) {
-      fetchedJsons.push(
-        fetch( URL.createObjectURL(fileList[i]) )
-          .then(response => response.json())
-          .then(json => json)
-          .catch(err => console.log(err.message))
-      )
-    }
-    Promise.all(fetchedJsons)
-      .then(resolvedJsons => {
-        const jsonResultObjs = resolvedJsons.filter(resolvedJson => resolvedJson) as JsonResultObj[]; // am I missing somethig? It should work without the type assertion
-        setJsonFilesState(prev => ({ ...prev, loadedJsons: jsonResultObjs }))
-      })
-      .catch(err => console.log(err.message));
+  async function handleManualJsonLoading(fileList: FileList) {
+    const loadedJsons = await loadJsons(fileList);
+    intervals.remoteRepoCheck.stop();
+    setJsonFilesState(prev => ({ ...prev, loadedJsons, localRepoState: null }));
   }
 
   function handleJsonSelection(jsonObj: JsonResultObj) {
@@ -169,9 +156,9 @@ export default function SetupWizard() {
   }
 
   function loadJsonsFromLocalRepo() {
-    fetchJsonFiles(SERVER_ADDRESS, (jsonFiles: JsonResultObj[]) => setJsonFilesState(prevState => {
-      return { ...prevState, loadedJsons: jsonFiles }
-    }));
+    fetchJsonFiles(SERVER_ADDRESS, loadedJsons =>
+      setJsonFilesState(prevState => ({ ...prevState, loadedJsons })));
+    intervals.remoteRepoCheck.start(true);
   }
 
   const fillInChannelValues = (value: string, twitter?: JsonResultObj["twitter"]) => {

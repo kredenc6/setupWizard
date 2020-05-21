@@ -16,8 +16,13 @@ const UploadButton = ({ childClass, handleManualJsonLoading, text }: Props) => {
           accept=".json"
           multiple
           onChange={e => {
-            if(e.target.files) handleManualJsonLoading(e.target.files);
-            else console.warn("No files accepted.")
+            if(e.target.files) {
+              handleManualJsonLoading(e.target.files);
+            }
+            else {
+              console.warn("No files accepted.");
+            }
+            e.target.value = ""; // reset input value so if the same files are chosen again the change listener is triggered
           }}
           style={{ display: "none" }}
           type="file" />

@@ -15,13 +15,19 @@ export default class Interval {
     this._callbackProps = callbackProps || [];
   }
 
-  executeNow(moveUpdateTime = true) {
+  executeNow(moveUpdateTime = true, oneTimeCallbackProps?: any[]) {
     if(moveUpdateTime) {
       this.stop();
-      this.start(true);
+      this.start();
+      this._lastUpdateTime = Date.now();
+
+      return oneTimeCallbackProps ?
+        this._callback(...oneTimeCallbackProps) : this._callback(...this._callbackProps);
     } else {
-      this._callback(...this._callbackProps);
       this._forcedUpdateTime = Date.now();
+      
+      return oneTimeCallbackProps ?
+        this._callback(...oneTimeCallbackProps) : this._callback(...this._callbackProps);
     }
   }
   
@@ -34,19 +40,21 @@ export default class Interval {
   }
 
   start(startImmediately = false) {
-    if(this._intervalID !== -1) return false;
+    let callbackResult: any = null;
+    if(this._intervalID !== -1) return callbackResult;
 
     if(startImmediately) {
       this._lastUpdateTime = Date.now();
-      this._callback(...this._callbackProps);
+      callbackResult = this._callback(...this._callbackProps);
     }
+
     this._intervalID = window.setInterval(() => {
       this._lastUpdateTime = Date.now();
       this._resetForcedUpdateTime();
       this._callback(...this._callbackProps);
     }, this._delay);
 
-    return true;
+    return callbackResult;
   }
 
   stop() {
@@ -82,7 +90,7 @@ export default class Interval {
     this._callbackProps = callbackProps;
   }
 
-  _resetForcedUpdateTime() {
+  private _resetForcedUpdateTime() {
     this._forcedUpdateTime = 0;
   }
 };

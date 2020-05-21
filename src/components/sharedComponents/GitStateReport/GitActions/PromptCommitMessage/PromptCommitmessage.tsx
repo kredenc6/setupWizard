@@ -37,6 +37,7 @@ export default function PromptCommitMessage({ handleChange, open, sendCommit, se
             margin="dense"
             onKeyUp={e => {
               if(e.key === "Enter") {
+                if(!value.trim()) return;
                 handleCommit();
               }
               if(e.key === "Escape") {
@@ -53,8 +54,9 @@ export default function PromptCommitMessage({ handleChange, open, sendCommit, se
             Cancel
           </Button>
           <Button
-            onClick={handleCommit}
-            color="primary">
+            color="primary"
+            disabled={!value.trim()}
+            onClick={handleCommit}>
             Commit
           </Button>
         </DialogActions>

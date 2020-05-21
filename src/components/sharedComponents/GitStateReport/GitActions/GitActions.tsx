@@ -1,9 +1,9 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState } from "react";
 import { Button, ButtonGroup, ClickAwayListener, Grid, Grow, IconButton, MenuItem, MenuList, Paper, Popper, Tooltip }
- from "@material-ui/core";
+  from "@material-ui/core";
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import SyncIcon from '@material-ui/icons/Sync';
-import PromptCommitMessage from "./PromptCommitMessage/PromptCommitmessage";
+import PromptCommitMessage from "./PromptCommitMessage/PromptCommitMessage";
 import { commitRepo, mergeRemoteRepo, pushToRemoteRepo } from "../../../../gitFunctions/gitFunctions";
 import { SERVER_ADDRESS } from "../../../../initialStates/constants";
 import { ServerIs } from "../../../../interfaces/interfaces";
@@ -18,7 +18,6 @@ interface Props {
 
 const OPTIONS = ["commit", "push", "merge", "merge and push"];
 
-// TODO refresh repoState after changes!
 export default function SplitButton({ gitState, remoteRepoCheckInterval, serverState }: Props) {
   const [openButtonGroup, setOpenButtonGroup] = useState(false);
   const [openCommitPrompt, setOpenCommitPrompt] = useState(false);
@@ -27,34 +26,29 @@ export default function SplitButton({ gitState, remoteRepoCheckInterval, serverS
   const [selectedIndex, setSelectedIndex] = useState(selectIndex(gitState));
   const conflicted = Boolean(gitState.conflicted.length);
 
-  const handleClick = () => {
+  const updateRepo = () => {
+    remoteRepoCheckInterval.executeNow(true, [serverState, true]);
+  };
+
+  const handleClick = async () => {
     if(OPTIONS[selectedIndex] === "commit") {
-      if(commitMessage.trim()) {
-        commitRepo(SERVER_ADDRESS, commitMessage, gitState.not_added)
-          .then(commitSummary => console.dir(commitSummary))
-          .catch(err => console.log(err.message));
-      } else {
-        console.log("Did not commit.");
-      }
+      await commitRepo(SERVER_ADDRESS, commitMessage, gitState.not_added)
+      updateRepo();
     }
     if(OPTIONS[selectedIndex] === "push") {
-      pushToRemoteRepo(SERVER_ADDRESS)
-      .then(pushSummary => console.log(pushSummary));
+      await pushToRemoteRepo(SERVER_ADDRESS)
+      updateRepo();
     }
     if(OPTIONS[selectedIndex] === "merge") {
-      mergeRemoteRepo(SERVER_ADDRESS);
+      await mergeRemoteRepo(SERVER_ADDRESS);
+      updateRepo();
     }
     if(OPTIONS[selectedIndex] === 'merge and push') {
-      mergeRemoteRepo(SERVER_ADDRESS)
-        .then(mergeSummary => {
-          if(mergeSummary) {
-            pushToRemoteRepo(SERVER_ADDRESS)
-              .then(pushSummary => console.log(pushSummary));
-          } else {
-            console.log("Merge failure.");
-          }
-        })
-        .catch(err => console.log(err.message));
+      const mergeSummary = await mergeRemoteRepo(SERVER_ADDRESS);
+      if(mergeSummary) {
+        await pushToRemoteRepo(SERVER_ADDRESS)
+        updateRepo();
+      }
     }
   };
 
@@ -68,10 +62,8 @@ export default function SplitButton({ gitState, remoteRepoCheckInterval, serverS
   };
 
   const handleClose = (event: React.MouseEvent<Document, MouseEvent>) => {
-    if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
-      return;
-    }
-
+    if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) return; // don't close...
+    // ...on the anchor element click
     setOpenButtonGroup(false);
   };
 
@@ -110,11 +102,7 @@ export default function SplitButton({ gitState, remoteRepoCheckInterval, serverS
           <IconButton
             color="secondary"
             disabled={serverState === "offline"}
-            onClick={() => {
-              remoteRepoCheckInterval.setCallbackProps([serverState, true]); // true for forced refresh
-              remoteRepoCheckInterval.executeNow();
-              remoteRepoCheckInterval.setCallbackProps([serverState]); // forced refresh closure value back to default
-            }}
+            onClick={() => {remoteRepoCheckInterval.executeNow(true, [serverState, true])}} // update repo
           >
             <SyncIcon />
           </IconButton>
@@ -160,7 +148,7 @@ function selectIndex(gitState: StatusResult) {
 
 function isOptionDisabled(option: string, gitState: StatusResult) {
   if(option === "commit" && !gitState.not_added.length) return true;
-  if(option === "push" && !gitState.ahead) return true;
+  if(option === "push" && (gitState.behind || !gitState.ahead)) return true;
   if(option === "merge" && !gitState.behind) return true;
   if(option === "merge and push" && !(gitState.ahead && gitState.behind)) return true;
   return false;

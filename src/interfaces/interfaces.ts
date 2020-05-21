@@ -133,11 +133,6 @@ export type JsonObjModule = JsonResultObj[UserInputModuleKeys];
 
 export type ServerIs = "online" | "offline";
 
-export interface SaveFileResponse {
-  fileName: string;
-  savedSuccessfully: boolean;
-}
-
 export interface IntervalsObj {
   [propName: string]: Interval;
-}
+};
