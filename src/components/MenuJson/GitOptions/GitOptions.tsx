@@ -5,27 +5,32 @@ import { GitOpt } from "../../../interfaces/gitInterfaces";
 import { StatusResult } from "../../../interfaces/simpleGit";
 
 interface Props {
+  disabled: boolean;
   gitOptions: GitOpt;
   repoState: StatusResult | null;
   setGitOptions: React.Dispatch<React.SetStateAction<GitOpt>>;
 };
 
-const useStyles = makeStyles(theme =>
+const useStyles = makeStyles(({ typography, palette, shape }) =>
   createStyles({
     gitOptionsWrapper: {
-      minWidth: `${theme.typography.fontSize * 15}px`,
+      minWidth: `${typography.fontSize * 15}px`,
       display: "flex",
       justifyContent: "center",
-      border: `1px solid ${theme.palette.primary.main}`,
-      borderTop: "none",
-      borderBottomLeftRadius: theme.shape.borderRadius,
-      borderBottomRightRadius: theme.shape.borderRadius
+      borderWidth: "1px",
+      borderStyle: "solid",
+      borderColor: ({ disabled }: { disabled: boolean }) => {
+        return disabled ? palette.action.disabledBackground : palette.primary.main
+      },
+      borderTopStyle: "none",
+      borderBottomLeftRadius: shape.borderRadius,
+      borderBottomRightRadius: shape.borderRadius
     }
   })
 );
 
-export default function GitOptions({ gitOptions, repoState, setGitOptions }: Props) {
-  const classes = useStyles();
+export default function GitOptions({ disabled, gitOptions, repoState, setGitOptions }: Props) {
+  const classes = useStyles({ disabled });
 
   const handleCheck = (name: string, checked: boolean) => {
     if(name === "push" && checked) {
@@ -45,7 +50,7 @@ export default function GitOptions({ gitOptions, repoState, setGitOptions }: Pro
         control={
           <Checkbox
             checked={gitOptions.commit}
-            disabled={!repoState || !!repoState.conflicted.length}
+            disabled={disabled || !repoState || !!repoState.conflicted.length}
             onChange={({ target }) => handleCheck(target.name, target.checked)}
             name="commit"
             color="secondary"
@@ -57,7 +62,7 @@ export default function GitOptions({ gitOptions, repoState, setGitOptions }: Pro
         control={
           <Checkbox
             checked={gitOptions.push}
-            disabled={!repoState || !!repoState.conflicted.length || !!repoState.behind}
+            disabled={disabled || !repoState || !!repoState.conflicted.length || !!repoState.behind}
             onChange={({ target }) => handleCheck(target.name, target.checked)}
             name="push"
             color="secondary"

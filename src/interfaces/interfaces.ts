@@ -1,4 +1,5 @@
 import Interval from "../classes/Interval";
+import { FilesState } from "./fileInterfaces";
 
 export interface Classes {
   [propName: string]: string;
@@ -135,4 +136,14 @@ export type ServerIs = "online" | "offline";
 
 export interface IntervalsObj {
   [propName: string]: Interval;
+};
+
+export interface sWState {
+  activeStep: number;
+  isNextStepAllowed: boolean;
+  userInput: UserInput;
+  jsonObj: JsonResultObj;
+  serverState: ServerIs;
+  jsonFilesState: FilesState;
+  intervals: IntervalsObj;
 };

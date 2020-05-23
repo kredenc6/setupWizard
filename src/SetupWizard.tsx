@@ -47,21 +47,13 @@ export default function SetupWizard() {
     serverCheck: new Interval(CHECK_SERVER_STATUS_INTERVAL, async () => setServerState(await getServerState(SERVER_ADDRESS))),
     remoteRepoCheck: new Interval(REMOTE_REPO_CHECK_INTERVAL, (serverState: ServerIs, forcedRefresh?: boolean) => {
       loadRepoState(serverState, forcedRefresh)
-        .then(timeStamp => {
-          if(timeStamp !== 0) {
-            setJsonFilesState(prevState => ({ ...prevState, lastRepoUpdate: timeStamp }));
-            console.log(`Repo updated at ${new Date(timeStamp)}`);
-          } else {
-            console.log("Repo state not updated.");
-          }
-        })
+        .then(updateMessage => console.log(updateMessage))
         .catch(err => console.log(err.message));
     })
   });
 
   useEffect(() => {
     intervals.serverCheck.start(true);
-    loadJsonsFromLocalRepo();
 
     return () => intervals.serverCheck.stop();
   },[intervals]);
@@ -119,34 +111,33 @@ export default function SetupWizard() {
     setJsonObj(jsonObj);
   }
 
-  function loadRepoState(serverState: ServerIs, forcedRefresh = false): Promise<number> {
+  function loadRepoState(serverState: ServerIs, forcedRefresh = false): Promise<string> {
     return new Promise((resolve, reject) => {
       const canRefresh = serverState === "online" &&
         ( forcedRefresh || shoudRepoStateBeRefreshed(jsonFilesState.lastRepoUpdate) );
-      
       if(canRefresh) {
         refreshRepoState()
-          .then(timeStamp => resolve(timeStamp))
+          .then(updateMessage => resolve(updateMessage))
           .catch((err: Error) => reject(err));
       } else {
         const localRepoState = getLocalStorageRepoState()?.state;
         if(localRepoState) {
           setJsonFilesState(prevState => ({ ...prevState, localRepoState }));
         }
-        resolve(0);
+        resolve("Repo state not updated.");
       }
     });
   }
 
-  function refreshRepoState(): Promise<number> {
+  function refreshRepoState(): Promise<string> {
     return new Promise((resolve, reject) => {
       fetchRepoStatus(SERVER_ADDRESS)
         .then(state => {
           if(state) {
             const timeStamp = Date.now();
             localStorage.setItem("repoState", JSON.stringify({ timeStamp, state }));
-            setJsonFilesState(prevState => ({ ...prevState, localRepoState: state }));
-            resolve(timeStamp)
+            setJsonFilesState(prevState => ({ ...prevState, localRepoState: state, lastRepoUpdate: timeStamp }));
+            resolve(`Repo updated at ${new Date(timeStamp)}`);
           
           } else {
             reject(new Error("Failed to fetch remote repo status."));

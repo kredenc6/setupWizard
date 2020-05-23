@@ -1,6 +1,7 @@
 import { MergeSummary, StatusResult } from "../interfaces/simpleGit";
 import { LocalStorageRepoState } from "../interfaces/fileInterfaces";
 import { CommitResponse, PushResponse } from "../interfaces/gitInterfaces";
+import { ServerIs } from "../interfaces/interfaces";
 
 export async function fetchRepoStatus(
   serverAddress: string, callback?: (repoState: StatusResult) => void) {

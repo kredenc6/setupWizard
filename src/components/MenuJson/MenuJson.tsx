@@ -113,6 +113,7 @@ export default function MenuJson(
           handleClick={handleSaveToRepo}
           jsonObj={jsonObj}
           repoState={jsonFilesState.localRepoState}
+          serverState={serverState}
           setGitOptions={setGitOptions} />
       </div>
       <DataDisplay classes={{ jsonWrapper: classes.jsonWrapper }} data={jsonObj} />
