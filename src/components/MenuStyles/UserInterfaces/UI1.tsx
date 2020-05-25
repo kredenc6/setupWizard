@@ -2,10 +2,10 @@ import React from "react";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
 import { Fab, Slider } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
-import { SchemeObj } from "../../../interfaces/interfaces";
+import { ColorSchemeInt } from "../../../interfaces/interfaces";
 
 interface Props {
-  schemeObj: SchemeObj;
+  schemeObj: ColorSchemeInt;
   className: string;
 };
 
@@ -22,13 +22,13 @@ const styles = createStyles(
       display: "flex",
       flexFlow: "row wrap",
       height: "13%",
-      color: (schemeObj: SchemeObj) => determineColor(schemeObj, "primary", "main"),
-      backgroundColor: (schemeObj: SchemeObj) => schemeObj.primary.main
+      color: (schemeObj: ColorSchemeInt) => determineColor(schemeObj, "primary", "main"),
+      backgroundColor: (schemeObj: ColorSchemeInt) => schemeObj.primary.main
     },
     ui1HeaderLine: {
       width: "100%",
       height: "22%",
-      backgroundColor: (schemeObj: SchemeObj) => schemeObj.primary.dark
+      backgroundColor: (schemeObj: ColorSchemeInt) => schemeObj.primary.dark
     },
     ui1Text: {
       paddingLeft: "2vh",
@@ -51,11 +51,11 @@ const styles = createStyles(
       width: "5.5vh",
       height: "5.5vh",
       fontSize: "4vh",
-      color: (schemeObj: SchemeObj) => determineColor(schemeObj, "secondary", "main"),
-      backgroundColor: (schemeObj: SchemeObj) => schemeObj.secondary.main,
+      color: (schemeObj: ColorSchemeInt) => determineColor(schemeObj, "secondary", "main"),
+      backgroundColor: (schemeObj: ColorSchemeInt) => schemeObj.secondary.main,
       "&:hover": {
-        color: (schemeObj: SchemeObj) => determineColor(schemeObj, "secondary", "dark"),
-        backgroundColor: (schemeObj: SchemeObj) => schemeObj.secondary.dark,
+        color: (schemeObj: ColorSchemeInt) => determineColor(schemeObj, "secondary", "dark"),
+        backgroundColor: (schemeObj: ColorSchemeInt) => schemeObj.secondary.dark,
       }
     },
     ui1Slider: {
@@ -63,13 +63,13 @@ const styles = createStyles(
       top: "2.5vh",
       right: "2.5vh",
       width: "30%",
-      color: (schemeObj: SchemeObj) => schemeObj.secondary.main
+      color: (schemeObj: ColorSchemeInt) => schemeObj.secondary.main
     }
   }
 );
 const useStyles = makeStyles(styles);
 
-const determineColor = (schemeObj: SchemeObj, scheme: "primary" | "secondary", shade: "light" | "main" | "dark") => {
+const determineColor = (schemeObj: ColorSchemeInt, scheme: "primary" | "secondary", shade: "light" | "main" | "dark") => {
   const overrideColor = schemeObj.textColorOverride[scheme];
   const color = schemeObj[scheme].contrastText[shade];
   return overrideColor ? overrideColor : color;

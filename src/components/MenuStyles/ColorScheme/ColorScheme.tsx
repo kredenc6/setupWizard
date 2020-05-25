@@ -1,40 +1,36 @@
 import React from "react";
-import { makeStyles, createStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import SchemeContainerLarge from "./SchemeContainerLarge/SchemeContainerLarge";
 import SchemeContainerNarrow from "./SchemeContainerNarrow/SchemeContainerNarrow";
-import { SchemeObj } from "../../../interfaces/interfaces";
+import { ColorSchemeInt } from "../../../interfaces/interfaces";
 
 interface Props {
   reset: (color: string | null) => void;
-  schemeObj: SchemeObj;
+  schemeObj: ColorSchemeInt;
   schemeProperty: "background" | "text";
   selectedPalette: "primary" | "secondary";
   setSchemeProperty: React.Dispatch<React.SetStateAction<"background" | "text">>;
   setSelectedPalette: React.Dispatch<React.SetStateAction<"primary" | "secondary">>;
 };
 
-const styles = createStyles(
-  {
-    colorSchemeWrapper: {
-      width: "100%",
-      display: "flex",
-      flexFlow: "row wrap",
-      alignContent: "flex-start"
-    },
-    colorSchemes: {
-      width: "100%",
-      height: "100%",
-      display: "flex", 
-    },
-    narrowSchemeWrapper: {
-      width: "20%"
-    }
+const useStyles = makeStyles({
+  colorSchemeWrapper: {
+    width: "100%",
+    display: "flex",
+    flexFlow: "row wrap",
+    alignContent: "flex-start"
+  },
+  colorSchemes: {
+    width: "100%",
+    height: "100%",
+    display: "flex", 
+  },
+  narrowSchemeWrapper: {
+    width: "20%"
   }
-);
+});
 
-const useStyles = makeStyles(styles);
-
-const ColorScheme = (props: Props) => {
+export default function ColorScheme(props: Props) {
   const {
     reset,
     schemeObj,
@@ -94,5 +90,3 @@ const ColorScheme = (props: Props) => {
     </article>
   );
 };
-
-export default ColorScheme;

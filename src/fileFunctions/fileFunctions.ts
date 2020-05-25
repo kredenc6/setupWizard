@@ -14,7 +14,7 @@ export async function fetchJsonFiles(serverAddress: string, callback?: (jsonObjs
             return null;
           }
         })
-        .filter(jsonObj => jsonObj !== null);
+        .filter(jsonObj => jsonObj !== null) as JsonResultObj[];
 
       if(callback) {
         callback(jsonObjArr);
@@ -23,7 +23,7 @@ export async function fetchJsonFiles(serverAddress: string, callback?: (jsonObjs
     })
     .catch(err => {
       console.log(err.message);
-      return null;
+      return [] as JsonResultObj[];
     });
 }
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { createContext, useEffect, useReducer, useState } from 'react';
 import { CssBaseline } from "@material-ui/core";
 import { makeStyles, ThemeProvider } from "@material-ui/core/styles";
 import MainMenu from "./components/MainMenu/MainMenu";
@@ -6,7 +6,7 @@ import MenuStyles from "./components/MenuStyles/MenuStyles";
 import MenuJson from "./components/MenuJson/MenuJson";
 import SelectedModule from "./components/SelectedModule/SelectedModule";
 import SetupStepper from "./components/SetupStepper/SetupStepper";
-import ServerState from "./components/sharedComponents/serverState";
+import ServerState from "./components/sharedComponents/ServerState"
 import theme from "./theme/theme";
 import sortObjEntriesAlphabetically from "./miscellaneous/sortObjEntriesAlphabetically";
 import getServerState from "./miscellaneous/getServerState";
@@ -14,10 +14,13 @@ import capitalizeFirstLetter from "./miscellaneous/capitalizeFirstLetter";
 import jsonObjFrame from './jsonObjFrame/jsonObjFrame';
 import Interval from "./classes/Interval";
 import { initialFilesState, initialUserInput } from "./initialStates/initialStates";
-import { CHECK_SERVER_STATUS_INTERVAL, REMOTE_REPO_CHECK_INTERVAL, SERVER_ADDRESS } from "./initialStates/constants";
+import { SERVER_STATUS_CHECK_INTERVAL, REMOTE_REPO_CHECK_INTERVAL, SERVER_ADDRESS } from "./initialStates/constants";
 import { fetchRepoStatus, getLocalStorageRepoState } from "./gitFunctions/gitFunctions";
-import { fetchJsonFiles, loadJsons } from "./fileFunctions/fileFunctions";
-import { IntervalsObj, JsonObjModule, JsonObjKey, JsonResultObj, JsonScheme, Menu, ServerIs, UserInput } from "./interfaces/interfaces";
+import { IntervalsObj, JsonObjModule, JsonObjKey, JsonResultObj, Menu, ServerIs, SwState, UserInputModuleKeys } from "./interfaces/interfaces";
+
+import { SWActions } from "./sWReducer/sWReducer";
+
+import sWReducer from "./sWReducer/sWReducer";
 
 const useStyles = makeStyles({
   wizardWrapper: {
@@ -35,22 +38,84 @@ const useStyles = makeStyles({
   }
 });
 
+const initialReducerState: SwState = {
+  activeStep: 1,
+  isNextStepAllowed: false,
+  userInput: initialUserInput,
+  jsonObj: jsonObjFrame,
+  serverState: "offline",
+  jsonFilesState: initialFilesState,
+};
+
+export const DispatchContext = createContext<React.Dispatch<SWActions>>(_ => {});
 export default function SetupWizard() {
   const classes = useStyles();
-  const [activeStep, setActiveStep] = useState(1);
-  const [isNextStepAllowed, setIsNextStepAllowed] = useState(false);
-  const [userInput, setUserInput] = useState(initialUserInput);
-  const [jsonObj, setJsonObj] = useState(jsonObjFrame);
-  const [serverState, setServerState] = useState<ServerIs>("offline");
+  const [state, dispatch ] = useReducer(sWReducer, initialReducerState);
   const [jsonFilesState, setJsonFilesState] = useState(initialFilesState);
   const [intervals, setIntervals] = useState<IntervalsObj>({
-    serverCheck: new Interval(CHECK_SERVER_STATUS_INTERVAL, async () => setServerState(await getServerState(SERVER_ADDRESS))),
+    serverCheck: new Interval(SERVER_STATUS_CHECK_INTERVAL, async () =>
+      dispatch({ type: "setServerState", payload: await getServerState(SERVER_ADDRESS) })),
     remoteRepoCheck: new Interval(REMOTE_REPO_CHECK_INTERVAL, (serverState: ServerIs, forcedRefresh?: boolean) => {
       loadRepoState(serverState, forcedRefresh)
         .then(updateMessage => console.log(updateMessage))
         .catch(err => console.log(err.message));
+
+      function loadRepoState(serverState: ServerIs, forcedRefresh = false): Promise<string> {
+        return new Promise((resolve, reject) => {
+          const canRefresh = serverState === "online" &&
+            ( forcedRefresh || shoudRepoStateBeRefreshed(state.jsonFilesState.lastRepoUpdate) );
+          console.log("Last repo update from loadRepoState: ");
+          console.log(state.jsonFilesState.lastRepoUpdate);
+          if(canRefresh) {
+            refreshRepoState()
+              .then(updateMessage => resolve(updateMessage))
+              .catch((err: Error) => reject(err));
+          } else {
+            const localRepoState = getLocalStorageRepoState()?.state;
+            if(localRepoState) {
+              setJsonFilesState(prevState => ({ ...prevState, localRepoState }));
+            }
+            resolve("Repo state not updated.");
+          }
+        });
+      }
     })
   });
+
+  // useEffect(() => {
+  //   state.intervals.serverCheck.
+  //   const serverCheck = new Interval(SERVER_STATUS_CHECK_INTERVAL, async () =>
+  //     dispatch({ type: "setServerState", payload: await getServerState(SERVER_ADDRESS) }));
+    
+  //   const remoteRepoCheck = new Interval(REMOTE_REPO_CHECK_INTERVAL, (serverState: ServerIs, forcedRefresh?: boolean) => {
+  //     loadRepoState(serverState, forcedRefresh)
+  //       .then(updateMessage => console.log(updateMessage))
+  //       .catch(err => console.log(err.message));
+  //   });
+
+  //   dispatch({ type: "changeIntervals", payload: { serverCheck, remoteRepoCheck } });
+  //   state.intervals.serverCheck.start(true);
+
+  //   function loadRepoState(serverState: ServerIs, forcedRefresh = false): Promise<string> {
+  //     return new Promise((resolve, reject) => {
+  //       const canRefresh = serverState === "online" &&
+  //         ( forcedRefresh || shoudRepoStateBeRefreshed(state.jsonFilesState.lastRepoUpdate) );
+  //       if(canRefresh) {
+  //         refreshRepoState()
+  //           .then(updateMessage => resolve(updateMessage))
+  //           .catch((err: Error) => reject(err));
+  //       } else {
+  //         const localRepoState = getLocalStorageRepoState()?.state;
+  //         if(localRepoState) {
+  //           setJsonFilesState(prevState => ({ ...prevState, localRepoState }));
+  //         }
+  //         resolve("Repo state not updated.");
+  //       }
+  //     });
+  //   }
+
+  //   return () => state.intervals.serverCheck.stop();
+  // },[dispatch, state.intervals, state.jsonFilesState.lastRepoUpdate]);
 
   useEffect(() => {
     intervals.serverCheck.start(true);
@@ -59,75 +124,31 @@ export default function SetupWizard() {
   },[intervals]);
   
   useEffect(() => {
-    intervals.remoteRepoCheck.setCallbackProps([serverState]);
-    if(serverState === "offline" || intervals.remoteRepoCheck.isRunning) return;
+    intervals.remoteRepoCheck.setCallbackProps([state.serverState]);
+    if(state.serverState === "offline" || intervals.remoteRepoCheck.isRunning) return;
 
     intervals.remoteRepoCheck.start(true);
 
     return () => intervals.remoteRepoCheck.stop();
-  },[intervals, serverState]);
+  },[intervals, state.serverState]);
 
-  function handleUserInputChange<K extends keyof UserInput>(propName: K, value: UserInput[K]) {
-    setUserInput(prev => ({ ...prev, [propName]: value }));
-  }
-
-  function handleJsonChange(value: JsonObjModule) {
-    setJsonObj(prev => ({ ...prev, ...value }));
-  }
-
-  function handleTopicChange(value: string) {
-    const appTopicIndex = jsonFilesState.loadedJsons.findIndex(loadedJson => loadedJson.app_topic === value);
-    if(appTopicIndex !== -1) { // if some loaded json alredy has this app topic
-      handleJsonSelection(jsonFilesState.loadedJsons[appTopicIndex]);
-    } else {
-      // twitter value change needs a special care to be saved properly
-      const twitter = { "twitter": [{ ...jsonObj["twitter"][0], "channel_name": value, "url": value }] }; 
-      userInput.resetJsonOnAppTopicChange ?
-        userInput.setAlsoAsChannelValues ? // reset
-          handleJsonSelection({ ...jsonObjFrame, "app_topic": value, ...fillInChannelValues(value, twitter.twitter) })
-          :
-          handleJsonSelection({ ...jsonObjFrame, "app_topic": value, ...twitter})
-        :
-        userInput.setAlsoAsChannelValues ? // don't reset
-          handleJsonChange({ "app_topic": value, ...fillInChannelValues(value, twitter.twitter) })
-          :
-          handleJsonChange({ "app_topic": value, ...twitter })
-    }
-  }
-
-  async function handleManualJsonLoading(fileList: FileList) {
-    const loadedJsons = await loadJsons(fileList);
-    intervals.remoteRepoCheck.stop();
-    setJsonFilesState(prev => ({ ...prev, loadedJsons, localRepoState: null }));
-  }
-
-  function handleJsonSelection(jsonObj: JsonResultObj) {
-    const newModules: UserInput["modules"] = JSON.parse(JSON.stringify(userInput.modules));
-    for(const moduleName of Object.keys(userInput.modules)) {
-      const isSelected = jsonObj.visible_components.includes(moduleName as keyof UserInput["modules"]);
-      newModules[moduleName as keyof UserInput["modules"]].selected = isSelected;
-    };
-    handleUserInputChange("modules", newModules);
-    setJsonObj(jsonObj);
-  }
-
-  function loadRepoState(serverState: ServerIs, forcedRefresh = false): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const canRefresh = serverState === "online" &&
-        ( forcedRefresh || shoudRepoStateBeRefreshed(jsonFilesState.lastRepoUpdate) );
-      if(canRefresh) {
-        refreshRepoState()
-          .then(updateMessage => resolve(updateMessage))
-          .catch((err: Error) => reject(err));
-      } else {
-        const localRepoState = getLocalStorageRepoState()?.state;
-        if(localRepoState) {
-          setJsonFilesState(prevState => ({ ...prevState, localRepoState }));
-        }
-        resolve("Repo state not updated.");
-      }
-    });
-  }
+  // function loadRepoState(serverState: ServerIs, forcedRefresh = false): Promise<string> {
+  //   return new Promise((resolve, reject) => {
+  //     const canRefresh = serverState === "online" &&
+  //       ( forcedRefresh || shoudRepoStateBeRefreshed(jsonFilesState.lastRepoUpdate) );
+  //     if(canRefresh) {
+  //       refreshRepoState()
+  //         .then(updateMessage => resolve(updateMessage))
+  //         .catch((err: Error) => reject(err));
+  //     } else {
+  //       const localRepoState = getLocalStorageRepoState()?.state;
+  //       if(localRepoState) {
+  //         setJsonFilesState(prevState => ({ ...prevState, localRepoState }));
+  //       }
+  //       resolve("Repo state not updated.");
+  //     }
+  //   });
+  // }
 
   function refreshRepoState(): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -146,40 +167,19 @@ export default function SetupWizard() {
     });
   }
 
-  function loadJsonsFromLocalRepo() {
-    fetchJsonFiles(SERVER_ADDRESS, loadedJsons =>
-      setJsonFilesState(prevState => ({ ...prevState, loadedJsons })));
-    intervals.remoteRepoCheck.start(true);
-  }
-
-  const fillInChannelValues = (value: string, twitter?: JsonResultObj["twitter"]) => {
-    twitter = twitter ||  [ { ...jsonObj["twitter"][0], "channel_name": value, "url": value } ];
-    
-    return {
-      "facebook":  { ...jsonObj.facebook, "channel": value},
-      "instagram": { ...jsonObj.instagram, "main_channel": value},
-      "reddit":    { ...jsonObj.reddit, "sub_reddit": value},
-      "videos":    [ ...jsonObj.videos.map(videoObj => ({ ...videoObj, "queries": [value]}))],
-      "audio":     [ ...jsonObj.audio.map(audioObj => ({ ...audioObj, "queries": [value]}))],
-      "books":     [ ...jsonObj.books.map(bookObj => ({ ...bookObj, "queries": [value]}))],
-      "twitter":   twitter
-    };
-  };
-
   const SelectedModuleComponents: Menu[] =
-    sortObjEntriesAlphabetically(Object.entries(userInput.modules))
+    sortObjEntriesAlphabetically(Object.entries(state.userInput.modules))
     .filter(([_, module]) => module.selected)
     .map(([key, _]) => {
       return {
         label: capitalizeFirstLetter(key),
         component: <SelectedModule 
-          appTopic={jsonObj.app_topic}
-          handleJsonChange={(changedModule: JsonObjModule) => handleJsonChange({ [key]: changedModule })}
-          jsonModuleObj={jsonObj[key as JsonObjKey] as unknown as JsonObjModule}
-          moduleSettings={userInput.modules[key as keyof UserInput["modules"]]}
-          moduleName={key}
-          serverState={serverState}
-          setIsNextStepAllowed={setIsNextStepAllowed} />
+          appTopic={state.jsonObj.app_topic}
+          dispatch={dispatch}
+          jsonModuleObj={state.jsonObj[key as UserInputModuleKeys] as unknown as JsonObjModule}
+          moduleSettings={state.userInput.modules[key as UserInputModuleKeys]}
+          moduleName={key as UserInputModuleKeys}
+          serverState={state.serverState} />
       };
   });
 
@@ -187,42 +187,34 @@ export default function SetupWizard() {
     {
       label: "Main menu",
       component: <MainMenu
-        fetchJsonsFromLocalRepo={loadJsonsFromLocalRepo}
-        handleChannelsSwitch={() => handleUserInputChange("setAlsoAsChannelValues", !userInput.setAlsoAsChannelValues)}
-        handleJsonChange={(value: string[]) => handleJsonChange({ "visible_components": value })}
-        handleJsonSelection={handleJsonSelection}
-        handleManualJsonLoading={handleManualJsonLoading}
-        handleModuleChange={handleUserInputChange}
-        handleResetSwitch={() => handleUserInputChange("resetJsonOnAppTopicChange", !userInput.resetJsonOnAppTopicChange)}
-        handleTopicChange={handleTopicChange}
+        dispatch={dispatch}
         remoteRepoCheckInterval={intervals.remoteRepoCheck}
-        jsonFilesState={jsonFilesState}
-        jsonObj={jsonObj}
-        serverState={serverState}
-        setAsChannelValues={userInput.setAlsoAsChannelValues}
-        setIsNextStepAllowed={setIsNextStepAllowed}
-        resetOtherValues={userInput.resetJsonOnAppTopicChange}
-        userInput={userInput} />
+        jsonFilesState={state.jsonFilesState}
+        jsonObj={state.jsonObj}
+        serverState={state.serverState}
+        setAsChannelValues={state.userInput.setAlsoAsChannelValues}
+        resetOtherValues={state.userInput.resetJsonOnAppTopicChange}
+        userInput={state.userInput} />
     },
     {
       label: "Color scheme",
       component: <MenuStyles
-        handleJsonChange={(value: JsonScheme) => handleJsonChange({ "ui_colors": value })}
-        handleSchemeChange={handleUserInputChange}
-        schemeObj={userInput.schemeObj}
-        selectedScheme={userInput.selectedScheme}
-        setIsNextStepAllowed={setIsNextStepAllowed} />
+        dispatch={dispatch}
+        schemeObj={state.userInput.schemeObj}
+        selectedScheme={state.userInput.schemeObj.name} />
     },
     ...SelectedModuleComponents,
     {
       label: "config.json",
       component: <MenuJson
-        jsonFilesState={jsonFilesState}
-        handleJsonChange={(key: JsonObjKey,changedModule: JsonResultObj[JsonObjKey]) => handleJsonChange({ [key]: changedModule })}
-        jsonObj={jsonObj}
+        jsonFilesState={state.jsonFilesState}
+        handleJsonChange={(key: JsonObjKey,changedModule: JsonResultObj[JsonObjKey]) => {
+          dispatch({ type: "changeJson", payload: { [key]: changedModule } })
+        }}
+        jsonObj={state.jsonObj}
         remoteRepoCheckInterval={intervals.remoteRepoCheck}
-        serverState={serverState}
-        userInput={userInput} />
+        serverState={state.serverState}
+        userInput={state.userInput} />
     }
   ];
 
@@ -230,13 +222,13 @@ export default function SetupWizard() {
     <CssBaseline>
       <ThemeProvider theme={ theme }>
         <main className={classes.wizardWrapper}>
-          <ServerState serverState={serverState} />
-          {menus[activeStep - 1].component}
+          <ServerState serverState={state.serverState} />
+          {menus[state.activeStep - 1].component}
           <SetupStepper
-            activeStep={activeStep}
+            activeStep={state.activeStep}
+            dispatch={dispatch}
             menuLabels={menus.map(({ label }) => label)}
-            isNextStepAllowed={isNextStepAllowed}
-            setActiveStep= {setActiveStep} />
+            isNextStepAllowed={state.isNextStepAllowed} />
         </main>
       </ThemeProvider>
     </CssBaseline>

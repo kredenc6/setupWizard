@@ -1,11 +1,12 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Checkbox, FormControlLabel } from "@material-ui/core";
 import StringArrayInput from "../StringArrayInput/StringArrayInput";
 import SwTextField from "../../sharedComponents/SwTextField";
 import VerifyUrlTextField from "../../sharedComponents/VerifyUrlTextField";
 import isProxyVerifiable from "../helpFunctions/isProxyVerifiable";
 import determineWebPrefix from "../helpFunctions/determineWebPrefix";
-import { Module } from "../../../interfaces/interfaces";
+import { DispatchContext } from "../../../SetupWizard";
+import { Module, JsonObjKey } from "../../../interfaces/interfaces";
 
 interface Props {
   dataObj: object;
@@ -18,6 +19,11 @@ interface Props {
 
 const ObjectDataComponent = (
   { dataObj, handleJsonObjChange, prefixIndex, isVerificationEnabled, moduleSettings, skipProperties }: Props) => {
+  const dispatch = useContext(DispatchContext);
+  // const handleChange = (key: string, value: any) => {
+  //   dispatch({ type: "jsonChange", payload: { [key as JsonObjKey]: value } });
+  // };
+  //TODO clean up if it works
   const handleChange = (key: string, value: any) => {
     handleJsonObjChange(dataObj, key, value);
   };

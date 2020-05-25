@@ -3,11 +3,11 @@ import { Button, InputLabel } from "@material-ui/core";
 
 interface Props {
   childClass: string;
-  handleManualJsonLoading: (value: FileList) => void;
+  handleManualJsonLoading: (value: FileList) => any;
   text: string;
 };
 
-const UploadButton = ({ childClass, handleManualJsonLoading, text }: Props) => {
+export default function UploadButton({ childClass, handleManualJsonLoading, text }: Props) {
   return (
     <Button>
       <InputLabel className={childClass}>
@@ -30,5 +30,3 @@ const UploadButton = ({ childClass, handleManualJsonLoading, text }: Props) => {
     </Button>
   );
 };
-
-export default UploadButton;

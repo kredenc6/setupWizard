@@ -8,16 +8,12 @@ import { createSchemeObjFromPresetScheme } from "../miscellaneous/colorSchemeFun
 export const initialFilesState: FilesState = {
   lastRepoUpdate: getLocalStorageRepoState()?.timeStamp || 0,
   loadedJsons: [],
-  localRepoState: null,
-  isActiveFileModified: false,
-  isActiveFileSaved: null,
-  loadManually: false
+  localRepoState: null
 };
 
 export const initialUserInput: UserInput = {
   resetJsonOnAppTopicChange: true,
   setAlsoAsChannelValues: true,
-  selectedScheme: "default",
   schemeObj: createSchemeObjFromPresetScheme(jsonObjFrame.ui_colors, theme.palette.getContrastText),
   modules: {
     audio: {

@@ -1,18 +1,19 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { createStyles, makeStyles } from '@material-ui/core/styles';
 import { Stepper} from '@material-ui/core';
 import SwStepperButtons from "./SwStepperButtons/SwStepperButtons";
 import SwStepConnector from "./SwStepConnector/SwStepConnector";
 import SwStep from "./SwStep/SwStep";
+import { SWActions } from '../../sWReducer/sWReducer';
 
 interface Props {
   activeStep: number;
+  dispatch: React.Dispatch<SWActions>
   menuLabels: string[];
   isNextStepAllowed: boolean;
-  setActiveStep: React.Dispatch<React.SetStateAction<number>>;
-}
+};
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(theme =>
   createStyles({
     root: {
       width: "100%",
@@ -25,7 +26,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const SetupStepper = ({ activeStep, menuLabels, isNextStepAllowed, setActiveStep }: Props) => {
+export default function SetupStepper ({ activeStep, dispatch, menuLabels, isNextStepAllowed }: Props) {
   const classes = useStyles();
   const [completed, setCompleted] = useState(new Set<number>());
   const [isFinished, setIsFinished] = useState(false);
@@ -44,24 +45,24 @@ const SetupStepper = ({ activeStep, menuLabels, isNextStepAllowed, setActiveStep
 
   const handleNext = () => {
     if(isLastStep()) return;
-    setActiveStep(activeStep + 1);
+    dispatch({ type: "setActiveStep", payload: activeStep + 1 });
   };
 
   const handleBack = () => {
-    setActiveStep(prevActiveStep => prevActiveStep - 1);
+    dispatch({ type: "setActiveStep", payload: activeStep - 1 });
   };
-
+  
   const handleStep = (step: number) => () => {
-    setActiveStep(step);
+    dispatch({ type: "setActiveStep", payload: step });
   };
-
+  
   const isStepComplete = useCallback(
     (step: number) => completed.has(step),
     [completed]
-  );
-
+    );
+    
   const handleReset = () => {
-    setActiveStep(1);
+    dispatch({ type: "setActiveStep", payload: 1 });
     setCompleted(new Set<number>());
     setIsFinished(false);
   };
@@ -135,5 +136,3 @@ const SetupStepper = ({ activeStep, menuLabels, isNextStepAllowed, setActiveStep
     </div>
   );
 };
-
-export default SetupStepper;

@@ -5,9 +5,6 @@ export interface FilesState {
   lastRepoUpdate: number;
   loadedJsons: JsonResultObj[];
   localRepoState: StatusResult | null;
-  isActiveFileSaved: boolean | null;
-  isActiveFileModified: boolean;
-  loadManually: boolean;
 };
 
 export interface LocalStorageRepoState {

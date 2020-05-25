@@ -9,21 +9,14 @@ import Submenu from "./Submenu";
 import { JsonResultObj, ServerIs, UserInput } from "../../interfaces/interfaces";
 import { FilesState } from "../../interfaces/fileInterfaces";
 import Interval from "../../classes/Interval";
+import { SWActions } from "../../sWReducer/sWReducer";
 
 interface Props {
-  fetchJsonsFromLocalRepo: () => void;
-  handleChannelsSwitch: () => void;
-  handleJsonChange: (value: string[]) => void;
-  handleJsonSelection: (jsonObj: JsonResultObj) => void
-  handleManualJsonLoading: (value: FileList) => void;
-  handleModuleChange: <K extends keyof UserInput>(propName: K, value: UserInput[K]) => void;
-  handleResetSwitch: () => void;
-  handleTopicChange: (value: string) => void;
+  dispatch: React.Dispatch<SWActions>;
   jsonFilesState: FilesState;
   jsonObj: JsonResultObj;
   serverState: ServerIs;
   setAsChannelValues: boolean;
-  setIsNextStepAllowed: React.Dispatch<React.SetStateAction<boolean>>;
   remoteRepoCheckInterval: Interval;
   resetOtherValues: boolean;
   userInput: UserInput;
@@ -67,19 +60,11 @@ const isAppTopicValid = (appTopic: string) => appTopic.trim().length >= 2;
 export default function MainMenu(props: Props) {
   const [isJsonSelectionOpen, setIsJsonSelectionOpen] = useState(false);
   const {
-    fetchJsonsFromLocalRepo,
-    handleChannelsSwitch,
-    handleJsonChange,
-    handleJsonSelection,
-    handleManualJsonLoading,
-    handleModuleChange,
-    handleResetSwitch,
-    handleTopicChange,
+    dispatch,
     jsonFilesState,
     jsonObj,
     serverState,
     setAsChannelValues,
-    setIsNextStepAllowed,
     remoteRepoCheckInterval,
     resetOtherValues,
     userInput
@@ -89,15 +74,16 @@ export default function MainMenu(props: Props) {
   //BUG? it's possible to have module prop "shwow_in_app" value true and the "visible_components" json prop
   // without the module
   useEffect(() => {
-    setIsNextStepAllowed(isAtLeastOneModuleSelected(userInput.modules) && isAppTopicValid(jsonObj.app_topic));
-  });
+    const isAllowed = isAtLeastOneModuleSelected(userInput.modules) && isAppTopicValid(jsonObj.app_topic);
+    dispatch({ type: "setIsNextStepAllowed", payload: isAllowed });
+  },[dispatch, jsonObj, userInput]);
 
   return (
     <section className={classes.mainMenu}>
       <AvailableJsons
         activeJsonObj={jsonObj}
         handleJsonSelection={(jsonObj: JsonResultObj) => {
-          handleJsonSelection(jsonObj);
+          dispatch({ type: "selectJson", payload: jsonObj });
           setIsJsonSelectionOpen(false);
         }}
         jsonFilesState={jsonFilesState}
@@ -109,9 +95,7 @@ export default function MainMenu(props: Props) {
             <Submenu
               component={
                 <MenuTopic
-                  handleChange={handleTopicChange}
-                  handleChannelsSwitch={handleChannelsSwitch}
-                  handleResetSwitch={handleResetSwitch}
+                  dispatch={dispatch}
                   resetOtherValues={resetOtherValues}
                   setAsChannelValues={setAsChannelValues}
                   value={jsonObj.app_topic} />
@@ -120,8 +104,7 @@ export default function MainMenu(props: Props) {
             <Submenu
               component={
                 <MenuFileState
-                  fetchJsonsFromLocalRepo={fetchJsonsFromLocalRepo}
-                  handleManualJsonLoading={handleManualJsonLoading}
+                  dispatch={dispatch}
                   jsonFilesState={jsonFilesState}
                   remoteRepoCheckInterval={remoteRepoCheckInterval}
                   serverState={serverState}
@@ -133,8 +116,7 @@ export default function MainMenu(props: Props) {
           <Submenu
             component={
               <MenuSelectModules
-                handleJsonChange={handleJsonChange}
-                handleModuleChange={handleModuleChange}
+                dispatch={dispatch}
                 modules={userInput.modules} />
             }
             heading="Select visible components" />

@@ -5,7 +5,7 @@ export interface Classes {
   [propName: string]: string;
 };
 
-export interface SchemeObj {
+export interface ColorSchemeInt {
   name: string;
   primary: Palette;
   secondary: Palette;
@@ -41,8 +41,8 @@ export interface JsonScheme {
 export interface UserInput {
   resetJsonOnAppTopicChange: boolean;
   setAlsoAsChannelValues: boolean;
-  selectedScheme: string;
-  schemeObj: SchemeObj;
+  // selectedScheme: string;
+  schemeObj: ColorSchemeInt;
   modules: {
     audio: Module;
     books: Module;
@@ -136,14 +136,15 @@ export type ServerIs = "online" | "offline";
 
 export interface IntervalsObj {
   [propName: string]: Interval;
+  serverCheck: Interval;
+  remoteRepoCheck: Interval;
 };
 
-export interface sWState {
+export interface SwState {
   activeStep: number;
   isNextStepAllowed: boolean;
   userInput: UserInput;
   jsonObj: JsonResultObj;
   serverState: ServerIs;
   jsonFilesState: FilesState;
-  intervals: IntervalsObj;
 };

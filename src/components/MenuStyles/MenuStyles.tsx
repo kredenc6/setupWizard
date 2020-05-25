@@ -5,19 +5,18 @@ import ColorPalette from "./ColorPalette/ColorPalette";
 import ColorToolHeading from "./ColorToolHeading";
 import UI1 from "./UserInterfaces/UI1";
 import { createJsonSchemeObj, createPaletteFromColor } from "../../miscellaneous/colorSchemeFunctions";
-import { JsonScheme, SchemeObj, UserInput } from "../../interfaces/interfaces";
-
 import PresetSchemes from "./ColorScheme/PresetSchemes/PresetSchemes";
+import { ColorSchemeInt } from "../../interfaces/interfaces";
+import { SWActions } from "../../sWReducer/sWReducer";
+
 
 interface Props {
-  handleJsonChange: (value: JsonScheme) => void;
-  handleSchemeChange: <K extends keyof UserInput>(propName: K, value: UserInput[K]) => void;
-  schemeObj: SchemeObj;
+  dispatch: React.Dispatch<SWActions>;
+  schemeObj: ColorSchemeInt;
   selectedScheme: string;
-  setIsNextStepAllowed: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const styles = {
+const useStyles = makeStyles({
   menuStyles: {
     width: "100%",
     display: "flex",
@@ -38,46 +37,46 @@ const styles = {
   userInterface: {
     alignSelf: "flex-start"
   }
-};
-const useStyles = makeStyles(styles);
+});
 
-const MenuStyles = (
-  { handleJsonChange, handleSchemeChange, schemeObj, selectedScheme, setIsNextStepAllowed }: Props) => {
+export default function MenuStyles( { dispatch, schemeObj, selectedScheme }: Props) {
   const classes = useStyles();
   const [schemeProperty, setSchemeProperty] = useState<"background" | "text">("background");
   const [selectedPalette, setSelectedPalette] = useState<"primary" | "secondary">("primary");
   const getContrastText = useTheme().palette.getContrastText;
 
   const assignColor = (color: string | null) => {
-    handleSchemeChange("selectedScheme", "custom");
     // change background scheme
     if(schemeProperty === "background" && color !== null) {
-      const newScheme = createPaletteFromColor(color, getContrastText);
-      const newSchemeObj = { ...schemeObj, [selectedPalette]: newScheme };
-      handleSchemeChange("schemeObj", newSchemeObj);
-      handleJsonChange( createJsonSchemeObj(newSchemeObj) );
+      const newPalette = createPaletteFromColor(color, getContrastText);
+      const newColorScheme = { ...schemeObj, [selectedPalette]: newPalette, name: "custom" };
+      const ui_colors = createJsonSchemeObj(newColorScheme);
+      dispatch({ type: "changeUserInput", payload: { schemeObj: newColorScheme } });
+      dispatch({ type: "changeJson", payload: { ui_colors } });
     }
     // change text color override
     else {
-      const newSchemeObj = { ...schemeObj, textColorOverride: { ...schemeObj.textColorOverride, [selectedPalette]: color } };
-      handleSchemeChange("schemeObj", newSchemeObj);
-      handleJsonChange( createJsonSchemeObj(newSchemeObj) );
+      const newColorScheme = {
+        ...schemeObj,
+        textColorOverride: { ...schemeObj.textColorOverride, [selectedPalette]: color },
+        name: "cutom"
+       };
+      const ui_colors = createJsonSchemeObj(newColorScheme);
+      dispatch({ type: "changeUserInput", payload: { schemeObj: newColorScheme } });
+      dispatch({ type: "changeJson", payload: { ui_colors } });
     }
   };
 
   // always allow next step
   useEffect(() => {
-    setIsNextStepAllowed(true);
-  });
+    dispatch({ type: "setIsNextStepAllowed", payload: true });
+  },[dispatch]);
 
   return(
     <section className={classes.menuStyles}>
       <div className={classes.left}>
         <ColorToolHeading text="user interfaces" />
-        <PresetSchemes
-          handleSchemeChange={handleSchemeChange}
-          selectedScheme={selectedScheme}
-          setSelectedScheme={(value: string) => handleSchemeChange("selectedScheme", value)} />
+        <PresetSchemes dispatch={dispatch} selectedScheme={selectedScheme} />
         <UI1 className={classes.userInterface} schemeObj={schemeObj} />
       </div>
       <div className={classes.right}>
@@ -100,9 +99,6 @@ const MenuStyles = (
     </section>
   );
 };
-
-export default MenuStyles;
-
 
 // TODO: any click on reset button or click on color on color palette triggers setting the "selectedScheme" as 'custom'
 // no matter if the resulting "schemeObj" still equals any selected(or not-selected*) preset "schemeObj"

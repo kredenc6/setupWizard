@@ -4,13 +4,15 @@ import { createStyles, makeStyles } from "@material-ui/core/styles";
 import UploadButton from "./UploadButton";
 import GitStateReport from "../sharedComponents/GitStateReport/GitStateReport";
 import AvailableJsonsButton from "../MainMenu/AvailableJsonsButton";
+import { fetchJsonFiles, loadJsons } from "../../fileFunctions/fileFunctions";
+import { SERVER_ADDRESS } from "../../initialStates/constants";
 import { ServerIs } from "../../interfaces/interfaces";
 import { FilesState } from "../../interfaces/fileInterfaces";
 import Interval from "../../classes/Interval";
+import { SWActions } from "../../sWReducer/sWReducer";
 
 interface Props {
-  fetchJsonsFromLocalRepo: () => void;
-  handleManualJsonLoading: (value: FileList) => void;
+  dispatch: React.Dispatch<SWActions>;
   jsonFilesState: FilesState;
   remoteRepoCheckInterval: Interval;
   serverState: ServerIs;
@@ -40,7 +42,7 @@ const useStyles = makeStyles(theme =>
 );
 
 export default function MenuFileState(
-  { fetchJsonsFromLocalRepo, handleManualJsonLoading, jsonFilesState, remoteRepoCheckInterval, serverState, setIsJsonSelectionOpen }: Props) {
+  { dispatch, jsonFilesState, remoteRepoCheckInterval, serverState, setIsJsonSelectionOpen }: Props) {
   const classes = useStyles();
 
   return (
@@ -56,13 +58,21 @@ export default function MenuFileState(
           jsonFileCount={jsonFilesState.loadedJsons.length} />
         <UploadButton
           childClass={classes.updateBtt}
-          handleManualJsonLoading={handleManualJsonLoading}
+          handleManualJsonLoading={async (fileList: FileList) => {
+            const loadedJsons = await loadJsons(fileList);
+            remoteRepoCheckInterval.stop();
+            dispatch({ type: "changeJsonFilesState", payload: { loadedJsons, localRepoState: null } });
+          }}
           text="Load JSON(s) manualy" />
         <Button
           children="Load JSON(s) from repo"
           disabled={serverState === "offline"}
           className={classes.updateBtt}
-          onClick={fetchJsonsFromLocalRepo} />
+          onClick={async () => {
+            const loadedJsons = await fetchJsonFiles(SERVER_ADDRESS);
+            dispatch({ type: "changeJsonFilesState", payload: { loadedJsons } });
+            remoteRepoCheckInterval.start(true);
+          }} />
       </div>
     </article>
   );

@@ -5,25 +5,24 @@ import ObjectDataComponent from "./ObjectDataComponent/ObjectDataComponent";
 import ArrayDataComponent from "./ArrayDataComponent/ArrayDataComponent";
 import ArrayComponent from "./ArrayComponent/ArrayComponent";
 import AppTopicParagraph from "../sharedComponents/AppTopicParagraph";
-import { JsonObjModule, Module, ServerIs } from "../../interfaces/interfaces";
+import { JsonObjModule, Module, ServerIs, UserInputModuleKeys } from "../../interfaces/interfaces";
+import { SWActions } from "../../sWReducer/sWReducer";
 
 interface Props {
   appTopic: string;
-  handleJsonChange: (changedModule: JsonObjModule) => void;
+  dispatch: React.Dispatch<SWActions>;
   jsonModuleObj: JsonObjModule;
-  moduleName: string;
+  moduleName: UserInputModuleKeys;
   moduleSettings: Module;
   serverState: ServerIs;
-  setIsNextStepAllowed: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const styles = {
+const useStyles = makeStyles({
   menuTopic: {
     minWidth: "70%",
     "text-align": "center"
   }
-};
-const useStyles = makeStyles(styles);
+});
 
 /** Empty array is returned as false. */
 const isArrObjectArr = (arr: any[]) => {
@@ -31,16 +30,19 @@ const isArrObjectArr = (arr: any[]) => {
   return false;
 };
 
-const SelectedInput = 
-  ({ appTopic, handleJsonChange, jsonModuleObj, moduleName, moduleSettings, serverState, setIsNextStepAllowed }: Props) => {
-
+export default function SelectedInput({ appTopic, dispatch, jsonModuleObj, moduleName, moduleSettings, serverState }: Props) {
   const classes = useStyles();
+  
+  const handleJsonChange = (changedModule: JsonObjModule) => {
+    dispatch({ type: "changeJson", payload: { [moduleName]: changedModule } });
+  };
+  
   const handleJsonObjChange = (dataObj: object, key: string, value: any) => handleJsonChange({ ...dataObj, [key]: value });
 
   // always allow next step
   useEffect(() => {
-    setIsNextStepAllowed(true);
-  });
+    dispatch({ type: "setIsNextStepAllowed", payload: true });
+  },[dispatch]);
     
   return (
     <section className={classes.menuTopic}>
@@ -70,5 +72,3 @@ const SelectedInput =
     </section>
   );
 };
-
-export default SelectedInput;

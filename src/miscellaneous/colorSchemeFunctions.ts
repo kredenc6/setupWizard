@@ -1,6 +1,6 @@
 import { darken, lighten, rgbToHex, Theme } from "@material-ui/core/styles";
 import rgbaToHex from "../miscellaneous/rgbaToHex";
-import { Palette, JsonScheme, SchemeObj } from "../interfaces/interfaces";
+import { Palette, JsonScheme, ColorSchemeInt } from "../interfaces/interfaces";
 
 const normalizeColor = (color: string) => {
   if(color.startsWith("#")) {
@@ -56,7 +56,7 @@ export const createPaletteFromPresetScheme =
 };
 
 export const createSchemeObjFromPalettes =
-  (primary: Palette, secondary: Palette, schemeName?: string, textColorOverride?: SchemeObj["textColorOverride"]): SchemeObj => {
+  (primary: Palette, secondary: Palette, schemeName?: string, textColorOverride?: ColorSchemeInt["textColorOverride"]): ColorSchemeInt => {
     return {
       name: schemeName ? schemeName : "custom",
       primary,
@@ -66,7 +66,7 @@ export const createSchemeObjFromPalettes =
 };
 
 export const createSchemeObjFromPresetScheme =
-  (presetScheme: JsonScheme, getContrastText: (background: string) => string): SchemeObj => {
+  (presetScheme: JsonScheme, getContrastText: (background: string) => string) => {
     return createSchemeObjFromPalettes(
       createPaletteFromPresetScheme(presetScheme, "primary", getContrastText),
       createPaletteFromPresetScheme(presetScheme, "secondary", getContrastText),
@@ -74,7 +74,7 @@ export const createSchemeObjFromPresetScheme =
     );
 };
 
-export const createSchemeObjFromTheme = (theme: Theme): SchemeObj => {
+export const createSchemeObjFromTheme = (theme: Theme): ColorSchemeInt => {
   return {
     name: "custom",
     primary: createPaletteFromColor(theme.palette.primary.main, theme.palette.getContrastText),
@@ -86,7 +86,7 @@ export const createSchemeObjFromTheme = (theme: Theme): SchemeObj => {
   };
 };
 
-export const createJsonSchemeObj = (schemeObj: SchemeObj): JsonScheme => {
+export const createJsonSchemeObj = (schemeObj: ColorSchemeInt): JsonScheme => {
   return {
     name: schemeObj.name,
     primaryColor: schemeObj.primary.main,
