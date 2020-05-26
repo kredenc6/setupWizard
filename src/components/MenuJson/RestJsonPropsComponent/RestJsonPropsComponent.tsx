@@ -1,10 +1,11 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Paper } from "@material-ui/core";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import ObjectDataComponent from "../../SelectedModule/ObjectDataComponent/ObjectDataComponent";
 import PropertyHeading from "./PropertyHeading";
-import { DispatchContext } from "../../../SetupWizard";
 import { JsonObjKey, JsonResultObj } from "../../../interfaces/interfaces";
+import { SWActions } from "../../../sWReducer/sWReducer";
+
 
 interface Props {
   handleJsonChange: (key: JsonObjKey, changedModule: JsonResultObj[JsonObjKey]) => void;
@@ -23,12 +24,7 @@ const useStyles = makeStyles(theme =>
 );
 
 export default function RestJsonPropsComponent ({ handleJsonChange, isVerificationEnabled, restJson }: Props) {
-  const dispatch = useContext(DispatchContext);
   const classes = useStyles();
-  //TODO clean up if it works
-  // const handleGroupedPropsChange = (_: object, key: string, value: any) => {
-  //   dispatch({ type: "jsonChange", payload: { [key as JsonObjKey]: value } });
-  // };
   const handleGroupedPropsChange = (_: object, key: string, value: any) => {
     handleJsonChange(key as JsonObjKey, value);
   };

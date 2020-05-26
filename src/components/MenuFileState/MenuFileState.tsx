@@ -60,8 +60,7 @@ export default function MenuFileState(
           childClass={classes.updateBtt}
           handleManualJsonLoading={async (fileList: FileList) => {
             const loadedJsons = await loadJsons(fileList);
-            remoteRepoCheckInterval.stop();
-            dispatch({ type: "changeJsonFilesState", payload: { loadedJsons, localRepoState: null } });
+            dispatch({ type: "changeJsonFilesState", payload: { loadedJsons } });
           }}
           text="Load JSON(s) manualy" />
         <Button

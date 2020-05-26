@@ -1,6 +1,8 @@
 import { Reducer } from "react";
 import jsonObjFrame from "../jsonObjFrame/jsonObjFrame";
-import { IntervalsObj, JsonResultObj, ServerIs, SwState, UserInput } from "../interfaces/interfaces";
+import { prefixValue } from "../components/sharedComponents/VerifyUrlTextField";
+import determineWebPrefix from "../components/SelectedModule/helpFunctions/determineWebPrefix";
+import { JsonResultObj, JsonResultObjFillIns, ServerIs, SwState, UserInput } from "../interfaces/interfaces";
 import { FilesState } from "../interfaces/fileInterfaces";
 
 interface Action<S extends string> {
@@ -101,32 +103,63 @@ function handleTopicChange(value: string, state: SwState) {
   }
 
   if(userInput.resetJsonOnAppTopicChange) {
-    const newJson: JsonResultObj = { ...jsonObjFrame, ...fillInTopicValue(jsonObj, value, fillModules) };
+    const newJson: JsonResultObj = { ...jsonObjFrame, ...fillInTopicValue(jsonObj, userInput.modules, value, fillModules) };
     return handleJsonSelection(newJson, state);
   } else {
-    const changedJson: JsonResultObj = { ...jsonObj, ...fillInTopicValue(jsonObj, value, fillModules) };
+    const changedJson: JsonResultObj = { ...jsonObj, ...fillInTopicValue(jsonObj, userInput.modules, value, fillModules) };
     return { ...state, jsonObj: changedJson };
   }
 }
 
-function fillInTopicValue(jsonObj: JsonResultObj, value: string, toModules = false) {
-  const twitter = [ { ...jsonObj["twitter"][0], "channel_name": value, "url": value } ];
-  
+export function fillInTopicValue(jsonObj: JsonResultObj, modules: UserInput["modules"], value: string, toModules = false) {
   if(!toModules) {
     return { 
-      "app_topic": value,
-      twitter
+      app_topic: value,
+      twitter: [ { ...jsonObj["twitter"][0], channel_name: value } ]
      };
   }
-  
-  return {
-    "app_topic": value,
-    "audio":     [ ...jsonObj.audio.map(audioObj => ({ ...audioObj, "queries": [value]}))],
-    "books":     [ ...jsonObj.books.map(bookObj => ({ ...bookObj, "queries": [value]}))],
-    "facebook":  { ...jsonObj.facebook, "channel": value},
-    "instagram": { ...jsonObj.instagram, "main_channel": value},
-    "reddit":    { ...jsonObj.reddit, "sub_reddit": value},
-    "videos":    [ ...jsonObj.videos.map(videoObj => ({ ...videoObj, "queries": [value]}))],
-    twitter
+
+  const prePrepedModules: JsonResultObjFillIns = {
+    app_topic: value,
+    audio: [ ...jsonObj.audio.map((audioObj, i) => {
+      return { ...audioObj, queries: [ prefixValue(determineWebPrefix(modules.audio, i), value) ] }
+    })],
+    books: [ ...jsonObj.books.map((bookObj, i) => {
+      return { ...bookObj, queries: [ prefixValue(determineWebPrefix(modules.books, i), value) ] }
+    })],
+    facebook: {
+      ...jsonObj.facebook,
+      channel: prefixValue(determineWebPrefix(modules.facebook, 0), value)
+    },
+    instagram: {
+      ...jsonObj.instagram,
+      main_channel: prefixValue(determineWebPrefix(modules.instagram, 0), value)
+    },
+    reddit: {
+      ...jsonObj.reddit,
+      sub_reddit: prefixValue(determineWebPrefix(modules.reddit, 0), value)
+    },
+    videos:    [ ...jsonObj.videos.map((videoObj, i) => {
+      return { ...videoObj, queries: [ prefixValue(determineWebPrefix(modules.videos, i), value) ] }
+    })],
+    twitter:   [{
+      ...jsonObj["twitter"][0],
+      channel_name: value,
+      url: prefixValue(determineWebPrefix(modules.twitter, 0), value)
+    }]
   };
-};
+
+  const selectedModulesObj: Partial<JsonResultObjFillIns> = { app_topic: value };
+  jsonObj.visible_components.forEach(module => {
+    if(module !== "websites" && module !=="events") {
+      assingSelectedModule.call(selectedModulesObj, module);
+    }
+  })
+  
+  return selectedModulesObj;
+
+  function assingSelectedModule<K extends keyof JsonResultObjFillIns>(this: Partial<JsonResultObjFillIns>, moduleName: K) {
+    this[moduleName] = prePrepedModules[moduleName];
+  }
+}
+

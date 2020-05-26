@@ -1,4 +1,4 @@
-import { UserInput } from "../interfaces/interfaces";
+import { SwState, UserInput } from "../interfaces/interfaces";
 import { FilesState } from "../interfaces/fileInterfaces";
 import jsonObjFrame from "../jsonObjFrame/jsonObjFrame";
 import theme from "../theme/theme";
@@ -57,4 +57,13 @@ export const initialUserInput: UserInput = {
       VERIFY_BY_PROXY: ["SELF"]
     }
   }
+};
+
+export const initialReducerState: SwState = {
+  activeStep: 1,
+  isNextStepAllowed: false,
+  userInput: initialUserInput,
+  jsonObj: jsonObjFrame,
+  serverState: "offline",
+  jsonFilesState: initialFilesState,
 };

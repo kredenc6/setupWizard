@@ -1,5 +1,5 @@
 import React from "react";
-import { FormControlLabel, Switch } from "@material-ui/core";
+import { FormControlLabel, Switch, Typography } from "@material-ui/core";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import SwTextField from "../sharedComponents/SwTextField";
 import { SWActions } from "../../sWReducer/sWReducer";
@@ -19,6 +19,7 @@ const useStyles = makeStyles(theme =>
       "text-align": "center"
     },
     textField: {
+      marginTop: "2rem",
       minWidth: `${PLACEHOLDER.length / 2}rem`
     },
     switchWrapper: {
@@ -49,13 +50,14 @@ const MenuTopic = (props: Props) => {
         value={value}
       />
       <div className={classes.switchWrapper}>
+        <Typography align="left" children="with change:" />
         <FormControlLabel
           control={
             <Switch
               checked={resetOtherValues}
               onChange={e => dispatch({ type: "changeUserInput", payload: { resetJsonOnAppTopicChange: e.target.checked } })} />
           }
-          label="reset other values with change" />
+          label="clear other values" />
         <FormControlLabel
           control={
             <Switch

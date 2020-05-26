@@ -4,7 +4,6 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import SteppDescription from "../Steppinstruction/SteppInstruction";
 
 interface Props {
-  // allStepsCompleted: () => boolean;
   isFinished: boolean;
   handleBack: () => void;
   handleNext: () => void;
@@ -12,7 +11,6 @@ interface Props {
   isFirstStep: () => boolean;
   isLastStep: () => boolean;
   isNextStepAllowed: boolean;
-  // setIsFinished: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const useStyles = makeStyles((theme: Theme) =>

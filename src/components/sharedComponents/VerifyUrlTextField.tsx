@@ -116,7 +116,7 @@ const VerifyUrlTextField = (props: Props & TextFieldProps) => {
 
   return(
     <SwTextField
-      {... textFieldProps}
+      {...textFieldProps}
       className={verification ?
         verification === "OK" ? classes.valid : classes.invalid
         :
@@ -135,7 +135,7 @@ function unprefixValue(prefix: string | undefined, value: string) {
   return value;
 }
 
-function prefixValue(prefix: string | undefined, value: string) {
+export function prefixValue(prefix: string | undefined, value: string) {
   return value.length > 0 ?
     (prefix || "") + value
     :

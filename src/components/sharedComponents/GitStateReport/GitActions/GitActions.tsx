@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button, ButtonGroup, ClickAwayListener, Grid, Grow, IconButton, MenuItem, MenuList, Paper, Popper, Tooltip }
   from "@material-ui/core";
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
@@ -51,6 +51,10 @@ export default function SplitButton({ gitState, remoteRepoCheckInterval, serverS
       }
     }
   };
+
+  useEffect(() => {
+    setSelectedIndex(selectIndex(gitState));
+  },[gitState]);
 
   const handleMenuItemClick = (index: number) => {
     setSelectedIndex(index);

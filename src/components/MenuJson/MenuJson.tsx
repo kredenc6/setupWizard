@@ -6,6 +6,7 @@ import SaveToRepoBtt from "./SaveToRepoBtt/SaveToRepoBtt";
 import GitStateReport from "../sharedComponents/GitStateReport/GitStateReport";
 import DataDisplay from "../sharedComponents/DataDisplay";
 import PromptCommitMessage from "../sharedComponents/GitStateReport/GitActions/PromptCommitMessage/PromptCommitMessage";
+import ClearJsonBtt from "./ClearJsonBtt/ClearJsonBtt";
 import { SERVER_ADDRESS } from "../../initialStates/constants";
 import { downloadJson, saveJson } from "../../fileFunctions/fileFunctions";
 import { commitRepo, pushToRemoteRepo } from "../../gitFunctions/gitFunctions";
@@ -40,7 +41,7 @@ const useStyles = makeStyles(theme =>
       height: "100%",
       display: "grid",
       gridGap: theme.spacing(1),
-      gridTemplateRows: "auto 1fr 1fr auto"
+      gridTemplateRows: "auto auto 1fr 1fr auto"
     }
   })
 );
@@ -105,6 +106,7 @@ export default function MenuJson(
           lastRepoUpdate={jsonFilesState.lastRepoUpdate}
           remoteRepoCheckInterval={remoteRepoCheckInterval}
           serverState={serverState} />
+        <ClearJsonBtt />
         <Button color="primary" onClick={() => downloadJson(jsonObj)} variant="contained">
           Download as {jsonObj.app_topic}.json
         </Button>

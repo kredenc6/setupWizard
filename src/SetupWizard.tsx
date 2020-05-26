@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useReducer, useState } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import { CssBaseline } from "@material-ui/core";
 import { makeStyles, ThemeProvider } from "@material-ui/core/styles";
 import MainMenu from "./components/MainMenu/MainMenu";
@@ -11,16 +11,13 @@ import theme from "./theme/theme";
 import sortObjEntriesAlphabetically from "./miscellaneous/sortObjEntriesAlphabetically";
 import getServerState from "./miscellaneous/getServerState";
 import capitalizeFirstLetter from "./miscellaneous/capitalizeFirstLetter";
-import jsonObjFrame from './jsonObjFrame/jsonObjFrame';
 import Interval from "./classes/Interval";
-import { initialFilesState, initialUserInput } from "./initialStates/initialStates";
+import sWReducer, { SWActions } from "./sWReducer/sWReducer";
+import { initialReducerState } from "./initialStates/initialStates";
 import { SERVER_STATUS_CHECK_INTERVAL, REMOTE_REPO_CHECK_INTERVAL, SERVER_ADDRESS } from "./initialStates/constants";
 import { fetchRepoStatus, getLocalStorageRepoState } from "./gitFunctions/gitFunctions";
-import { IntervalsObj, JsonObjModule, JsonObjKey, JsonResultObj, Menu, ServerIs, SwState, UserInputModuleKeys } from "./interfaces/interfaces";
+import { IntervalsObj, JsonObjModule, JsonObjKey, JsonResultObj, Menu, ServerIs, UserInputModuleKeys } from "./interfaces/interfaces";
 
-import { SWActions } from "./sWReducer/sWReducer";
-
-import sWReducer from "./sWReducer/sWReducer";
 
 const useStyles = makeStyles({
   wizardWrapper: {
@@ -38,20 +35,9 @@ const useStyles = makeStyles({
   }
 });
 
-const initialReducerState: SwState = {
-  activeStep: 1,
-  isNextStepAllowed: false,
-  userInput: initialUserInput,
-  jsonObj: jsonObjFrame,
-  serverState: "offline",
-  jsonFilesState: initialFilesState,
-};
-
-export const DispatchContext = createContext<React.Dispatch<SWActions>>(_ => {});
 export default function SetupWizard() {
   const classes = useStyles();
   const [state, dispatch ] = useReducer(sWReducer, initialReducerState);
-  const [jsonFilesState, setJsonFilesState] = useState(initialFilesState);
   const [intervals, setIntervals] = useState<IntervalsObj>({
     serverCheck: new Interval(SERVER_STATUS_CHECK_INTERVAL, async () =>
       dispatch({ type: "setServerState", payload: await getServerState(SERVER_ADDRESS) })),
@@ -64,16 +50,14 @@ export default function SetupWizard() {
         return new Promise((resolve, reject) => {
           const canRefresh = serverState === "online" &&
             ( forcedRefresh || shoudRepoStateBeRefreshed(state.jsonFilesState.lastRepoUpdate) );
-          console.log("Last repo update from loadRepoState: ");
-          console.log(state.jsonFilesState.lastRepoUpdate);
           if(canRefresh) {
-            refreshRepoState()
+            refreshRepoState(dispatch)
               .then(updateMessage => resolve(updateMessage))
               .catch((err: Error) => reject(err));
           } else {
             const localRepoState = getLocalStorageRepoState()?.state;
             if(localRepoState) {
-              setJsonFilesState(prevState => ({ ...prevState, localRepoState }));
+              dispatch({ type: "changeJsonFilesState", payload: { localRepoState } });
             }
             resolve("Repo state not updated.");
           }
@@ -81,41 +65,6 @@ export default function SetupWizard() {
       }
     })
   });
-
-  // useEffect(() => {
-  //   state.intervals.serverCheck.
-  //   const serverCheck = new Interval(SERVER_STATUS_CHECK_INTERVAL, async () =>
-  //     dispatch({ type: "setServerState", payload: await getServerState(SERVER_ADDRESS) }));
-    
-  //   const remoteRepoCheck = new Interval(REMOTE_REPO_CHECK_INTERVAL, (serverState: ServerIs, forcedRefresh?: boolean) => {
-  //     loadRepoState(serverState, forcedRefresh)
-  //       .then(updateMessage => console.log(updateMessage))
-  //       .catch(err => console.log(err.message));
-  //   });
-
-  //   dispatch({ type: "changeIntervals", payload: { serverCheck, remoteRepoCheck } });
-  //   state.intervals.serverCheck.start(true);
-
-  //   function loadRepoState(serverState: ServerIs, forcedRefresh = false): Promise<string> {
-  //     return new Promise((resolve, reject) => {
-  //       const canRefresh = serverState === "online" &&
-  //         ( forcedRefresh || shoudRepoStateBeRefreshed(state.jsonFilesState.lastRepoUpdate) );
-  //       if(canRefresh) {
-  //         refreshRepoState()
-  //           .then(updateMessage => resolve(updateMessage))
-  //           .catch((err: Error) => reject(err));
-  //       } else {
-  //         const localRepoState = getLocalStorageRepoState()?.state;
-  //         if(localRepoState) {
-  //           setJsonFilesState(prevState => ({ ...prevState, localRepoState }));
-  //         }
-  //         resolve("Repo state not updated.");
-  //       }
-  //     });
-  //   }
-
-  //   return () => state.intervals.serverCheck.stop();
-  // },[dispatch, state.intervals, state.jsonFilesState.lastRepoUpdate]);
 
   useEffect(() => {
     intervals.serverCheck.start(true);
@@ -131,41 +80,6 @@ export default function SetupWizard() {
 
     return () => intervals.remoteRepoCheck.stop();
   },[intervals, state.serverState]);
-
-  // function loadRepoState(serverState: ServerIs, forcedRefresh = false): Promise<string> {
-  //   return new Promise((resolve, reject) => {
-  //     const canRefresh = serverState === "online" &&
-  //       ( forcedRefresh || shoudRepoStateBeRefreshed(jsonFilesState.lastRepoUpdate) );
-  //     if(canRefresh) {
-  //       refreshRepoState()
-  //         .then(updateMessage => resolve(updateMessage))
-  //         .catch((err: Error) => reject(err));
-  //     } else {
-  //       const localRepoState = getLocalStorageRepoState()?.state;
-  //       if(localRepoState) {
-  //         setJsonFilesState(prevState => ({ ...prevState, localRepoState }));
-  //       }
-  //       resolve("Repo state not updated.");
-  //     }
-  //   });
-  // }
-
-  function refreshRepoState(): Promise<string> {
-    return new Promise((resolve, reject) => {
-      fetchRepoStatus(SERVER_ADDRESS)
-        .then(state => {
-          if(state) {
-            const timeStamp = Date.now();
-            localStorage.setItem("repoState", JSON.stringify({ timeStamp, state }));
-            setJsonFilesState(prevState => ({ ...prevState, localRepoState: state, lastRepoUpdate: timeStamp }));
-            resolve(`Repo updated at ${new Date(timeStamp)}`);
-          
-          } else {
-            reject(new Error("Failed to fetch remote repo status."));
-          }
-        });
-    });
-  }
 
   const SelectedModuleComponents: Menu[] =
     sortObjEntriesAlphabetically(Object.entries(state.userInput.modules))
@@ -208,8 +122,8 @@ export default function SetupWizard() {
       label: "config.json",
       component: <MenuJson
         jsonFilesState={state.jsonFilesState}
-        handleJsonChange={(key: JsonObjKey,changedModule: JsonResultObj[JsonObjKey]) => {
-          dispatch({ type: "changeJson", payload: { [key]: changedModule } })
+        handleJsonChange={(key: JsonObjKey, changedModule: JsonResultObj[JsonObjKey]) => {
+          dispatch({ type: "changeJson", payload: { [key]: changedModule } });
         }}
         jsonObj={state.jsonObj}
         remoteRepoCheckInterval={intervals.remoteRepoCheck}
@@ -238,4 +152,21 @@ export default function SetupWizard() {
 function shoudRepoStateBeRefreshed(lastUpdateTime: number) {
   const isTimeIntervalExceeded = Date.now() - lastUpdateTime > REMOTE_REPO_CHECK_INTERVAL;
   return isTimeIntervalExceeded;
+}
+
+function refreshRepoState(dispatch: React.Dispatch<SWActions>): Promise<string> {
+  return new Promise((resolve, reject) => {
+    fetchRepoStatus(SERVER_ADDRESS)
+      .then(state => {
+        if(state) {
+          const timeStamp = Date.now();
+          localStorage.setItem("repoState", JSON.stringify({ timeStamp, state }));
+          dispatch({ type: "changeJsonFilesState", payload: { localRepoState: state, lastRepoUpdate: timeStamp } });
+          resolve(`Repo updated at ${new Date(timeStamp)}`);
+        
+        } else {
+          reject(new Error("Failed to fetch remote repo status."));
+        }
+      });
+  });
 }

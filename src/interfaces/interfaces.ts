@@ -41,7 +41,6 @@ export interface JsonScheme {
 export interface UserInput {
   resetJsonOnAppTopicChange: boolean;
   setAlsoAsChannelValues: boolean;
-  // selectedScheme: string;
   schemeObj: ColorSchemeInt;
   modules: {
     audio: Module;
@@ -131,6 +130,9 @@ export interface VideoItem extends MediaItem {
 export type JsonObjKey = keyof JsonResultObj;
 
 export type JsonObjModule = JsonResultObj[UserInputModuleKeys];
+
+export type JsonResultObjFillIns =
+  Pick<JsonResultObj, "app_topic" | "audio" | "books" | "facebook" | "instagram" | "reddit" | "videos" | "twitter">;
 
 export type ServerIs = "online" | "offline";
 
