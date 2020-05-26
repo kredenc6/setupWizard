@@ -5,7 +5,7 @@ import RestJsonPropsComponent from "./RestJsonPropsComponent/RestJsonPropsCompon
 import SaveToRepoBtt from "./SaveToRepoBtt/SaveToRepoBtt";
 import GitStateReport from "../sharedComponents/GitStateReport/GitStateReport";
 import DataDisplay from "../sharedComponents/DataDisplay";
-import PromptCommitMessage from "../sharedComponents/GitStateReport/GitActions/PromptCommitMessage/PromptCommitMessage";
+import PromptCommitMessage from "../sharedComponents/GitStateReport/GitActions/PromptCommitMsg/PromptCommitMsg";
 import ClearJsonBtt from "./ClearJsonBtt/ClearJsonBtt";
 import { SERVER_ADDRESS } from "../../initialStates/constants";
 import { downloadJson, saveJson } from "../../fileFunctions/fileFunctions";

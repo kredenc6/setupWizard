@@ -3,7 +3,7 @@ import { Button, ButtonGroup, ClickAwayListener, Grid, Grow, IconButton, MenuIte
   from "@material-ui/core";
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import SyncIcon from '@material-ui/icons/Sync';
-import PromptCommitMessage from "./PromptCommitMessage/PromptCommitMessage";
+import PromptCommitMessage from "./PromptCommitMsg/PromptCommitMsg";
 import { commitRepo, mergeRemoteRepo, pushToRemoteRepo } from "../../../../gitFunctions/gitFunctions";
 import { SERVER_ADDRESS } from "../../../../initialStates/constants";
 import { ServerIs } from "../../../../interfaces/interfaces";
