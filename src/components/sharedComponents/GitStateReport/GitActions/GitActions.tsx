@@ -4,7 +4,7 @@ import { Button, ButtonGroup, ClickAwayListener, Grid, Grow, IconButton, MenuIte
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import SyncIcon from '@material-ui/icons/Sync';
 import PromptCommitMessage from "./PromptCommitMsg/PromptCommitMsg";
-import { commitRepo, mergeRemoteRepo, pushToRemoteRepo } from "../../../../gitFunctions/gitFunctions";
+import { commitRepo, getFileNamesForCommit, mergeRemoteRepo, pushToRemoteRepo } from "../../../../gitFunctions/gitFunctions";
 import { SERVER_ADDRESS } from "../../../../initialStates/constants";
 import { ServerIs } from "../../../../interfaces/interfaces";
 import { StatusResult } from "../../../../interfaces/simpleGit";
@@ -32,7 +32,7 @@ export default function SplitButton({ gitState, remoteRepoCheckInterval, serverS
 
   const handleClick = async () => {
     if(OPTIONS[selectedIndex] === "commit") {
-      await commitRepo(SERVER_ADDRESS, commitMessage, gitState.not_added)
+      await commitRepo(SERVER_ADDRESS, commitMessage, getFileNamesForCommit(gitState));
       updateRepo();
     }
     if(OPTIONS[selectedIndex] === "push") {

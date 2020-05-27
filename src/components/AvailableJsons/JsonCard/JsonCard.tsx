@@ -15,6 +15,7 @@ interface Props {
 const useStyles = makeStyles(theme =>
   createStyles({
     card: {
+      position: "relative",
       minWidth: `${theme.typography.fontSize * 20}px`,
       margin: theme.spacing(1),
       border: ({ active, selected }: { active: boolean, selected: boolean}) => {

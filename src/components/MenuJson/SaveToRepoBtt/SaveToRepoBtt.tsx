@@ -4,14 +4,16 @@ import { makeStyles } from "@material-ui/core/styles";
 import GitOptions from "../GitOptions/GitOptions";
 import { JsonResultObj, ServerIs } from "../../../interfaces/interfaces";
 import { GitOpt } from "../../../interfaces/gitInterfaces";
+import { FileStatus } from "../../../interfaces/fileInterfaces";
 import { StatusResult } from "../../../interfaces/simpleGit";
 
 interface Props {
   gitOptions: GitOpt;
   handleClick: () => void;
+  jsonObj: JsonResultObj;
+  fileStatus: FileStatus;
   repoState: StatusResult | null;
   serverState: ServerIs;
-  jsonObj: JsonResultObj;
   setGitOptions: React.Dispatch<React.SetStateAction<GitOpt>>;
 };
 
@@ -27,22 +29,26 @@ const useStyles = makeStyles({
   }
 });
 
-export default function SaveButton({ gitOptions, handleClick, repoState, serverState, jsonObj, setGitOptions }: Props) {
+export default function SaveButton({ gitOptions, fileStatus, handleClick, repoState, serverState, jsonObj, setGitOptions }: Props) {
   const classes = useStyles();
+  const disabled = serverState === "offline" || fileStatus !== "ready";
 
   return(
     <Box className={classes.buttonWrapper}>
       <Button
         className={classes.root}
         color="primary"
-        disabled={serverState === "offline"}
+        disabled={disabled}
         onClick={handleClick}
         variant="contained"
       >
-        <p>{`Save to repo as ${jsonObj.app_topic}.json`}</p>
+        {fileStatus === "ready" ?
+            `Save to repo as ${jsonObj.app_topic}.json`
+          :
+            `File is ${fileStatus}.`}
       </Button>
       <GitOptions
-        disabled={serverState === "offline"}
+        disabled={disabled}
         gitOptions={gitOptions}
         repoState={repoState}
         setGitOptions={setGitOptions} />

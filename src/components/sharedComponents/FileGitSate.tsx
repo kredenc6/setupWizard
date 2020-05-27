@@ -9,18 +9,15 @@ interface Props {
 const useStyles = makeStyles(theme => 
   createStyles({
     gitStateWrapper: {
+      position: "absolute",
+      left: 0,
+      bottom: ".2rem",
+      width: "100%",
       display: "flex",
-      justifyContent: "center",
+      justifyContent: "flex-end",
       "& > *": {
-        margin: `${theme.spacing(2)}px ${theme.spacing(1)}px`
-      }
-    },
-    state: {
-      margin: `0 ${theme.spacing(1)}px`,
-      fontSize: `${theme.typography.fontSize * 0.8}px`,
-    },
-    "MuiChip-root": {
-      backgroundColor: "pink"
+        margin: `0 ${theme.spacing(1)}px`
+      },
     },
     red: {
       backgroundColor: "#f00"
@@ -32,9 +29,10 @@ const FileGitState = ({ fileGitState }: Props) => {
   const stateComponents = fileGitState.map(state =>
     <Chip
       className={state === "conflicted" ? classes.red : "" }
-      color="primary"
+      color="secondary"
       key={state}
       label={state}
+      variant="outlined"
       size="small" />
   );
   

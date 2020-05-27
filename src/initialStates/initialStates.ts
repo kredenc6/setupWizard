@@ -1,6 +1,6 @@
 import { SwState, UserInput } from "../interfaces/interfaces";
 import { FilesState } from "../interfaces/fileInterfaces";
-import jsonObjFrame from "../jsonObjFrame/jsonObjFrame";
+import jsonObjFrame from "./jsonObjFrame";
 import theme from "../theme/theme";
 import { getLocalStorageRepoState } from "../gitFunctions/gitFunctions";
 import { createSchemeObjFromPresetScheme } from "../miscellaneous/colorSchemeFunctions";
@@ -8,7 +8,8 @@ import { createSchemeObjFromPresetScheme } from "../miscellaneous/colorSchemeFun
 export const initialFilesState: FilesState = {
   lastRepoUpdate: getLocalStorageRepoState()?.timeStamp || 0,
   loadedJsons: [],
-  localRepoState: null
+  localRepoState: null,
+  fileStatus: "ready"
 };
 
 export const initialUserInput: UserInput = {

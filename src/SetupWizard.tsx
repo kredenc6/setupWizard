@@ -6,7 +6,8 @@ import MenuStyles from "./components/MenuStyles/MenuStyles";
 import MenuJson from "./components/MenuJson/MenuJson";
 import SelectedModule from "./components/SelectedModule/SelectedModule";
 import SetupStepper from "./components/SetupStepper/SetupStepper";
-import ServerState from "./components/sharedComponents/ServerState"
+import ServerState from "./components/sharedComponents/ServerState";
+import MessageSnackBar from "./components/sharedComponents/MessageSnackBar";
 import theme from "./theme/theme";
 import sortObjEntriesAlphabetically from "./miscellaneous/sortObjEntriesAlphabetically";
 import getServerState from "./miscellaneous/getServerState";
@@ -16,7 +17,7 @@ import sWReducer, { SWActions } from "./sWReducer/sWReducer";
 import { initialReducerState } from "./initialStates/initialStates";
 import { SERVER_STATUS_CHECK_INTERVAL, REMOTE_REPO_CHECK_INTERVAL, SERVER_ADDRESS } from "./initialStates/constants";
 import { fetchRepoStatus, getLocalStorageRepoState } from "./gitFunctions/gitFunctions";
-import { IntervalsObj, JsonObjModule, JsonObjKey, JsonResultObj, Menu, ServerIs, UserInputModuleKeys } from "./interfaces/interfaces";
+import { IntervalsObj, JsonObjModule, Menu, ServerIs, UserInputModuleKeys } from "./interfaces/interfaces";
 
 
 const useStyles = makeStyles({
@@ -121,10 +122,8 @@ export default function SetupWizard() {
     {
       label: "config.json",
       component: <MenuJson
+        dispatch={dispatch}
         jsonFilesState={state.jsonFilesState}
-        handleJsonChange={(key: JsonObjKey, changedModule: JsonResultObj[JsonObjKey]) => {
-          dispatch({ type: "changeJson", payload: { [key]: changedModule } });
-        }}
         jsonObj={state.jsonObj}
         remoteRepoCheckInterval={intervals.remoteRepoCheck}
         serverState={state.serverState}
@@ -136,6 +135,9 @@ export default function SetupWizard() {
     <CssBaseline>
       <ThemeProvider theme={ theme }>
         <main className={classes.wizardWrapper}>
+          <MessageSnackBar
+            message={`Server is ${state.serverState}.`}
+            type={state.serverState === "offline" ? "warning" : "info"} />
           <ServerState serverState={state.serverState} />
           {menus[state.activeStep - 1].component}
           <SetupStepper

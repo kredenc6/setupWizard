@@ -1,5 +1,5 @@
 import { Reducer } from "react";
-import jsonObjFrame from "../jsonObjFrame/jsonObjFrame";
+import jsonObjFrame from "../initialStates/jsonObjFrame";
 import { prefixValue } from "../components/sharedComponents/VerifyUrlTextField";
 import determineWebPrefix from "../components/SelectedModule/helpFunctions/determineWebPrefix";
 import { JsonResultObj, JsonResultObjFillIns, ServerIs, SwState, UserInput } from "../interfaces/interfaces";

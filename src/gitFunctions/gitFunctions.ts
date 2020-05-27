@@ -1,7 +1,6 @@
 import { MergeSummary, StatusResult } from "../interfaces/simpleGit";
 import { LocalStorageRepoState } from "../interfaces/fileInterfaces";
 import { CommitResponse, PushResponse } from "../interfaces/gitInterfaces";
-import { ServerIs } from "../interfaces/interfaces";
 
 export async function fetchRepoStatus(
   serverAddress: string, callback?: (repoState: StatusResult) => void) {
@@ -44,4 +43,19 @@ export async function mergeRemoteRepo(serverAddress: string) {
 export function getLocalStorageRepoState() {
   const repoStateString = localStorage.getItem("repoState") || undefined;
   return repoStateString ? JSON.parse(repoStateString) as LocalStorageRepoState : undefined;
+}
+
+export function getFileNamesForCommit(gitState: StatusResult) {
+  const GET_FILENAMES_FROM = ["created", "deleted", "modified", "not_added", "renamed", "staged"];
+  const fileNames: Set<string> = new Set();
+
+  Object.entries(gitState).forEach(([key, value]) => {
+    if(GET_FILENAMES_FROM.includes(key)) {
+      for(const fileName of value) {
+        fileNames.add(fileName);
+      }
+    }
+  });
+
+  return Array.from(fileNames);
 }
