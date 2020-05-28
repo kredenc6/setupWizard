@@ -10,6 +10,7 @@ import ClearJsonBtt from "./ClearJsonBtt/ClearJsonBtt";
 import { SERVER_ADDRESS } from "../../initialStates/constants";
 import { downloadJson, saveJson } from "../../fileFunctions/fileFunctions";
 import { commitRepo, getFileNamesForCommit, pushToRemoteRepo } from "../../gitFunctions/gitFunctions";
+import { createMessage } from "../../sWReducer/messageHandlingFunctions";
 import { JsonObjKey, JsonResultObj, ServerIs, UserInput } from "../../interfaces/interfaces";
 import { GitOpt } from "../../interfaces/gitInterfaces";
 import { FilesState, FileStatus } from "../../interfaces/fileInterfaces";
@@ -68,6 +69,7 @@ export default function MenuJson(
   const handleSaveToRepo = async (): Promise<FileStatus> => {
     const savedSuccessfuly = await saveJson(SERVER_ADDRESS, jsonObj);
     if(!savedSuccessfuly) {
+      dispatch({ type: "addMessage", payload: createMessage("error", `Failed to save ${jsonObj.app_topic}.json to repo.`) });
       console.log(`Failed to save ${jsonObj.app_topic}.json to repo. No commits or pushes were handled.`);
       return "ready";
     }
@@ -88,15 +90,15 @@ export default function MenuJson(
       return "ready";
     }
 
-    const notAddedFiles = getFileNamesForCommit(jsonFilesState.localRepoState) || [];
-    if(!notAddedFiles.length) {
+    const filesForCommit = getFileNamesForCommit(jsonFilesState.localRepoState) || [];
+    if(!filesForCommit.length) {
       console.error("It seems git did not register the new file addition.");
       console.log("Before commiting again try refreshing the repo or re-save the file.");
       console.log("No files were commited.");
       return "ready";
     }
 
-    const commitResponse = await commitRepo(SERVER_ADDRESS, commitMsg, notAddedFiles);
+    const commitResponse = await commitRepo(SERVER_ADDRESS, commitMsg, filesForCommit);
     console.log(`Commit was successful: ${commitResponse ? true : false}`);
     
     if(commitResponse && gitOptions.push) {

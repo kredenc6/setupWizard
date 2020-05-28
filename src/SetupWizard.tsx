@@ -17,8 +17,9 @@ import sWReducer, { SWActions } from "./sWReducer/sWReducer";
 import { initialReducerState } from "./initialStates/initialStates";
 import { SERVER_STATUS_CHECK_INTERVAL, REMOTE_REPO_CHECK_INTERVAL, SERVER_ADDRESS } from "./initialStates/constants";
 import { fetchRepoStatus, getLocalStorageRepoState } from "./gitFunctions/gitFunctions";
-import { IntervalsObj, JsonObjModule, Menu, ServerIs, UserInputModuleKeys } from "./interfaces/interfaces";
+import { IntervalsObj, JsonObjModule, Menu, ServerIs, SwState, UserInputModuleKeys } from "./interfaces/interfaces";
 
+import { createMessage } from "./sWReducer/messageHandlingFunctions";
 
 const useStyles = makeStyles({
   wizardWrapper: {
@@ -40,10 +41,11 @@ export default function SetupWizard() {
   const classes = useStyles();
   const [state, dispatch ] = useReducer(sWReducer, initialReducerState);
   const [intervals, setIntervals] = useState<IntervalsObj>({
-    serverCheck: new Interval(SERVER_STATUS_CHECK_INTERVAL, async () =>
-      dispatch({ type: "setServerState", payload: await getServerState(SERVER_ADDRESS) })),
-    remoteRepoCheck: new Interval(REMOTE_REPO_CHECK_INTERVAL, (serverState: ServerIs, forcedRefresh?: boolean) => {
-      loadRepoState(serverState, forcedRefresh)
+    serverCheck: new Interval(SERVER_STATUS_CHECK_INTERVAL, async () => {
+      dispatch({ type: "setServerState", payload: await getServerState(SERVER_ADDRESS) });
+    }),
+    remoteRepoCheck: new Interval(REMOTE_REPO_CHECK_INTERVAL, (state: SwState, forcedRefresh?: boolean) => {
+      loadRepoState(state.serverState, forcedRefresh)
         .then(updateMessage => console.log(updateMessage))
         .catch(err => console.log(err.message));
 
@@ -67,9 +69,25 @@ export default function SetupWizard() {
     })
   });
 
+  // useEffect(() => {
+  //   console.log(state.activeMessage);
+  //   console.dir(state.pendingMessages);
+  // },[state.activeMessage, state.pendingMessages]);
+
+  useEffect(() => {
+    dispatch({ type: "addMessage", payload: createMessage("server", state.serverState) });
+  },[state.serverState]);
+
+  useEffect(() => {
+    dispatch({ type: "addMessage", payload: createMessage("fileStatus", state.jsonFilesState.fileStatus) });
+  },[state.jsonFilesState.fileStatus]);
+  
+  useEffect(() => {
+    dispatch({ type: "addMessage", payload: createMessage("repoUpdate", state.jsonFilesState.lastRepoUpdate) });
+  },[state.jsonFilesState.lastRepoUpdate]);
+
   useEffect(() => {
     intervals.serverCheck.start(true);
-
     return () => intervals.serverCheck.stop();
   },[intervals]);
   
@@ -136,8 +154,8 @@ export default function SetupWizard() {
       <ThemeProvider theme={ theme }>
         <main className={classes.wizardWrapper}>
           <MessageSnackBar
-            message={`Server is ${state.serverState}.`}
-            type={state.serverState === "offline" ? "warning" : "info"} />
+            dispatch={dispatch}
+            message={state.activeMessage} />
           <ServerState serverState={state.serverState} />
           {menus[state.activeStep - 1].component}
           <SetupStepper
@@ -164,7 +182,7 @@ function refreshRepoState(dispatch: React.Dispatch<SWActions>): Promise<string> 
           const timeStamp = Date.now();
           localStorage.setItem("repoState", JSON.stringify({ timeStamp, state }));
           dispatch({ type: "changeJsonFilesState", payload: { localRepoState: state, lastRepoUpdate: timeStamp } });
-          resolve(`Repo updated at ${new Date(timeStamp)}`);
+          resolve(`Repo status updated at ${new Date(timeStamp)}`);
         
         } else {
           reject(new Error("Failed to fetch remote repo status."));

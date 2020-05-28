@@ -1,5 +1,6 @@
 import Interval from "../classes/Interval";
 import { FilesState } from "./fileInterfaces";
+import { AlertProps } from "@material-ui/lab/Alert";
 
 export interface Classes {
   [propName: string]: string;
@@ -149,4 +150,12 @@ export interface SwState {
   jsonObj: JsonResultObj;
   serverState: ServerIs;
   jsonFilesState: FilesState;
+  pendingMessages: MessageProps[];
+  activeMessage: MessageProps | undefined;
+};
+
+export interface MessageProps {
+  text: string;
+  topic: string;
+  type: AlertProps["severity"];
 };

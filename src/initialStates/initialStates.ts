@@ -67,4 +67,6 @@ export const initialReducerState: SwState = {
   jsonObj: jsonObjFrame,
   serverState: "offline",
   jsonFilesState: initialFilesState,
+  pendingMessages: [],
+  activeMessage: undefined
 };

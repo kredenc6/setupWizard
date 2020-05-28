@@ -2,8 +2,10 @@ import { Reducer } from "react";
 import jsonObjFrame from "../initialStates/jsonObjFrame";
 import { prefixValue } from "../components/sharedComponents/VerifyUrlTextField";
 import determineWebPrefix from "../components/SelectedModule/helpFunctions/determineWebPrefix";
-import { JsonResultObj, JsonResultObjFillIns, ServerIs, SwState, UserInput } from "../interfaces/interfaces";
+import { placeNewMessage } from "./messageHandlingFunctions";
+import { JsonResultObj, JsonResultObjFillIns, MessageProps, ServerIs, SwState, UserInput } from "../interfaces/interfaces";
 import { FilesState } from "../interfaces/fileInterfaces";
+
 
 interface Action<S extends string> {
   type: S;
@@ -14,6 +16,8 @@ interface ActionWithPayload<S extends string, P> extends Action<S> {
 };
 
 export type SWActions = 
+  Action<"messageDelivered"> |
+  ActionWithPayload<"addMessage", (MessageProps | null)> |
   ActionWithPayload<"changeJson", Partial<JsonResultObj>> |
   ActionWithPayload<"changeJsonFilesState", Partial<FilesState>> |
   ActionWithPayload<"changeTopic", string> |
@@ -21,14 +25,17 @@ export type SWActions =
   ActionWithPayload<"selectJson", JsonResultObj> |
   ActionWithPayload<"setActiveStep", number> |
   ActionWithPayload<"setIsNextStepAllowed", boolean> |
-  ActionWithPayload<"setServerState", ServerIs> |
-  Action<"test">
+  ActionWithPayload<"setServerState", ServerIs>
 ;
-
 
 const sWReducer: Reducer<SwState, SWActions> = (state, action) => {
   switch(action.type) {
     
+    case "addMessage": {
+      if(!action.payload) return state;
+      return { ...state, ...placeNewMessage(action.payload, state) };
+    }
+
     case "changeJson": {
       const newJsonObj = { ...state["jsonObj"], ...action.payload };
       return { ...state, jsonObj: newJsonObj };
@@ -49,6 +56,11 @@ const sWReducer: Reducer<SwState, SWActions> = (state, action) => {
       return { ...state, userInput: newUserInput };
     }
 
+    case "messageDelivered": {
+      const activeMessage = state.pendingMessages.shift();
+      return { ...state, activeMessage, pendingMessages: state.pendingMessages };
+    }
+
     case "selectJson": {
       const updatedState = handleJsonSelection(action.payload, state);
       return updatedState;
@@ -64,11 +76,6 @@ const sWReducer: Reducer<SwState, SWActions> = (state, action) => {
 
     case "setServerState": {
       return { ...state, serverState: action.payload };
-    }
-
-    case "test": {
-      console.log("Text successful.");
-      return state;
     }
 
     default: {
@@ -162,4 +169,3 @@ export function fillInTopicValue(jsonObj: JsonResultObj, modules: UserInput["mod
     this[moduleName] = prePrepedModules[moduleName];
   }
 }
-
