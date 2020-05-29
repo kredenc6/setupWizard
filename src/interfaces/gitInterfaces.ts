@@ -6,8 +6,8 @@ export interface GitOpt {
 };
 
 export interface CommitResponse {
-  addedFilesCount: number;
-  commitSummary: CommitSummary;
+  commitedFilesCount: number;
+  commitSummary: CommitSummary | null;
 };
 
 export interface PushResponse {

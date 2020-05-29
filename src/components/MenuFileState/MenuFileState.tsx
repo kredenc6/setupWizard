@@ -49,8 +49,8 @@ export default function MenuFileState(
     <article>
       <div className={classes.bttGroup}>
         <GitStateReport
-          gitState={jsonFilesState.localRepoState}
-          lastRepoUpdate={jsonFilesState.lastRepoUpdate}
+          dispatch={dispatch}
+          jsonFilesState={jsonFilesState}
           remoteRepoCheckInterval={remoteRepoCheckInterval}
           serverState={serverState} />
         <AvailableJsonsButton

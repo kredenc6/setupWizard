@@ -14,12 +14,12 @@ import getServerState from "./miscellaneous/getServerState";
 import capitalizeFirstLetter from "./miscellaneous/capitalizeFirstLetter";
 import Interval from "./classes/Interval";
 import sWReducer, { SWActions } from "./sWReducer/sWReducer";
+import { createMessage } from "./sWReducer/messageHandlingFunctions";
 import { initialReducerState } from "./initialStates/initialStates";
 import { SERVER_STATUS_CHECK_INTERVAL, REMOTE_REPO_CHECK_INTERVAL, SERVER_ADDRESS } from "./initialStates/constants";
 import { fetchRepoStatus, getLocalStorageRepoState } from "./gitFunctions/gitFunctions";
-import { IntervalsObj, JsonObjModule, Menu, ServerIs, SwState, UserInputModuleKeys } from "./interfaces/interfaces";
+import { IntervalsObj, JsonObjModule, Menu, ServerIs, UserInputModuleKeys } from "./interfaces/interfaces";
 
-import { createMessage } from "./sWReducer/messageHandlingFunctions";
 
 const useStyles = makeStyles({
   wizardWrapper: {
@@ -44,15 +44,16 @@ export default function SetupWizard() {
     serverCheck: new Interval(SERVER_STATUS_CHECK_INTERVAL, async () => {
       dispatch({ type: "setServerState", payload: await getServerState(SERVER_ADDRESS) });
     }),
-    remoteRepoCheck: new Interval(REMOTE_REPO_CHECK_INTERVAL, (state: SwState, forcedRefresh?: boolean) => {
-      loadRepoState(state.serverState, forcedRefresh)
+    // TODO cancel forcedRefresh(can be replaced with lastRepoUpdate = 0)
+    remoteRepoCheck: new Interval(REMOTE_REPO_CHECK_INTERVAL, (serverState: ServerIs, lastRepoUpdate: number, forcedRefresh?: boolean) => {
+      loadRepoState(serverState, lastRepoUpdate, forcedRefresh)
         .then(updateMessage => console.log(updateMessage))
         .catch(err => console.log(err.message));
 
-      function loadRepoState(serverState: ServerIs, forcedRefresh = false): Promise<string> {
+      function loadRepoState(serverState: ServerIs, lastRepoUpdate: number, forcedRefresh = false): Promise<string> {
         return new Promise((resolve, reject) => {
           const canRefresh = serverState === "online" &&
-            ( forcedRefresh || shoudRepoStateBeRefreshed(state.jsonFilesState.lastRepoUpdate) );
+            ( forcedRefresh || shoudRepoStateBeRefreshed(lastRepoUpdate) );
           if(canRefresh) {
             refreshRepoState(dispatch)
               .then(updateMessage => resolve(updateMessage))
@@ -69,21 +70,15 @@ export default function SetupWizard() {
     })
   });
 
-  // useEffect(() => {
-  //   console.log(state.activeMessage);
-  //   console.dir(state.pendingMessages);
-  // },[state.activeMessage, state.pendingMessages]);
-
   useEffect(() => {
     dispatch({ type: "addMessage", payload: createMessage("server", state.serverState) });
   },[state.serverState]);
 
   useEffect(() => {
-    dispatch({ type: "addMessage", payload: createMessage("fileStatus", state.jsonFilesState.fileStatus) });
-  },[state.jsonFilesState.fileStatus]);
-  
-  useEffect(() => {
-    dispatch({ type: "addMessage", payload: createMessage("repoUpdate", state.jsonFilesState.lastRepoUpdate) });
+    dispatch({
+      type: "addMessage",
+      payload: createMessage("info", "Repo state updated.")
+    });
   },[state.jsonFilesState.lastRepoUpdate]);
 
   useEffect(() => {
@@ -92,13 +87,13 @@ export default function SetupWizard() {
   },[intervals]);
   
   useEffect(() => {
-    intervals.remoteRepoCheck.setCallbackProps([state.serverState]);
+    intervals.remoteRepoCheck.setCallbackProps([state.serverState, state.jsonFilesState.lastRepoUpdate]);
     if(state.serverState === "offline" || intervals.remoteRepoCheck.isRunning) return;
 
     intervals.remoteRepoCheck.start(true);
 
     return () => intervals.remoteRepoCheck.stop();
-  },[intervals, state.serverState]);
+  },[intervals, state.jsonFilesState.lastRepoUpdate, state.serverState]);
 
   const SelectedModuleComponents: Menu[] =
     sortObjEntriesAlphabetically(Object.entries(state.userInput.modules))

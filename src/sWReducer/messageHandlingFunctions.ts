@@ -15,7 +15,23 @@ export function createMessage(topic: string, value: any): MessageProps | null {
       return { topic, text: "Repo state updated.", type: "info" };
     }
 
+    case "success": {
+      console.log(value);
+      return { topic, text: value, type: "success" };
+    }
+
+    case "info": {
+      console.log(value);
+      return { topic, text: value, type: "info" };
+    }
+
+    case "warning": {
+      console.warn(value);
+      return { topic, text: value , type: "warning" };
+    }
+
     case "error": {
+      console.error(value);
       return { topic, text: value, type: "error" };
     }
 

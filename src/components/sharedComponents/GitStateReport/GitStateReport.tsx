@@ -8,10 +8,12 @@ import sortObjEntriesAlphabetically from "../../../miscellaneous/sortObjEntriesA
 import { ServerIs } from "../../../interfaces/interfaces";
 import { StatusResult } from "../../../interfaces/simpleGit";
 import Interval from "../../../classes/Interval";
+import { SWActions } from "../../../sWReducer/sWReducer";
+import { FilesState } from "../../../interfaces/fileInterfaces";
 
 interface Props {
-  gitState: StatusResult | null;
-  lastRepoUpdate: number;
+  dispatch: React.Dispatch<SWActions>;
+  jsonFilesState: FilesState;
   remoteRepoCheckInterval: Interval;
   serverState: ServerIs;
 };
@@ -26,10 +28,12 @@ const useStyles = makeStyles(theme =>
   })
 );
 
-export default function GitStateReport ({ gitState, lastRepoUpdate, remoteRepoCheckInterval, serverState }: Props) {
+export default function GitStateReport
+  ({ dispatch, jsonFilesState, remoteRepoCheckInterval, serverState }: Props) {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = Boolean(anchorEl);
+  const { lastRepoUpdate, localRepoState } = jsonFilesState;
 
   const handleClick = (currentTarget: HTMLElement) => {
     if(!anchorEl) setAnchorEl(currentTarget);
@@ -42,11 +46,11 @@ export default function GitStateReport ({ gitState, lastRepoUpdate, remoteRepoCh
 
   return(
     <>
-      <Badge badgeContent={gitState?.ahead || gitState?.behind ? "!" : 0} color="error">
+      <Badge badgeContent={localRepoState?.ahead || localRepoState?.behind ? "!" : 0} color="error">
         <Button
           color="primary"
           children="git state"
-          disabled={serverState === "offline" || !gitState}
+          disabled={serverState === "offline" || !localRepoState}
           onClick={e => handleClick(e.currentTarget)}
           style={{ width: "100%" }}
           variant="outlined" />
@@ -70,12 +74,16 @@ export default function GitStateReport ({ gitState, lastRepoUpdate, remoteRepoCh
         }}
       >
         <div>
-          {gitState ?
-              <GitActions gitState={gitState} remoteRepoCheckInterval={remoteRepoCheckInterval} serverState={serverState} />
+          {localRepoState ?
+              <GitActions
+                dispatch={dispatch}
+                jsonFilesState={jsonFilesState}
+                remoteRepoCheckInterval={remoteRepoCheckInterval}
+                serverState={serverState} />
             :
               null}
           <LastUpdate timeStamp={lastRepoUpdate} />
-          <DataDisplay data={normalizeRepoState(gitState)} />
+          <DataDisplay data={normalizeRepoState(localRepoState)} />
         </div>
       </Popover>
     </>

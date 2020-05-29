@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Checkbox, FormControlLabel } from "@material-ui/core";
 import StringArrayInput from "../StringArrayInput/StringArrayInput";
 import SwTextField from "../../sharedComponents/SwTextField";
@@ -18,10 +18,6 @@ interface Props {
 
 const ObjectDataComponent = (
   { dataObj, handleJsonObjChange, prefixIndex, isVerificationEnabled, moduleSettings, skipProperties }: Props) => {
-  // const handleChange = (key: string, value: any) => {
-  //   dispatch({ type: "jsonChange", payload: { [key as JsonObjKey]: value } });
-  // };
-  //TODO clean up if it works
   const handleChange = (key: string, value: any) => {
     handleJsonObjChange(dataObj, key, value);
   };

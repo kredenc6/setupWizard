@@ -4,58 +4,72 @@ import { Button, ButtonGroup, ClickAwayListener, Grid, Grow, IconButton, MenuIte
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import SyncIcon from '@material-ui/icons/Sync';
 import PromptCommitMessage from "./PromptCommitMsg/PromptCommitMsg";
-import { commitRepo, getFileNamesForCommit, mergeRemoteRepo, pushToRemoteRepo } from "../../../../gitFunctions/gitFunctions";
+import { handleCommit, handlePush, mergeRemoteRepo, pushToRemoteRepo } from "../../../../gitFunctions/gitFunctions";
+import { createMessage } from "../../../../sWReducer/messageHandlingFunctions";
 import { SERVER_ADDRESS } from "../../../../initialStates/constants";
 import { ServerIs } from "../../../../interfaces/interfaces";
 import { StatusResult } from "../../../../interfaces/simpleGit";
 import Interval from '../../../../classes/Interval';
+import { SWActions } from "../../../../sWReducer/sWReducer";
+import { FilesState } from "../../../../interfaces/fileInterfaces";
 
 interface Props {
-  gitState: StatusResult;
+  dispatch: React.Dispatch<SWActions>;
+  jsonFilesState: FilesState;
   remoteRepoCheckInterval: Interval;
   serverState: ServerIs;
 };
 
 const OPTIONS = ["commit", "push", "merge", "merge and push"];
 
-export default function SplitButton({ gitState, remoteRepoCheckInterval, serverState }: Props) {
+export default function SplitButton({ dispatch, jsonFilesState, remoteRepoCheckInterval, serverState }: Props) {
+  const localRepoState = jsonFilesState.localRepoState as StatusResult;
   const [openButtonGroup, setOpenButtonGroup] = useState(false);
   const [openCommitPrompt, setOpenCommitPrompt] = useState(false);
   const [commitMessage, setCommitMessage] = useState("");
   const anchorRef = useRef<HTMLDivElement>(null);
-  const [selectedIndex, setSelectedIndex] = useState(selectIndex(gitState));
-  const conflicted = Boolean(gitState.conflicted.length);
+  const [selectedIndex, setSelectedIndex] = useState(selectIndex(localRepoState));
+  const conflicted = Boolean(localRepoState?.conflicted.length);
 
   const updateRepo = () => {
-    remoteRepoCheckInterval.executeNow(true, [serverState, true]);
+    remoteRepoCheckInterval.executeNow(true, [serverState, 0, true]);
   };
 
   const handleClick = async () => {
     if(OPTIONS[selectedIndex] === "commit") {
-      await commitRepo(SERVER_ADDRESS, commitMessage, getFileNamesForCommit(gitState));
-      updateRepo();
+      // TODO optimize handleCommit?
+      await handleCommit({ dispatch, commitMessage, jsonFilesState, serverState, remoteRepoCheckInterval });
+      // await commitRepo(SERVER_ADDRESS, commitMessage, getFileNamesForCommit(localRepoState));
+      // updateRepo();
     }
     if(OPTIONS[selectedIndex] === "push") {
-      await pushToRemoteRepo(SERVER_ADDRESS)
-      updateRepo();
+      await handlePush(dispatch);
+      // await pushToRemoteRepo(SERVER_ADDRESS)
+      // updateRepo();
     }
     if(OPTIONS[selectedIndex] === "merge") {
-      await mergeRemoteRepo(SERVER_ADDRESS);
+      const mergeSummary = await mergeRemoteRepo(SERVER_ADDRESS);
+      const messageTopic = mergeSummary ? "success" : "warning";
+      const messageText = mergeSummary? "Merge successful." : "Merge failed.";
+      dispatch({ type: "addMessage", payload: createMessage(messageTopic, messageText) });
       updateRepo();
     }
     if(OPTIONS[selectedIndex] === 'merge and push') {
       const mergeSummary = await mergeRemoteRepo(SERVER_ADDRESS);
+      let messageTopic = mergeSummary ? "success" : "warning";
+      let messageText = mergeSummary? "Merge successful." : "Merge failed.";
+      dispatch({ type: "addMessage", payload: createMessage(messageTopic, messageText) });
+      
       if(mergeSummary) {
-        await pushToRemoteRepo(SERVER_ADDRESS)
-        updateRepo();
+        const pushSuccesful = await pushToRemoteRepo(SERVER_ADDRESS);
+        messageTopic = pushSuccesful ? "success" : "warning";
+        messageText = pushSuccesful? "Push successful." : "Push failed.";
+        dispatch({ type: "addMessage", payload: createMessage(messageTopic, messageText) });
       }
+      updateRepo();
     }
   };
-
-  useEffect(() => {
-    setSelectedIndex(selectIndex(gitState));
-  },[gitState]);
-
+  
   const handleMenuItemClick = (index: number) => {
     setSelectedIndex(index);
     setOpenButtonGroup(false);
@@ -71,6 +85,10 @@ export default function SplitButton({ gitState, remoteRepoCheckInterval, serverS
     setOpenButtonGroup(false);
   };
 
+  useEffect(() => {
+    setSelectedIndex(selectIndex(localRepoState));
+  },[localRepoState]);
+  
   return (
     <Grid container direction="column" alignItems="center">
       <PromptCommitMessage
@@ -80,7 +98,7 @@ export default function SplitButton({ gitState, remoteRepoCheckInterval, serverS
         sendCommit={() => handleClick()}
         value={commitMessage} />
       <Grid item xs={12}>
-        <ButtonGroup color="primary" disabled={isButtonGroupDisabled(gitState)} ref={anchorRef} variant="contained">
+        <ButtonGroup color="primary" disabled={isButtonGroupDisabled(localRepoState)} ref={anchorRef} variant="contained">
           {conflicted ?
               <Button>Conflicted!</Button>
             :
@@ -106,7 +124,7 @@ export default function SplitButton({ gitState, remoteRepoCheckInterval, serverS
           <IconButton
             color="secondary"
             disabled={serverState === "offline"}
-            onClick={() => {remoteRepoCheckInterval.executeNow(true, [serverState, true])}} // update repo
+            onClick={() => {remoteRepoCheckInterval.executeNow(true, [serverState, 0, true])}} // force repo state update(0 -> last update time doesn't matter)
           >
             <SyncIcon />
           </IconButton>
@@ -125,7 +143,7 @@ export default function SplitButton({ gitState, remoteRepoCheckInterval, serverS
                     {OPTIONS.map((option, index) => (
                       <MenuItem
                         key={option}
-                        disabled={isOptionDisabled(option, gitState)}
+                        disabled={isOptionDisabled(option, localRepoState)}
                         selected={index === selectedIndex}
                         onClick={() => handleMenuItemClick(index)}
                       >
@@ -143,21 +161,41 @@ export default function SplitButton({ gitState, remoteRepoCheckInterval, serverS
   );
 }
 
-function selectIndex(gitState: StatusResult) {
-  if(gitState.not_added.length) return 0;
-  if(gitState.ahead && gitState.behind) return 3;
-  if(gitState.behind) return 2;
+function selectIndex(localRepoState: StatusResult) {
+  if(!isCommitBttDisabled(localRepoState)) return 0;
+  if(localRepoState.ahead && localRepoState.behind) return 3;
+  if(localRepoState.behind) return 2;
   return 1;
 }
 
-function isOptionDisabled(option: string, gitState: StatusResult) {
-  if(option === "commit" && !gitState.not_added.length) return true;
-  if(option === "push" && (gitState.behind || !gitState.ahead)) return true;
-  if(option === "merge" && !gitState.behind) return true;
-  if(option === "merge and push" && !(gitState.ahead && gitState.behind)) return true;
+function isOptionDisabled(option: string, localRepoState: StatusResult) {
+  if(option === "commit" && isCommitBttDisabled(localRepoState)) return true;
+  if(option === "push" && (localRepoState.behind || !localRepoState.ahead)) return true;
+  if(option === "merge" && !localRepoState.behind) return true;
+  if(option === "merge and push" && !(localRepoState.ahead && localRepoState.behind)) return true;
   return false;
 }
 
-function isButtonGroupDisabled(gitState: StatusResult) {
-  return !Boolean(gitState.ahead + gitState.behind + gitState.not_added.length) || Boolean(gitState.conflicted.length);
+function isButtonGroupDisabled(localRepoState: StatusResult) {
+  return !Boolean(
+    localRepoState.ahead +
+    localRepoState.behind +
+    localRepoState.not_added.length +
+    localRepoState.created.length +
+    localRepoState.deleted.length +
+    localRepoState.modified.length +
+    localRepoState.renamed.length +
+    localRepoState.staged.length
+  ) || Boolean(localRepoState.conflicted.length);
+}
+
+function isCommitBttDisabled(localRepoState: StatusResult) {
+  return !Boolean(
+    localRepoState.not_added.length +
+    localRepoState.created.length +
+    localRepoState.deleted.length +
+    localRepoState.modified.length +
+    localRepoState.renamed.length +
+    localRepoState.staged.length
+  )
 }

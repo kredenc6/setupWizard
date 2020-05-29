@@ -9,7 +9,7 @@ import PromptCommitMessage from "../sharedComponents/GitStateReport/GitActions/P
 import ClearJsonBtt from "./ClearJsonBtt/ClearJsonBtt";
 import { SERVER_ADDRESS } from "../../initialStates/constants";
 import { downloadJson, saveJson } from "../../fileFunctions/fileFunctions";
-import { commitRepo, getFileNamesForCommit, pushToRemoteRepo } from "../../gitFunctions/gitFunctions";
+import { handleCommit, handlePush } from "../../gitFunctions/gitFunctions";
 import { createMessage } from "../../sWReducer/messageHandlingFunctions";
 import { JsonObjKey, JsonResultObj, ServerIs, UserInput } from "../../interfaces/interfaces";
 import { GitOpt } from "../../interfaces/gitInterfaces";
@@ -48,12 +48,11 @@ const useStyles = makeStyles(theme =>
   })
 );
 
-
 export default function MenuJson(
   { dispatch, jsonFilesState, jsonObj, remoteRepoCheckInterval, serverState, userInput }: Props) {
   const [gitOptions, setGitOptions] = useState<GitOpt>({ commit: false, push: false });
   const [openPrompt, setOpenPrompt] = useState(false);
-  const [commitMsg, setCommitMsg] = useState("");
+  const [commitMessage, setCommitMessage] = useState("");
   const classes = useStyles();
   const restJsonProps = Object.entries(jsonObj)
     .filter(([key, _]) => {
@@ -69,13 +68,19 @@ export default function MenuJson(
   const handleSaveToRepo = async (): Promise<FileStatus> => {
     const savedSuccessfuly = await saveJson(SERVER_ADDRESS, jsonObj);
     if(!savedSuccessfuly) {
-      dispatch({ type: "addMessage", payload: createMessage("error", `Failed to save ${jsonObj.app_topic}.json to repo.`) });
-      console.log(`Failed to save ${jsonObj.app_topic}.json to repo. No commits or pushes were handled.`);
+      dispatch({
+        type: "addMessage",
+        payload: createMessage("error", `Failed to save ${jsonObj.app_topic}.json to repo. No commits or pushes were handled.`)
+      });
       return "ready";
     }
-    console.log(`${jsonObj.app_topic}.json saved successfuly: ${savedSuccessfuly}`);
+    dispatch({
+      type: "addMessage",
+      payload: createMessage("success", `${jsonObj.app_topic}.json saved.`)
+    });
 
-    await remoteRepoCheckInterval.executeNow(true, [serverState, true]); // update repo state
+    //TODO failed update is not catched
+    await remoteRepoCheckInterval.executeNow(true, [serverState, jsonFilesState.lastRepoUpdate, true]); //  force repo state update
     
     if(gitOptions.commit) {
       setOpenPrompt(true);
@@ -84,50 +89,59 @@ export default function MenuJson(
     return "ready";
   };
 
-  const handleCommit = async (): Promise<FileStatus> => {
-    if(!jsonFilesState.localRepoState) {
-      console.error("Invalid repo state! No files commited.");
-      return "ready";
-    }
+  // const handleCommit = async (): Promise<FileStatus> => {
+  //   console.log("lksdfjsdlkfjsdlk");
+  //   if(!jsonFilesState.localRepoState) {
+  //     dispatch({ type: "addMessage", payload: createMessage("error", "Invalid repo state! No files commited.") });
+  //     return "ready";
+  //   }
 
-    const filesForCommit = getFileNamesForCommit(jsonFilesState.localRepoState) || [];
-    if(!filesForCommit.length) {
-      console.error("It seems git did not register the new file addition.");
-      console.log("Before commiting again try refreshing the repo or re-save the file.");
-      console.log("No files were commited.");
-      return "ready";
-    }
+  //   const filesForCommit = getFileNamesForCommit(jsonFilesState.localRepoState) || [];
+  //   if(!filesForCommit.length) {
+  //     dispatch({ type: "addMessage", payload: createMessage("error", "It seems git did not register the new file addition.") });
+  //     console.log("Before commiting again try refreshing the repo or re-save the file.");
+  //     console.log("No files were commited.");
+  //     return "ready";
+  //   }
 
-    const commitResponse = await commitRepo(SERVER_ADDRESS, commitMsg, filesForCommit);
-    console.log(`Commit was successful: ${commitResponse ? true : false}`);
+  //   const commitResponse = await commitRepo(SERVER_ADDRESS, commitMsg, filesForCommit);
+  //   const messageType = commitResponse?.commitedFilesCount ? "success" : "warning";
+  //   const messageText = commitResponse?.commitedFilesCount ? "Commit was successful." : "Commit failed.";
+  //   console.log(messageText);
+  //   dispatch({ type: "addMessage", payload: createMessage(messageType, messageText) });
     
-    if(commitResponse && gitOptions.push) {
-      return "being pushed";
-    }
+  //   if(commitResponse && gitOptions.push) {
+  //     return "being pushed";
+  //   }
 
-    remoteRepoCheckInterval.executeNow(true, [serverState, true]); // update repo state
-    return "ready";
-  };
+  //   remoteRepoCheckInterval.executeNow(true, [serverState, jsonFilesState.lastRepoUpdate, true]); // force repo state update
+  //   return "ready";
+  // };
 
-  const handlePush = async (): Promise<FileStatus> => {
-    const pushSucces = await pushToRemoteRepo(SERVER_ADDRESS);
-    console.log(`Changes pushed succesffuly: ${pushSucces}`);
-    return "ready";
-  };
+  // const handlePush = async (): Promise<FileStatus> => {
+  //   const pushSucces = await pushToRemoteRepo(SERVER_ADDRESS);
+  //   const messageType = pushSucces ? "success" : "warning";
+  //   const messageText = pushSucces ? "Push was successful." : "Push failed";
+  //   dispatch({ type: "addMessage", payload: createMessage(messageType, messageText) });
+  //   return "ready";
+  // };
 
   return(
     <section className={classes.menuJson}>
       <PromptCommitMessage
-        handleChange={(value: string) => setCommitMsg(value)}
+        handleChange={(value: string) => setCommitMessage(value)}
         open={openPrompt}
         sendCommit={async () => {
-          dispatch({ type: "changeJsonFilesState", payload: { fileStatus: await handleCommit()}});
+          dispatch({
+            type: "changeJsonFilesState",
+            payload: { fileStatus: await handleCommit({ dispatch, commitMessage, jsonFilesState, serverState, remoteRepoCheckInterval, gitOptions }) }
+          });
           if(gitOptions.push) {
-            dispatch({ type: "changeJsonFilesState", payload: { fileStatus: await handlePush()}});
+            dispatch({ type: "changeJsonFilesState", payload: { fileStatus: await handlePush(dispatch) } });
           }
         }}
         setOpen={setOpenPrompt}
-        value={commitMsg} />
+        value={commitMessage} />
       <div>
         <RestJsonPropsComponent
           handleJsonChange={handleJsonChange}
@@ -136,8 +150,8 @@ export default function MenuJson(
       </div>
       <div className={classes.buttonsWrapper}>
         <GitStateReport
-          gitState={jsonFilesState.localRepoState}
-          lastRepoUpdate={jsonFilesState.lastRepoUpdate}
+          dispatch={dispatch}
+          jsonFilesState={jsonFilesState}
           remoteRepoCheckInterval={remoteRepoCheckInterval}
           serverState={serverState} />
         <ClearJsonBtt />

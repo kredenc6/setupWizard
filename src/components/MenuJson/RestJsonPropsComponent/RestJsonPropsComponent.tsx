@@ -4,8 +4,6 @@ import { createStyles, makeStyles } from "@material-ui/core/styles";
 import ObjectDataComponent from "../../SelectedModule/ObjectDataComponent/ObjectDataComponent";
 import PropertyHeading from "./PropertyHeading";
 import { JsonObjKey, JsonResultObj } from "../../../interfaces/interfaces";
-import { SWActions } from "../../../sWReducer/sWReducer";
-
 
 interface Props {
   handleJsonChange: (key: JsonObjKey, changedModule: JsonResultObj[JsonObjKey]) => void;
