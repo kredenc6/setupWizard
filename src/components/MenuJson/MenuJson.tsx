@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@material-ui/core";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import RestJsonPropsComponent from "./RestJsonPropsComponent/RestJsonPropsComponent";
@@ -9,19 +9,17 @@ import PromptCommitMessage from "../sharedComponents/GitStateReport/GitActions/P
 import ClearJsonBtt from "./ClearJsonBtt/ClearJsonBtt";
 import { SERVER_ADDRESS } from "../../initialStates/constants";
 import { downloadJson, saveJson } from "../../fileFunctions/fileFunctions";
-import { handleCommit, handlePush } from "../../gitFunctions/gitFunctions";
+import { handleCommit, handlePush, refreshRepoState } from "../../gitFunctions/gitFunctions";
 import { createMessage } from "../../sWReducer/messageHandlingFunctions";
 import { JsonObjKey, JsonResultObj, ServerIs, UserInput } from "../../interfaces/interfaces";
 import { GitOpt } from "../../interfaces/gitInterfaces";
 import { FilesState, FileStatus } from "../../interfaces/fileInterfaces";
-import Interval from "../../classes/Interval";
 import { SWActions } from "../../sWReducer/sWReducer";
 
 interface Props {
   dispatch: React.Dispatch<SWActions>;
   jsonFilesState: FilesState;
   jsonObj: JsonResultObj;
-  remoteRepoCheckInterval: Interval;
   serverState: ServerIs;
   userInput: UserInput;
 };
@@ -48,8 +46,8 @@ const useStyles = makeStyles(theme =>
   })
 );
 
-export default function MenuJson(
-  { dispatch, jsonFilesState, jsonObj, remoteRepoCheckInterval, serverState, userInput }: Props) {
+export default function MenuJson({ dispatch, jsonFilesState, jsonObj, serverState, userInput }: Props) {
+  const { fileStatus, localRepoState } = jsonFilesState;
   const [gitOptions, setGitOptions] = useState<GitOpt>({ commit: false, push: false });
   const [openPrompt, setOpenPrompt] = useState(false);
   const [commitMessage, setCommitMessage] = useState("");
@@ -65,6 +63,8 @@ export default function MenuJson(
     dispatch({ type: "changeJson", payload: { [key]: changedModule } });
   };
 
+
+  // TODO can be moved to fileFunctions?
   const handleSaveToRepo = async (): Promise<FileStatus> => {
     const savedSuccessfuly = await saveJson(SERVER_ADDRESS, jsonObj);
     if(!savedSuccessfuly) {
@@ -79,8 +79,7 @@ export default function MenuJson(
       payload: createMessage("success", `${jsonObj.app_topic}.json saved.`)
     });
 
-    //TODO failed update is not catched
-    await remoteRepoCheckInterval.executeNow(true, [serverState, jsonFilesState.lastRepoUpdate, true]); //  force repo state update
+    await refreshRepoState(dispatch);
     
     if(gitOptions.commit) {
       setOpenPrompt(true);
@@ -89,42 +88,14 @@ export default function MenuJson(
     return "ready";
   };
 
-  // const handleCommit = async (): Promise<FileStatus> => {
-  //   console.log("lksdfjsdlkfjsdlk");
-  //   if(!jsonFilesState.localRepoState) {
-  //     dispatch({ type: "addMessage", payload: createMessage("error", "Invalid repo state! No files commited.") });
-  //     return "ready";
-  //   }
-
-  //   const filesForCommit = getFileNamesForCommit(jsonFilesState.localRepoState) || [];
-  //   if(!filesForCommit.length) {
-  //     dispatch({ type: "addMessage", payload: createMessage("error", "It seems git did not register the new file addition.") });
-  //     console.log("Before commiting again try refreshing the repo or re-save the file.");
-  //     console.log("No files were commited.");
-  //     return "ready";
-  //   }
-
-  //   const commitResponse = await commitRepo(SERVER_ADDRESS, commitMsg, filesForCommit);
-  //   const messageType = commitResponse?.commitedFilesCount ? "success" : "warning";
-  //   const messageText = commitResponse?.commitedFilesCount ? "Commit was successful." : "Commit failed.";
-  //   console.log(messageText);
-  //   dispatch({ type: "addMessage", payload: createMessage(messageType, messageText) });
-    
-  //   if(commitResponse && gitOptions.push) {
-  //     return "being pushed";
-  //   }
-
-  //   remoteRepoCheckInterval.executeNow(true, [serverState, jsonFilesState.lastRepoUpdate, true]); // force repo state update
-  //   return "ready";
-  // };
-
-  // const handlePush = async (): Promise<FileStatus> => {
-  //   const pushSucces = await pushToRemoteRepo(SERVER_ADDRESS);
-  //   const messageType = pushSucces ? "success" : "warning";
-  //   const messageText = pushSucces ? "Push was successful." : "Push failed";
-  //   dispatch({ type: "addMessage", payload: createMessage(messageType, messageText) });
-  //   return "ready";
-  // };
+  useEffect(() => {
+    if(jsonFilesState.localRepoState?.conflicted.length) {
+      setGitOptions({ commit: false, push: false });
+    }
+    if(jsonFilesState.localRepoState?.behind) {
+      setGitOptions(prev => ({ commit: prev.commit, push: false }));
+    }
+  },[jsonFilesState.localRepoState]);
 
   return(
     <section className={classes.menuJson}>
@@ -134,7 +105,7 @@ export default function MenuJson(
         sendCommit={async () => {
           dispatch({
             type: "changeJsonFilesState",
-            payload: { fileStatus: await handleCommit({ dispatch, commitMessage, jsonFilesState, serverState, remoteRepoCheckInterval, gitOptions }) }
+            payload: { fileStatus: await handleCommit({ dispatch, commitMessage, localRepoState, gitOptions }) }
           });
           if(gitOptions.push) {
             dispatch({ type: "changeJsonFilesState", payload: { fileStatus: await handlePush(dispatch) } });
@@ -152,7 +123,6 @@ export default function MenuJson(
         <GitStateReport
           dispatch={dispatch}
           jsonFilesState={jsonFilesState}
-          remoteRepoCheckInterval={remoteRepoCheckInterval}
           serverState={serverState} />
         <ClearJsonBtt />
         <Button color="primary" onClick={() => downloadJson(jsonObj)} variant="contained">
@@ -160,10 +130,10 @@ export default function MenuJson(
         </Button>
         <SaveToRepoBtt
           gitOptions={gitOptions}
-          fileStatus={jsonFilesState.fileStatus}
+          fileStatus={fileStatus}
           handleClick={async () => dispatch({ type: "changeJsonFilesState", payload: { fileStatus: await handleSaveToRepo() } })}
           jsonObj={jsonObj}
-          repoState={jsonFilesState.localRepoState}
+          repoState={localRepoState}
           serverState={serverState}
           setGitOptions={setGitOptions} />
       </div>

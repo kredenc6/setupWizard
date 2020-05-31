@@ -8,7 +8,6 @@ import MenuFileState from "../MenuFileState/MenuFileState";
 import Submenu from "./Submenu";
 import { JsonResultObj, ServerIs, UserInput } from "../../interfaces/interfaces";
 import { FilesState } from "../../interfaces/fileInterfaces";
-import Interval from "../../classes/Interval";
 import { SWActions } from "../../sWReducer/sWReducer";
 
 interface Props {
@@ -17,7 +16,6 @@ interface Props {
   jsonObj: JsonResultObj;
   serverState: ServerIs;
   setAsChannelValues: boolean;
-  remoteRepoCheckInterval: Interval;
   resetOtherValues: boolean;
   userInput: UserInput;
 };
@@ -65,7 +63,6 @@ export default function MainMenu(props: Props) {
     jsonObj,
     serverState,
     setAsChannelValues,
-    remoteRepoCheckInterval,
     resetOtherValues,
     userInput
   } = props;
@@ -106,7 +103,6 @@ export default function MainMenu(props: Props) {
                 <MenuFileState
                   dispatch={dispatch}
                   jsonFilesState={jsonFilesState}
-                  remoteRepoCheckInterval={remoteRepoCheckInterval}
                   serverState={serverState}
                   setIsJsonSelectionOpen={setIsJsonSelectionOpen} />
               }

@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from 'react';
+import React, { useEffect, useReducer } from 'react';
 import { CssBaseline } from "@material-ui/core";
 import { makeStyles, ThemeProvider } from "@material-ui/core/styles";
 import MainMenu from "./components/MainMenu/MainMenu";
@@ -13,13 +13,14 @@ import sortObjEntriesAlphabetically from "./miscellaneous/sortObjEntriesAlphabet
 import getServerState from "./miscellaneous/getServerState";
 import capitalizeFirstLetter from "./miscellaneous/capitalizeFirstLetter";
 import Interval from "./classes/Interval";
-import sWReducer, { SWActions } from "./sWReducer/sWReducer";
+import sWReducer from "./sWReducer/sWReducer";
 import { createMessage } from "./sWReducer/messageHandlingFunctions";
 import { initialReducerState } from "./initialStates/initialStates";
-import { SERVER_STATUS_CHECK_INTERVAL, REMOTE_REPO_CHECK_INTERVAL, SERVER_ADDRESS } from "./initialStates/constants";
-import { fetchRepoStatus, getLocalStorageRepoState } from "./gitFunctions/gitFunctions";
-import { IntervalsObj, JsonObjModule, Menu, ServerIs, UserInputModuleKeys } from "./interfaces/interfaces";
+import { SERVER_STATUS_CHECK_INTERVAL, SERVER_ADDRESS } from "./initialStates/constants";
+import { refreshRepoState, shouldRepoStateBeRefreshed } from "./gitFunctions/gitFunctions";
+import { JsonObjModule, MenuInt, UserInputModuleKeys } from "./interfaces/interfaces";
 
+import Menu from "./components/Menu/Menu";
 
 const useStyles = makeStyles({
   wizardWrapper: {
@@ -40,62 +41,37 @@ const useStyles = makeStyles({
 export default function SetupWizard() {
   const classes = useStyles();
   const [state, dispatch ] = useReducer(sWReducer, initialReducerState);
-  const [intervals, setIntervals] = useState<IntervalsObj>({
-    serverCheck: new Interval(SERVER_STATUS_CHECK_INTERVAL, async () => {
+
+  useEffect(() => {
+    const serverCheck = new Interval(SERVER_STATUS_CHECK_INTERVAL, async () => {
       dispatch({ type: "setServerState", payload: await getServerState(SERVER_ADDRESS) });
-    }),
-    // TODO cancel forcedRefresh(can be replaced with lastRepoUpdate = 0)
-    remoteRepoCheck: new Interval(REMOTE_REPO_CHECK_INTERVAL, (serverState: ServerIs, lastRepoUpdate: number, forcedRefresh?: boolean) => {
-      loadRepoState(serverState, lastRepoUpdate, forcedRefresh)
-        .then(updateMessage => console.log(updateMessage))
-        .catch(err => console.log(err.message));
+    });
+    dispatch({ type: "setIntervals", payload: { serverCheck } });
+  },[]);
 
-      function loadRepoState(serverState: ServerIs, lastRepoUpdate: number, forcedRefresh = false): Promise<string> {
-        return new Promise((resolve, reject) => {
-          const canRefresh = serverState === "online" &&
-            ( forcedRefresh || shoudRepoStateBeRefreshed(lastRepoUpdate) );
-          if(canRefresh) {
-            refreshRepoState(dispatch)
-              .then(updateMessage => resolve(updateMessage))
-              .catch((err: Error) => reject(err));
-          } else {
-            const localRepoState = getLocalStorageRepoState()?.state;
-            if(localRepoState) {
-              dispatch({ type: "changeJsonFilesState", payload: { localRepoState } });
-            }
-            resolve("Repo state not updated.");
-          }
-        });
+  useEffect(() => {
+    if(state.intervals.serverCheck && !state.intervals.serverCheck.isRunning) {
+      state.intervals.serverCheck.start();
+    }
+
+    return () => {
+      if(state.intervals.serverCheck) {
+        state.intervals.serverCheck.stop();
       }
-    })
-  });
-
+    }
+  },[state.intervals]);
+  
   useEffect(() => {
     dispatch({ type: "addMessage", payload: createMessage("server", state.serverState) });
   },[state.serverState]);
-
-  useEffect(() => {
-    dispatch({
-      type: "addMessage",
-      payload: createMessage("info", "Repo state updated.")
-    });
-  },[state.jsonFilesState.lastRepoUpdate]);
-
-  useEffect(() => {
-    intervals.serverCheck.start(true);
-    return () => intervals.serverCheck.stop();
-  },[intervals]);
   
   useEffect(() => {
-    intervals.remoteRepoCheck.setCallbackProps([state.serverState, state.jsonFilesState.lastRepoUpdate]);
-    if(state.serverState === "offline" || intervals.remoteRepoCheck.isRunning) return;
+    if(shouldRepoStateBeRefreshed(state.jsonFilesState.lastRepoUpdate)) {
+      refreshRepoState(dispatch);
+    }
+  },[state.jsonFilesState.lastRepoUpdate, state.serverState]);
 
-    intervals.remoteRepoCheck.start(true);
-
-    return () => intervals.remoteRepoCheck.stop();
-  },[intervals, state.jsonFilesState.lastRepoUpdate, state.serverState]);
-
-  const SelectedModuleComponents: Menu[] =
+  const SelectedModuleComponents: MenuInt[] =
     sortObjEntriesAlphabetically(Object.entries(state.userInput.modules))
     .filter(([_, module]) => module.selected)
     .map(([key, _]) => {
@@ -111,18 +87,17 @@ export default function SetupWizard() {
       };
   });
 
-  const menus: Menu[] = [
+  const menus: MenuInt[] = [
     {
       label: "Main menu",
       component: <MainMenu
-        dispatch={dispatch}
-        remoteRepoCheckInterval={intervals.remoteRepoCheck}
-        jsonFilesState={state.jsonFilesState}
-        jsonObj={state.jsonObj}
-        serverState={state.serverState}
-        setAsChannelValues={state.userInput.setAlsoAsChannelValues}
-        resetOtherValues={state.userInput.resetJsonOnAppTopicChange}
-        userInput={state.userInput} />
+          dispatch={dispatch}
+          jsonFilesState={state.jsonFilesState}
+          jsonObj={state.jsonObj}
+          serverState={state.serverState}
+          setAsChannelValues={state.userInput.setAlsoAsChannelValues}
+          resetOtherValues={state.userInput.resetJsonOnAppTopicChange}
+          userInput={state.userInput} />
     },
     {
       label: "Color scheme",
@@ -138,7 +113,6 @@ export default function SetupWizard() {
         dispatch={dispatch}
         jsonFilesState={state.jsonFilesState}
         jsonObj={state.jsonObj}
-        remoteRepoCheckInterval={intervals.remoteRepoCheck}
         serverState={state.serverState}
         userInput={state.userInput} />
     }
@@ -163,25 +137,3 @@ export default function SetupWizard() {
     </CssBaseline>
   );
 };
-
-function shoudRepoStateBeRefreshed(lastUpdateTime: number) {
-  const isTimeIntervalExceeded = Date.now() - lastUpdateTime > REMOTE_REPO_CHECK_INTERVAL;
-  return isTimeIntervalExceeded;
-}
-
-function refreshRepoState(dispatch: React.Dispatch<SWActions>): Promise<string> {
-  return new Promise((resolve, reject) => {
-    fetchRepoStatus(SERVER_ADDRESS)
-      .then(state => {
-        if(state) {
-          const timeStamp = Date.now();
-          localStorage.setItem("repoState", JSON.stringify({ timeStamp, state }));
-          dispatch({ type: "changeJsonFilesState", payload: { localRepoState: state, lastRepoUpdate: timeStamp } });
-          resolve(`Repo status updated at ${new Date(timeStamp)}`);
-        
-        } else {
-          reject(new Error("Failed to fetch remote repo status."));
-        }
-      });
-  });
-}

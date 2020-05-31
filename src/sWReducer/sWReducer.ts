@@ -2,9 +2,10 @@ import { Reducer } from "react";
 import jsonObjFrame from "../initialStates/jsonObjFrame";
 import { prefixValue } from "../components/sharedComponents/VerifyUrlTextField";
 import determineWebPrefix from "../components/SelectedModule/helpFunctions/determineWebPrefix";
-import { placeNewMessage } from "./messageHandlingFunctions";
+import { createMessage, placeNewMessage } from "./messageHandlingFunctions";
 import { JsonResultObj, JsonResultObjFillIns, MessageProps, ServerIs, SwState, UserInput } from "../interfaces/interfaces";
 import { FilesState } from "../interfaces/fileInterfaces";
+import Interval from "../classes/Interval";
 
 
 interface Action<S extends string> {
@@ -24,8 +25,10 @@ export type SWActions =
   ActionWithPayload<"changeUserInput", Partial<UserInput>> |
   ActionWithPayload<"selectJson", JsonResultObj> |
   ActionWithPayload<"setActiveStep", number> |
+  ActionWithPayload<"setIntervals", { [propName: string]: Interval } | null> |
   ActionWithPayload<"setIsNextStepAllowed", boolean> |
-  ActionWithPayload<"setServerState", ServerIs>
+  ActionWithPayload<"setServerState", ServerIs> |
+  ActionWithPayload<"updateRepoState", number>
 ;
 
 const sWReducer: Reducer<SwState, SWActions> = (state, action) => {
@@ -70,6 +73,11 @@ const sWReducer: Reducer<SwState, SWActions> = (state, action) => {
       return { ...state, activeStep: action.payload };
     }
 
+    case "setIntervals": {
+      const newIntervals = { ...state.intervals, ...action.payload };
+      return { ...state, intervals: newIntervals };
+    }
+
     case "setIsNextStepAllowed": {
       return { ...state, isNextStepAllowed: action.payload };
     }
@@ -79,7 +87,8 @@ const sWReducer: Reducer<SwState, SWActions> = (state, action) => {
     }
 
     default: {
-      throw new Error("Something went wrong in the reducer.");
+      const errorMessage = createMessage("error", "Unknown case in the reducer!");
+      return { ...state, ...placeNewMessage(errorMessage, state) };
     }
   }
 };

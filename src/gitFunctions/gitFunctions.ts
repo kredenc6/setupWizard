@@ -1,28 +1,25 @@
 import { createMessage } from "../sWReducer/messageHandlingFunctions";
 import { MergeSummary, StatusResult } from "../interfaces/simpleGit";
-import { LocalStorageRepoState, FilesState, FileStatus } from "../interfaces/fileInterfaces";
+import { LocalStorageRepoState, FileStatus } from "../interfaces/fileInterfaces";
 import { CommitResponse, PushResponse, GitOpt } from "../interfaces/gitInterfaces";
 import { SWActions } from "../sWReducer/sWReducer";
-import Interval from "../classes/Interval";
-import { SERVER_ADDRESS } from "../initialStates/constants";
+import { REMOTE_REPO_CHECK_INTERVAL, SERVER_ADDRESS } from "../initialStates/constants";
 
 interface HandleCommitProps {
   commitMessage: string;
   dispatch: React.Dispatch<SWActions>;
   gitOptions?: GitOpt;
-  jsonFilesState: FilesState;
-  remoteRepoCheckInterval: Interval;
-  serverState: string;
-}
+  localRepoState: StatusResult | null;
+};
 
 export const handleCommit =
-  async ({ dispatch, commitMessage, jsonFilesState, serverState, remoteRepoCheckInterval, gitOptions }: HandleCommitProps): Promise<FileStatus> => {
-  if(!jsonFilesState.localRepoState) {
+  async ({ commitMessage, dispatch, gitOptions, localRepoState }: HandleCommitProps): Promise<FileStatus> => {
+  if(!localRepoState) {
     dispatch({ type: "addMessage", payload: createMessage("error", "Invalid repo state! No files commited.") });
     return "ready";
   }
 
-  const filesForCommit = getFileNamesForCommit(jsonFilesState.localRepoState) || [];
+  const filesForCommit = getFileNamesForCommit(localRepoState) || [];
   if(!filesForCommit.length) {
     dispatch({ type: "addMessage", payload: createMessage("error", "It seems git did not register the new file addition.") });
     console.log("Before commiting again try refreshing the repo or re-save the file.");
@@ -31,16 +28,16 @@ export const handleCommit =
   }
 
   const commitResponse = await commitRepo(SERVER_ADDRESS, commitMessage, filesForCommit);
-  console.log(commitResponse?.commitedFilesCount);
   const messageType = commitResponse?.commitedFilesCount ? "success" : "warning";
   const messageText = commitResponse ? `${commitResponse.commitedFilesCount} file(s) commited.` : "Commit failed.";
   dispatch({ type: "addMessage", payload: createMessage(messageType, messageText) });
+  
+  refreshRepoState(dispatch);
   
   if(commitResponse && gitOptions?.push) {
     return "being pushed";
   }
 
-  remoteRepoCheckInterval.executeNow(true, [serverState, jsonFilesState.lastRepoUpdate, true]); // force repo state update
   return "ready";
 };
 
@@ -50,6 +47,26 @@ export const handlePush = async (dispatch: React.Dispatch<SWActions>): Promise<F
   const messageText = pushSucces ? "Push was successful." : "Push failed";
   dispatch({ type: "addMessage", payload: createMessage(messageType, messageText) });
   return "ready";
+};
+
+export async function refreshRepoState(dispatch: React.Dispatch<SWActions>) {
+  return fetchRepoStatus(SERVER_ADDRESS)
+    .then(state => {
+      if(state) {
+        const timeStamp = Date.now();
+        localStorage.setItem("repoState", JSON.stringify({ timeStamp, state }));
+        dispatch({ type: "changeJsonFilesState", payload: { localRepoState: state, lastRepoUpdate: timeStamp } });
+        dispatch({ type: "addMessage", payload: createMessage("info", "Repo state updated.") });
+      
+      } else {
+        dispatch({ type: "addMessage", payload: createMessage("error", "Failed to fetch remote repo status.") });
+      }
+    });
+}
+
+export const shouldRepoStateBeRefreshed = (lastUpdateTime: number, timeNow = Date.now()) => {
+  const isTimeIntervalExceeded = timeNow - lastUpdateTime > REMOTE_REPO_CHECK_INTERVAL;
+  return isTimeIntervalExceeded;
 };
 
 

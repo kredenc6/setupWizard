@@ -42,7 +42,7 @@ export default function GitOptions({ disabled, gitOptions, repoState, setGitOpti
       return;
     }
     setGitOptions(prev => ({ ...prev, [name]: checked }));
-  }
+  };
 
   return(
     <Box className={classes.gitOptionsWrapper}>

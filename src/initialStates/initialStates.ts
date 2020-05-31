@@ -8,7 +8,7 @@ import { createSchemeObjFromPresetScheme } from "../miscellaneous/colorSchemeFun
 export const initialFilesState: FilesState = {
   lastRepoUpdate: getLocalStorageRepoState()?.timeStamp || 0,
   loadedJsons: [],
-  localRepoState: null,
+  localRepoState: getLocalStorageRepoState()?.state || null,
   fileStatus: "ready"
 };
 
@@ -68,5 +68,8 @@ export const initialReducerState: SwState = {
   serverState: "offline",
   jsonFilesState: initialFilesState,
   pendingMessages: [],
-  activeMessage: undefined
+  activeMessage: undefined,
+  intervals: {
+    serverCheck: null
+  }
 };

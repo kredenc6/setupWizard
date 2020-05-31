@@ -8,13 +8,11 @@ import { fetchJsonFiles, loadJsons } from "../../fileFunctions/fileFunctions";
 import { SERVER_ADDRESS } from "../../initialStates/constants";
 import { ServerIs } from "../../interfaces/interfaces";
 import { FilesState } from "../../interfaces/fileInterfaces";
-import Interval from "../../classes/Interval";
 import { SWActions } from "../../sWReducer/sWReducer";
 
 interface Props {
   dispatch: React.Dispatch<SWActions>;
   jsonFilesState: FilesState;
-  remoteRepoCheckInterval: Interval;
   serverState: ServerIs;
   setIsJsonSelectionOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -41,8 +39,7 @@ const useStyles = makeStyles(theme =>
   })
 );
 
-export default function MenuFileState(
-  { dispatch, jsonFilesState, remoteRepoCheckInterval, serverState, setIsJsonSelectionOpen }: Props) {
+export default function MenuFileState({ dispatch, jsonFilesState, serverState, setIsJsonSelectionOpen }: Props) {
   const classes = useStyles();
 
   return (
@@ -51,7 +48,6 @@ export default function MenuFileState(
         <GitStateReport
           dispatch={dispatch}
           jsonFilesState={jsonFilesState}
-          remoteRepoCheckInterval={remoteRepoCheckInterval}
           serverState={serverState} />
         <AvailableJsonsButton
           handleClick={() => setIsJsonSelectionOpen(true)}
@@ -70,7 +66,6 @@ export default function MenuFileState(
           onClick={async () => {
             const loadedJsons = await fetchJsonFiles(SERVER_ADDRESS);
             dispatch({ type: "changeJsonFilesState", payload: { loadedJsons } });
-            remoteRepoCheckInterval.start(true);
           }} />
       </div>
     </article>

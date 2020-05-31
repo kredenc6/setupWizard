@@ -65,7 +65,7 @@ export interface Module {
 
 export type UserInputModuleKeys = keyof UserInput["modules"];
 
-export interface Menu {
+export interface MenuInt {
   label: string;
   component: JSX.Element;
 };
@@ -138,9 +138,8 @@ export type JsonResultObjFillIns =
 export type ServerIs = "online" | "offline";
 
 export interface IntervalsObj {
-  [propName: string]: Interval;
-  serverCheck: Interval;
-  remoteRepoCheck: Interval;
+  [propName: string]: Interval | null;
+  serverCheck: Interval | null;
 };
 
 export interface SwState {
@@ -152,6 +151,7 @@ export interface SwState {
   jsonFilesState: FilesState;
   pendingMessages: MessageProps[];
   activeMessage: MessageProps | undefined;
+  intervals: IntervalsObj;
 };
 
 export interface MessageProps {

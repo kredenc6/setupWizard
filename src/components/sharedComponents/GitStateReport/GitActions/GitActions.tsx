@@ -4,25 +4,23 @@ import { Button, ButtonGroup, ClickAwayListener, Grid, Grow, IconButton, MenuIte
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import SyncIcon from '@material-ui/icons/Sync';
 import PromptCommitMessage from "./PromptCommitMsg/PromptCommitMsg";
-import { handleCommit, handlePush, mergeRemoteRepo, pushToRemoteRepo } from "../../../../gitFunctions/gitFunctions";
+import { handleCommit, handlePush, mergeRemoteRepo, refreshRepoState, pushToRemoteRepo } from "../../../../gitFunctions/gitFunctions";
 import { createMessage } from "../../../../sWReducer/messageHandlingFunctions";
 import { SERVER_ADDRESS } from "../../../../initialStates/constants";
 import { ServerIs } from "../../../../interfaces/interfaces";
 import { StatusResult } from "../../../../interfaces/simpleGit";
-import Interval from '../../../../classes/Interval';
 import { SWActions } from "../../../../sWReducer/sWReducer";
 import { FilesState } from "../../../../interfaces/fileInterfaces";
 
 interface Props {
   dispatch: React.Dispatch<SWActions>;
   jsonFilesState: FilesState;
-  remoteRepoCheckInterval: Interval;
   serverState: ServerIs;
 };
 
 const OPTIONS = ["commit", "push", "merge", "merge and push"];
 
-export default function SplitButton({ dispatch, jsonFilesState, remoteRepoCheckInterval, serverState }: Props) {
+export default function SplitButton({ dispatch, jsonFilesState, serverState }: Props) {
   const localRepoState = jsonFilesState.localRepoState as StatusResult;
   const [openButtonGroup, setOpenButtonGroup] = useState(false);
   const [openCommitPrompt, setOpenCommitPrompt] = useState(false);
@@ -31,28 +29,19 @@ export default function SplitButton({ dispatch, jsonFilesState, remoteRepoCheckI
   const [selectedIndex, setSelectedIndex] = useState(selectIndex(localRepoState));
   const conflicted = Boolean(localRepoState?.conflicted.length);
 
-  const updateRepo = () => {
-    remoteRepoCheckInterval.executeNow(true, [serverState, 0, true]);
-  };
-
   const handleClick = async () => {
     if(OPTIONS[selectedIndex] === "commit") {
-      // TODO optimize handleCommit?
-      await handleCommit({ dispatch, commitMessage, jsonFilesState, serverState, remoteRepoCheckInterval });
-      // await commitRepo(SERVER_ADDRESS, commitMessage, getFileNamesForCommit(localRepoState));
-      // updateRepo();
+      await handleCommit({ commitMessage, dispatch, localRepoState });
     }
     if(OPTIONS[selectedIndex] === "push") {
       await handlePush(dispatch);
-      // await pushToRemoteRepo(SERVER_ADDRESS)
-      // updateRepo();
     }
     if(OPTIONS[selectedIndex] === "merge") {
       const mergeSummary = await mergeRemoteRepo(SERVER_ADDRESS);
       const messageTopic = mergeSummary ? "success" : "warning";
       const messageText = mergeSummary? "Merge successful." : "Merge failed.";
       dispatch({ type: "addMessage", payload: createMessage(messageTopic, messageText) });
-      updateRepo();
+      refreshRepoState(dispatch);
     }
     if(OPTIONS[selectedIndex] === 'merge and push') {
       const mergeSummary = await mergeRemoteRepo(SERVER_ADDRESS);
@@ -66,7 +55,7 @@ export default function SplitButton({ dispatch, jsonFilesState, remoteRepoCheckI
         messageText = pushSuccesful? "Push successful." : "Push failed.";
         dispatch({ type: "addMessage", payload: createMessage(messageTopic, messageText) });
       }
-      updateRepo();
+      refreshRepoState(dispatch);
     }
   };
   
@@ -80,8 +69,8 @@ export default function SplitButton({ dispatch, jsonFilesState, remoteRepoCheckI
   };
 
   const handleClose = (event: React.MouseEvent<Document, MouseEvent>) => {
-    if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) return; // don't close...
-    // ...on the anchor element click
+    // don't close on the anchor element click
+    if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) return;
     setOpenButtonGroup(false);
   };
 
@@ -124,7 +113,7 @@ export default function SplitButton({ dispatch, jsonFilesState, remoteRepoCheckI
           <IconButton
             color="secondary"
             disabled={serverState === "offline"}
-            onClick={() => {remoteRepoCheckInterval.executeNow(true, [serverState, 0, true])}} // force repo state update(0 -> last update time doesn't matter)
+            onClick={() => refreshRepoState(dispatch)}
           >
             <SyncIcon />
           </IconButton>

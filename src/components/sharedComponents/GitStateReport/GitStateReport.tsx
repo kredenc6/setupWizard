@@ -7,14 +7,12 @@ import DataDisplay from "../DataDisplay";
 import sortObjEntriesAlphabetically from "../../../miscellaneous/sortObjEntriesAlphabetically";
 import { ServerIs } from "../../../interfaces/interfaces";
 import { StatusResult } from "../../../interfaces/simpleGit";
-import Interval from "../../../classes/Interval";
 import { SWActions } from "../../../sWReducer/sWReducer";
 import { FilesState } from "../../../interfaces/fileInterfaces";
 
 interface Props {
   dispatch: React.Dispatch<SWActions>;
   jsonFilesState: FilesState;
-  remoteRepoCheckInterval: Interval;
   serverState: ServerIs;
 };
 
@@ -28,8 +26,7 @@ const useStyles = makeStyles(theme =>
   })
 );
 
-export default function GitStateReport
-  ({ dispatch, jsonFilesState, remoteRepoCheckInterval, serverState }: Props) {
+export default function GitStateReport({ dispatch, jsonFilesState, serverState }: Props) {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = Boolean(anchorEl);
@@ -78,7 +75,6 @@ export default function GitStateReport
               <GitActions
                 dispatch={dispatch}
                 jsonFilesState={jsonFilesState}
-                remoteRepoCheckInterval={remoteRepoCheckInterval}
                 serverState={serverState} />
             :
               null}
