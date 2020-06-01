@@ -29,13 +29,14 @@ const useStyles = makeStyles(theme =>
     menuJson: {
       width: "100%",
       display: "flex",
-      justifyContent: "space-between"
+      justifyContent: "space-between",
+      padding: `${theme.spacing(2)}px 0 ${theme.spacing(1)}px ${theme.spacing(1)}px`,
+      overflow: "auto"
     },
     jsonWrapper: {
       minWidth: "25rem",
       maxHeight: "100%",
-      padding: "1rem",
-      "overflow-y": "auto"
+      padding: theme.spacing(1),
     },
     buttonsWrapper: {
       height: "100%",

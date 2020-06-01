@@ -4,23 +4,20 @@ import { makeStyles, ThemeProvider } from "@material-ui/core/styles";
 import MainMenu from "./components/MainMenu/MainMenu";
 import MenuStyles from "./components/MenuStyles/MenuStyles";
 import MenuJson from "./components/MenuJson/MenuJson";
-import SelectedModule from "./components/SelectedModule/SelectedModule";
 import SetupStepper from "./components/SetupStepper/SetupStepper";
-import ServerState from "./components/sharedComponents/ServerState";
 import MessageSnackBar from "./components/sharedComponents/MessageSnackBar";
 import theme from "./theme/theme";
-import sortObjEntriesAlphabetically from "./miscellaneous/sortObjEntriesAlphabetically";
 import getServerState from "./miscellaneous/getServerState";
-import capitalizeFirstLetter from "./miscellaneous/capitalizeFirstLetter";
 import Interval from "./classes/Interval";
 import sWReducer from "./sWReducer/sWReducer";
 import { createMessage } from "./sWReducer/messageHandlingFunctions";
 import { initialReducerState } from "./initialStates/initialStates";
 import { SERVER_STATUS_CHECK_INTERVAL, SERVER_ADDRESS } from "./initialStates/constants";
 import { refreshRepoState, shouldRepoStateBeRefreshed } from "./gitFunctions/gitFunctions";
-import { JsonObjModule, MenuInt, UserInputModuleKeys } from "./interfaces/interfaces";
+import { MenuInt } from "./interfaces/interfaces";
 
 import Menu from "./components/Menu/Menu";
+import MenuSelectedModules from "./components/MenuSelectedModules/MenuSelectedModules";
 
 const useStyles = makeStyles({
   wizardWrapper: {
@@ -33,8 +30,7 @@ const useStyles = makeStyles({
     // ... `calc(100vh - stepper height - wizardWrapper padding) stepper height`
     justifyContent: "stretch",
     justifyItems: "center",
-    margin: "0 auto",
-    padding: `${theme.spacing(1)}px ${theme.spacing(1)}px 0`
+    margin: "0 auto"
   }
 });
 
@@ -71,26 +67,11 @@ export default function SetupWizard() {
     }
   },[state.jsonFilesState.lastRepoUpdate, state.serverState]);
 
-  const SelectedModuleComponents: MenuInt[] =
-    sortObjEntriesAlphabetically(Object.entries(state.userInput.modules))
-    .filter(([_, module]) => module.selected)
-    .map(([key, _]) => {
-      return {
-        label: capitalizeFirstLetter(key),
-        component: <SelectedModule 
-          appTopic={state.jsonObj.app_topic}
-          dispatch={dispatch}
-          jsonModuleObj={state.jsonObj[key as UserInputModuleKeys] as unknown as JsonObjModule}
-          moduleSettings={state.userInput.modules[key as UserInputModuleKeys]}
-          moduleName={key as UserInputModuleKeys}
-          serverState={state.serverState} />
-      };
-  });
-
   const menus: MenuInt[] = [
     {
       label: "Main menu",
-      component: <MainMenu
+      component: <Menu
+        component={<MainMenu
           dispatch={dispatch}
           jsonFilesState={state.jsonFilesState}
           jsonObj={state.jsonObj}
@@ -98,6 +79,9 @@ export default function SetupWizard() {
           setAsChannelValues={state.userInput.setAlsoAsChannelValues}
           resetOtherValues={state.userInput.resetJsonOnAppTopicChange}
           userInput={state.userInput} />
+        }
+        headingText="Main menu"
+        serverState={state.serverState} />
     },
     {
       label: "Color scheme",
@@ -106,15 +90,30 @@ export default function SetupWizard() {
         schemeObj={state.userInput.schemeObj}
         selectedScheme={state.userInput.schemeObj.name} />
     },
-    ...SelectedModuleComponents,
+    {
+      label: "Selected modules",
+      component: <Menu
+        component={<MenuSelectedModules
+          dispatch={dispatch}
+          jsonObj={state.jsonObj}
+          modules={state.userInput.modules}
+          serverState={state.serverState} />
+        }
+        headingText="Selected modules"
+        serverState={state.serverState} />
+    },
     {
       label: "config.json",
-      component: <MenuJson
-        dispatch={dispatch}
-        jsonFilesState={state.jsonFilesState}
-        jsonObj={state.jsonObj}
-        serverState={state.serverState}
-        userInput={state.userInput} />
+      component: <Menu
+        component={<MenuJson
+          dispatch={dispatch}
+          jsonFilesState={state.jsonFilesState}
+          jsonObj={state.jsonObj}
+          serverState={state.serverState}
+          userInput={state.userInput} />
+        }
+        headingText="config.json"
+        serverState={state.serverState} />
     }
   ];
 
@@ -125,7 +124,6 @@ export default function SetupWizard() {
           <MessageSnackBar
             dispatch={dispatch}
             message={state.activeMessage} />
-          <ServerState serverState={state.serverState} />
           {menus[state.activeStep - 1].component}
           <SetupStepper
             activeStep={state.activeStep}

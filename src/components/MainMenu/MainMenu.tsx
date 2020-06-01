@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import AvailableJsons from "../AvailableJsons/AvailableJsons";
-import MenuHeading from "../sharedComponents/MenuHeading";
 import MenuSelectModules from "../MenuSelectModules/MenuSelectModules";
 import MenuTopic from "../MenuTopic/MenuTopic";
 import MenuFileState from "../MenuFileState/MenuFileState";
@@ -23,11 +22,10 @@ interface Props {
 const useStyles = makeStyles(theme => 
   createStyles({
     mainMenu: {
-      height: "100%",
       width: "100%",
       display: "grid",
-      gridTemplateRows: "auto auto-fill",
-      padding: theme.spacing(1)
+      gridTemplateRows: "auto-fill",
+      padding: `${theme.spacing(2)}px ${theme.spacing(1)}px ${theme.spacing(1)}px`
     },
     fileButtonsWrapper: {
       height: "100%",
@@ -86,39 +84,37 @@ export default function MainMenu(props: Props) {
         jsonFilesState={jsonFilesState}
         open={isJsonSelectionOpen}
         setIsJsonSelectionOpen={setIsJsonSelectionOpen} />
-        <MenuHeading text="Main menu" />
-        <div className={classes.leftRight}>
-          <div className={classes.topBottom}>
-            <Submenu
-              component={
-                <MenuTopic
-                  dispatch={dispatch}
-                  resetOtherValues={resetOtherValues}
-                  setAsChannelValues={setAsChannelValues}
-                  value={jsonObj.app_topic} />
-              }
-              heading="What is the app topic?" />
-            <Submenu
-              component={
-                <MenuFileState
-                  dispatch={dispatch}
-                  jsonFilesState={jsonFilesState}
-                  serverState={serverState}
-                  setIsJsonSelectionOpen={setIsJsonSelectionOpen} />
-              }
-              heading="Handle json files" />
-            
-          </div>
+      <div className={classes.leftRight}>
+        <div className={classes.topBottom}>
           <Submenu
             component={
-              <MenuSelectModules
+              <MenuTopic
                 dispatch={dispatch}
-                jsonObj={jsonObj}
-                modules={userInput.modules}
-                setAsChannelValues={setAsChannelValues} />
+                resetOtherValues={resetOtherValues}
+                setAsChannelValues={setAsChannelValues}
+                value={jsonObj.app_topic} />
             }
-            heading="Select visible components" />
+            heading="What is the app topic?" />
+          <Submenu
+            component={
+              <MenuFileState
+                dispatch={dispatch}
+                jsonFilesState={jsonFilesState}
+                serverState={serverState}
+                setIsJsonSelectionOpen={setIsJsonSelectionOpen} />
+            }
+            heading="Handle json files" />
         </div>
+        <Submenu
+          component={
+            <MenuSelectModules
+              dispatch={dispatch}
+              jsonObj={jsonObj}
+              modules={userInput.modules}
+              setAsChannelValues={setAsChannelValues} />
+          }
+          heading="Select visible components" />
+      </div>
     </section>
   );
 };

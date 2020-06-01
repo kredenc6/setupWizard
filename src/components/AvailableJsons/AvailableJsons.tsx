@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { Dialog, DialogContent, Paper } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import SimpleBar from "simplebar-react";
 import AvailableJsonsAppBar from "./AvailableJsonsAppBar/AvailableJsonsAppBar";
 import JsonCard from "./JsonCard/JsonCard";
 import DataDisplay from "../sharedComponents/DataDisplay";
 import { JsonResultObj } from "../../interfaces/interfaces";
 import { StatusResult } from "../../interfaces/simpleGit";
 import { FilesState } from "../../interfaces/fileInterfaces";
+import "simplebar/dist/simplebar.min.css";
 
 interface Props {
   activeJsonObj: JsonResultObj;
@@ -18,14 +20,21 @@ interface Props {
 
 const useStyles = makeStyles({
   dialog: {
+    maxHeight: "90vh"
+  },
+  dialogContent: {
     display: "flex",
-    flexFlow: "row nowrap"
+    flexFlow: "row nowrap",
+    overflow: "hidden"
+  },
+  simpleBar: {
+    width: "70%"
   },
   jsonFileCards: {
-    width: "70%",
-    display: "inline-flex",
+    display: "flex",
     flexFlow: "row wrap",
-    justifyContent: "center"
+    justifyContent: "center",
+    overflow: "auto"
   },
   jsonObjView: {
     display: "inline-box",
@@ -76,18 +85,20 @@ export default function AvaiableJsons ({ activeJsonObj, handleJsonSelection, jso
 
   return(
     <Dialog
+      className={classes.dialog}
       fullWidth maxWidth="xl"
       onKeyDown={e => {
-        console.log(e.key);
         if(e.key === "Escape") setIsJsonSelectionOpen(false);
       }}
       open={open}
     >
       <AvailableJsonsAppBar fileCount={jsonFilesState.loadedJsons.length} setIsJsonSelectionOpen={setIsJsonSelectionOpen} />
-      <DialogContent>
-        <div className={classes.jsonFileCards}>
-          {jsonCardComponents}
-        </div>
+      <DialogContent className={classes.dialogContent}>
+        <SimpleBar className={classes.simpleBar}>
+          <div className={classes.jsonFileCards}>
+            {jsonCardComponents}
+          </div>
+        </SimpleBar>
         <Paper className={classes.jsonObjView}>
           <DataDisplay classes={{ jsonWrapper: classes.jsonWrapper }} data={selectedJsonObj} />
         </Paper>

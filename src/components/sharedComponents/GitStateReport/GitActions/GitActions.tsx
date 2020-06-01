@@ -4,9 +4,7 @@ import { Button, ButtonGroup, ClickAwayListener, Grid, Grow, IconButton, MenuIte
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import SyncIcon from '@material-ui/icons/Sync';
 import PromptCommitMessage from "./PromptCommitMsg/PromptCommitMsg";
-import { handleCommit, handlePush, mergeRemoteRepo, refreshRepoState, pushToRemoteRepo } from "../../../../gitFunctions/gitFunctions";
-import { createMessage } from "../../../../sWReducer/messageHandlingFunctions";
-import { SERVER_ADDRESS } from "../../../../initialStates/constants";
+import { handleCommit, handleMerge, handlePush, refreshRepoState } from "../../../../gitFunctions/gitFunctions";
 import { ServerIs } from "../../../../interfaces/interfaces";
 import { StatusResult } from "../../../../interfaces/simpleGit";
 import { SWActions } from "../../../../sWReducer/sWReducer";
@@ -37,25 +35,10 @@ export default function SplitButton({ dispatch, jsonFilesState, serverState }: P
       await handlePush(dispatch);
     }
     if(OPTIONS[selectedIndex] === "merge") {
-      const mergeSummary = await mergeRemoteRepo(SERVER_ADDRESS);
-      const messageTopic = mergeSummary ? "success" : "warning";
-      const messageText = mergeSummary? "Merge successful." : "Merge failed.";
-      dispatch({ type: "addMessage", payload: createMessage(messageTopic, messageText) });
-      refreshRepoState(dispatch);
+      await handleMerge(dispatch);
     }
-    if(OPTIONS[selectedIndex] === 'merge and push') {
-      const mergeSummary = await mergeRemoteRepo(SERVER_ADDRESS);
-      let messageTopic = mergeSummary ? "success" : "warning";
-      let messageText = mergeSummary? "Merge successful." : "Merge failed.";
-      dispatch({ type: "addMessage", payload: createMessage(messageTopic, messageText) });
-      
-      if(mergeSummary) {
-        const pushSuccesful = await pushToRemoteRepo(SERVER_ADDRESS);
-        messageTopic = pushSuccesful ? "success" : "warning";
-        messageText = pushSuccesful? "Push successful." : "Push failed.";
-        dispatch({ type: "addMessage", payload: createMessage(messageTopic, messageText) });
-      }
-      refreshRepoState(dispatch);
+    if(OPTIONS[selectedIndex] === "merge and push") {
+      if( await handleMerge(dispatch) ) await handlePush(dispatch);
     }
   };
   
@@ -118,12 +101,12 @@ export default function SplitButton({ dispatch, jsonFilesState, serverState }: P
             <SyncIcon />
           </IconButton>
         </Tooltip>
-        <Popper open={openButtonGroup} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
+        <Popper anchorEl={anchorRef.current} disablePortal open={openButtonGroup} role={undefined} style={{ zIndex: 1 }} transition>
           {({ TransitionProps, placement }) => (
             <Grow
               {...TransitionProps}
               style={{
-                transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom',
+                transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom'
               }}
             >
               <Paper>

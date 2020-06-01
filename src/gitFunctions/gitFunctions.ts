@@ -12,6 +12,15 @@ interface HandleCommitProps {
   localRepoState: StatusResult | null;
 };
 
+export const handleMerge = async (dispatch: React.Dispatch<SWActions>) => {
+  const mergeSummary = await mergeRemoteRepo(SERVER_ADDRESS);
+  const messageTopic = mergeSummary ? "success" : "warning";
+  const messageText = mergeSummary? "Merge successful." : "Merge failed.";
+  dispatch({ type: "addMessage", payload: createMessage(messageTopic, messageText) });
+  refreshRepoState(dispatch);
+  return mergeSummary;
+};
+
 export const handleCommit =
   async ({ commitMessage, dispatch, gitOptions, localRepoState }: HandleCommitProps): Promise<FileStatus> => {
   if(!localRepoState) {
@@ -46,6 +55,7 @@ export const handlePush = async (dispatch: React.Dispatch<SWActions>): Promise<F
   const messageType = pushSucces ? "success" : "warning";
   const messageText = pushSucces ? "Push was successful." : "Push failed";
   dispatch({ type: "addMessage", payload: createMessage(messageType, messageText) });
+  refreshRepoState(dispatch);
   return "ready";
 };
 
@@ -111,7 +121,10 @@ export async function mergeRemoteRepo(serverAddress: string) {
   return await fetch(`${serverAddress}/gitRepo/merge`)
     .then(response => response.json())
     .then((mergeResponse: MergeSummary | null) => mergeResponse)
-    .catch(err => console.log(err.message));
+    .catch(err => {
+      console.log(err.message);
+      return null;
+    });
 }
 
 export function getLocalStorageRepoState() {

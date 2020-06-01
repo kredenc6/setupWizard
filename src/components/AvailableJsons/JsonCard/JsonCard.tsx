@@ -16,7 +16,8 @@ const useStyles = makeStyles(theme =>
   createStyles({
     card: {
       position: "relative",
-      minWidth: `${theme.typography.fontSize * 20}px`,
+      // minWidth: `${theme.typography.fontSize * 20}px`,
+      width: "75%",
       margin: theme.spacing(1),
       border: ({ active, selected }: { active: boolean, selected: boolean}) => {
         let line = "1px solid ";

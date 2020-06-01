@@ -1,5 +1,6 @@
 import { MessageProps, SwState } from "../interfaces/interfaces";
 
+// TODO createMessage can be simplified?
 export function createMessage(topic: string, value: any): MessageProps | null {
   switch(topic) {
     case "server": {

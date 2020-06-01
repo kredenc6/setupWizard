@@ -1,12 +1,13 @@
 import React, { useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import MenuHeading from "../sharedComponents/MenuHeading";
 import ObjectDataComponent from "./ObjectDataComponent/ObjectDataComponent";
 import ArrayDataComponent from "./ArrayDataComponent/ArrayDataComponent";
 import ArrayComponent from "./ArrayComponent/ArrayComponent";
-import AppTopicParagraph from "../sharedComponents/AppTopicParagraph";
+import capitalizeFirstLetter from "../../miscellaneous/capitalizeFirstLetter";
 import { JsonObjModule, Module, ServerIs, UserInputModuleKeys } from "../../interfaces/interfaces";
 import { SWActions } from "../../sWReducer/sWReducer";
+
+import Submenu from "../MainMenu/Submenu";
 
 interface Props {
   appTopic: string;
@@ -18,9 +19,8 @@ interface Props {
 };
 
 const useStyles = makeStyles({
-  menuTopic: {
-    minWidth: "70%",
-    "text-align": "center"
+  selectedModuleSubmenu: {
+    gridTemplateRows: "auto 1fr"
   }
 });
 
@@ -45,30 +45,31 @@ export default function SelectedInput({ appTopic, dispatch, jsonModuleObj, modul
   },[dispatch]);
     
   return (
-    <section className={classes.menuTopic}>
-      <MenuHeading text={moduleName} />
-      <AppTopicParagraph topic={appTopic} />
-      {Array.isArray(jsonModuleObj) ?
-        isArrObjectArr(jsonModuleObj) ?
-          <ArrayDataComponent
-            dataArr={jsonModuleObj}
-            handleJsonChange={handleJsonChange}
-            isVerificationEnabled={serverState === "online"}
-            moduleSettings={moduleSettings} />
+    <Submenu
+      className={classes.selectedModuleSubmenu}
+      component={
+        Array.isArray(jsonModuleObj) ?
+          isArrObjectArr(jsonModuleObj) ?
+            <ArrayDataComponent
+              dataArr={jsonModuleObj}
+              handleJsonChange={handleJsonChange}
+              isVerificationEnabled={serverState === "online"}
+              moduleSettings={moduleSettings} />
+            :
+            <ArrayComponent
+              array={jsonModuleObj as string[]}
+              handleJsonChange={handleJsonChange}
+              isVerificationEnabled={serverState === "online"}
+              label={moduleName}
+              moduleSettings={moduleSettings} />
           :
-          <ArrayComponent
-            array={jsonModuleObj as string[]}
-            handleJsonChange={handleJsonChange}
+          <ObjectDataComponent
+            dataObj={jsonModuleObj}
+            handleJsonObjChange={handleJsonObjChange}
             isVerificationEnabled={serverState === "online"}
-            label={moduleName}
             moduleSettings={moduleSettings} />
-        :
-        <ObjectDataComponent
-          dataObj={jsonModuleObj}
-          handleJsonObjChange={handleJsonObjChange}
-          isVerificationEnabled={serverState === "online"}
-          moduleSettings={moduleSettings} />
+        
       }
-    </section>
+      heading={capitalizeFirstLetter(moduleName)} />
   );
 };

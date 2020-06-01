@@ -1,26 +1,42 @@
 import React from "react";
-import { Box } from "@material-ui/core";
+import { Box, Chip } from "@material-ui/core";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import MenuHeading from "../sharedComponents/MenuHeading";
+import { ServerIs } from "../../interfaces/interfaces";
 
 interface Props {
   component: JSX.Element;
   headingText: string;
+  serverState: ServerIs;
 };
 
 const useStyles = makeStyles(theme => 
   createStyles({
     menu: {
-      padding: theme.spacing(1),
-      border: "2px solid pink"
+      height: "100%",
+      width: "100%",
+      display: "grid",
+      gridTemplateRows: "auto 1fr"
+    },
+    headingWrapper: {
+      textAlign: "center"
+    },
+    serverStatus: {
+      position: "absolute",
+      top: theme.spacing(1),
+      right: theme.spacing(1),
+      color: ({ serverState }: { serverState: ServerIs }) => {
+        return serverState === "offline" ? "red" : "green";
+      }
     }
   })
 );
 
-export default function Menu({ component, headingText }: Props) {
-  const classes = useStyles();
+export default function Menu({ component, headingText, serverState }: Props) {
+  const classes = useStyles({ serverState });
   return (
     <Box className={classes.menu}>
+      <Chip label={`Server ${serverState}`} className={classes.serverStatus} variant="outlined" />
       <MenuHeading text={headingText} />
       {component}
     </Box>
