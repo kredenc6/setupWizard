@@ -1,5 +1,5 @@
 import React from "react";
-import { Checkbox, FormControlLabel } from "@material-ui/core";
+import { Checkbox, FormControlLabel, makeStyles } from "@material-ui/core";
 import StringArrayInput from "../StringArrayInput/StringArrayInput";
 import SwTextField from "../../sharedComponents/SwTextField";
 import VerifyUrlTextField from "../../sharedComponents/VerifyUrlTextField";
@@ -16,23 +16,30 @@ interface Props {
   skipProperties?: string[];
 };
 
-const ObjectDataComponent = (
-  { dataObj, handleJsonObjChange, prefixIndex, isVerificationEnabled, moduleSettings, skipProperties }: Props) => {
+const useStyles = makeStyles({
+  objectDataWrapper: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center"
+  }
+});
+
+export default function ObjectDataComponent(
+  { dataObj, handleJsonObjChange, prefixIndex, isVerificationEnabled, moduleSettings, skipProperties }: Props) {
+  const classes = useStyles();
   const handleChange = (key: string, value: any) => {
     handleJsonObjChange(dataObj, key, value);
   };
   const Components = turnObjToFormComponents(dataObj, handleChange, moduleSettings, skipProperties, isVerificationEnabled, prefixIndex);
 
   return(
-    <div>
-      <div>{Components.TextFieldComponents}</div>
+    <div className={classes.objectDataWrapper}>
+      <div className={classes.objectDataWrapper}>{Components.TextFieldComponents}</div>
       <div>{Components.CheckboxComponents}</div>
-      <div>{Components.StringArrayInputComponents}</div>
+      <div className={classes.objectDataWrapper}>{Components.StringArrayInputComponents}</div>
     </div>
   );
 };
-
-export default ObjectDataComponent;
 
 function turnObjToFormComponents
   (obj: object, handleChange: (key: string, value: any) => void, moduleSettings: Module | undefined,

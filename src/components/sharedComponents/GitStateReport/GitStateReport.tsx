@@ -16,12 +16,16 @@ interface Props {
   serverState: ServerIs;
 };
 
-const useStyles = makeStyles(theme => 
+const useStyles = makeStyles(({ spacing }) => 
   createStyles({
     popover: {
     },
     paper: {
-      padding: theme.spacing(1),
+      padding: spacing(1),
+    },
+    jsonWrapper: {
+      width: "auto",
+      padding: spacing(1)
     }
   })
 );
@@ -79,7 +83,7 @@ export default function GitStateReport({ dispatch, jsonFilesState, serverState }
             :
               null}
           <LastUpdate timeStamp={lastRepoUpdate} />
-          <DataDisplay data={normalizeRepoState(localRepoState)} />
+          <DataDisplay classes={{ jsonWrapper: classes.jsonWrapper }} data={normalizeRepoState(localRepoState)} />
         </div>
       </Popover>
     </>

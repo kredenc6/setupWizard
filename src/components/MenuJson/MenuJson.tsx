@@ -7,14 +7,13 @@ import GitStateReport from "../sharedComponents/GitStateReport/GitStateReport";
 import DataDisplay from "../sharedComponents/DataDisplay";
 import PromptCommitMessage from "../sharedComponents/GitStateReport/GitActions/PromptCommitMsg/PromptCommitMsg";
 import ClearJsonBtt from "./ClearJsonBtt/ClearJsonBtt";
-import { SERVER_ADDRESS } from "../../initialStates/constants";
-import { downloadJson, saveJson } from "../../fileFunctions/fileFunctions";
-import { handleCommit, handlePush, refreshRepoState } from "../../gitFunctions/gitFunctions";
-import { createMessage } from "../../sWReducer/messageHandlingFunctions";
+import { downloadJson, handleSaveToRepo, normalizeJsonFileName } from "../../fileFunctions/fileFunctions";
+import { handleCommit, handlePush } from "../../gitFunctions/gitFunctions";
 import { JsonObjKey, JsonResultObj, ServerIs, UserInput } from "../../interfaces/interfaces";
 import { GitOpt } from "../../interfaces/gitInterfaces";
-import { FilesState, FileStatus } from "../../interfaces/fileInterfaces";
+import { FilesState } from "../../interfaces/fileInterfaces";
 import { SWActions } from "../../sWReducer/sWReducer";
+
 
 interface Props {
   dispatch: React.Dispatch<SWActions>;
@@ -24,24 +23,25 @@ interface Props {
   userInput: UserInput;
 };
 
-const useStyles = makeStyles(theme =>
+const useStyles = makeStyles(({ spacing }) =>
   createStyles({
     menuJson: {
       width: "100%",
       display: "flex",
       justifyContent: "space-between",
-      padding: `${theme.spacing(2)}px 0 ${theme.spacing(1)}px ${theme.spacing(1)}px`,
+      padding: `${spacing(2)}px 0 ${spacing(1)}px ${spacing(1)}px`,
       overflow: "auto"
     },
     jsonWrapper: {
       minWidth: "25rem",
+      width: "auto",
       maxHeight: "100%",
-      padding: theme.spacing(1),
+      padding: spacing(1),
     },
     buttonsWrapper: {
       height: "100%",
       display: "grid",
-      gridGap: theme.spacing(1),
+      gridGap: spacing(1),
       gridTemplateRows: "auto auto 1fr 1fr auto"
     }
   })
@@ -59,34 +59,10 @@ export default function MenuJson({ dispatch, jsonFilesState, jsonObj, serverStat
         .concat(["visible_components", "app_topic", "ui_colors"]) // and these properties
         .includes(key); // condition or filter method
   });
+  const fileName = normalizeJsonFileName(`${jsonObj.app_topic}.json`);
 
   const handleJsonChange = (key: JsonObjKey, changedModule: JsonResultObj[JsonObjKey]) => {
     dispatch({ type: "changeJson", payload: { [key]: changedModule } });
-  };
-
-
-  // TODO can be moved to fileFunctions?
-  const handleSaveToRepo = async (): Promise<FileStatus> => {
-    const savedSuccessfuly = await saveJson(SERVER_ADDRESS, jsonObj);
-    if(!savedSuccessfuly) {
-      dispatch({
-        type: "addMessage",
-        payload: createMessage("error", `Failed to save ${jsonObj.app_topic}.json to repo. No commits or pushes were handled.`)
-      });
-      return "ready";
-    }
-    dispatch({
-      type: "addMessage",
-      payload: createMessage("success", `${jsonObj.app_topic}.json saved.`)
-    });
-
-    await refreshRepoState(dispatch);
-    
-    if(gitOptions.commit) {
-      setOpenPrompt(true);
-      return "being commited";
-    }
-    return "ready";
   };
 
   useEffect(() => {
@@ -114,12 +90,10 @@ export default function MenuJson({ dispatch, jsonFilesState, jsonObj, serverStat
         }}
         setOpen={setOpenPrompt}
         value={commitMessage} />
-      <div>
-        <RestJsonPropsComponent
-          handleJsonChange={handleJsonChange}
-          isVerificationEnabled={serverState === "online" ? true : false}
-          restJson={restJsonProps} />
-      </div>
+      <RestJsonPropsComponent
+        handleJsonChange={handleJsonChange}
+        isVerificationEnabled={serverState === "online" ? true : false}
+        restJson={restJsonProps} />
       <div className={classes.buttonsWrapper}>
         <GitStateReport
           dispatch={dispatch}
@@ -127,13 +101,18 @@ export default function MenuJson({ dispatch, jsonFilesState, jsonObj, serverStat
           serverState={serverState} />
         <ClearJsonBtt />
         <Button color="primary" onClick={() => downloadJson(jsonObj)} variant="contained">
-          Download as {jsonObj.app_topic}.json
+          Download as {fileName}
         </Button>
         <SaveToRepoBtt
           gitOptions={gitOptions}
           fileStatus={fileStatus}
-          handleClick={async () => dispatch({ type: "changeJsonFilesState", payload: { fileStatus: await handleSaveToRepo() } })}
-          jsonObj={jsonObj}
+          handleClick={async () =>
+            dispatch({
+              type: "changeJsonFilesState",
+              payload: { fileStatus: await handleSaveToRepo(gitOptions.commit, dispatch, jsonObj, setOpenPrompt) }
+            })
+          }
+          fileName={fileName}
           repoState={localRepoState}
           serverState={serverState}
           setGitOptions={setGitOptions} />

@@ -34,10 +34,14 @@ const useStyles = makeStyles(theme =>
 
 export default function Menu({ component, headingText, serverState }: Props) {
   const classes = useStyles({ serverState });
+
   return (
     <Box className={classes.menu}>
-      <Chip label={`Server ${serverState}`} className={classes.serverStatus} variant="outlined" />
-      <MenuHeading text={headingText} />
+      <MenuHeading
+        serverStateComponent={
+          <Chip label={`Server ${serverState}`} className={classes.serverStatus} variant="outlined" />
+        }
+        text={headingText} />
       {component}
     </Box>
   );

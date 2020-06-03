@@ -1,6 +1,6 @@
 import React from "react";
 import { Step, StepButton, StepProps } from "@material-ui/core";
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import { createStyles, makeStyles } from "@material-ui/core/styles";
 
 interface Props extends StepProps {
   activeStep: number;
@@ -13,7 +13,7 @@ interface Props extends StepProps {
   nextStepToBeCompleted: () => number;
 };
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(theme =>
   createStyles({
     activeStep: {
       "& svg": {
@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const SwStep = (props: Props) => {
+export default function SwStep(props: Props) {
   const classes = useStyles();
   const {
     activeStep,
@@ -87,5 +87,3 @@ const SwStep = (props: Props) => {
     </Step>
   );
 };
-
-export default SwStep;

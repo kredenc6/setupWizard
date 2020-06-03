@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent, Paper } from "@material-ui/core";
+import { Dialog, DialogContent } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import SimpleBar from "simplebar-react";
 import AvailableJsonsAppBar from "./AvailableJsonsAppBar/AvailableJsonsAppBar";
@@ -45,8 +45,7 @@ const useStyles = makeStyles({
     width: "100%",
     maxHeight: "100%",
     height: "75vh",
-    padding: "1rem",
-    overflow: "auto"
+    padding: "1rem"
   }
 });
 
@@ -99,9 +98,9 @@ export default function AvaiableJsons ({ activeJsonObj, handleJsonSelection, jso
             {jsonCardComponents}
           </div>
         </SimpleBar>
-        <Paper className={classes.jsonObjView}>
+        <div className={classes.jsonObjView}>
           <DataDisplay classes={{ jsonWrapper: classes.jsonWrapper }} data={selectedJsonObj} />
-        </Paper>
+        </div>
       </DialogContent>
     </Dialog>
   );

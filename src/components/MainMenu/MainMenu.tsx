@@ -4,7 +4,7 @@ import AvailableJsons from "../AvailableJsons/AvailableJsons";
 import MenuSelectModules from "../MenuSelectModules/MenuSelectModules";
 import MenuTopic from "../MenuTopic/MenuTopic";
 import MenuFileState from "../MenuFileState/MenuFileState";
-import Submenu from "./Submenu";
+import Submenu from "../sharedComponents/Submenu";
 import { JsonResultObj, ServerIs, UserInput } from "../../interfaces/interfaces";
 import { FilesState } from "../../interfaces/fileInterfaces";
 import { SWActions } from "../../sWReducer/sWReducer";
@@ -22,6 +22,10 @@ interface Props {
 const useStyles = makeStyles(theme => 
   createStyles({
     mainMenu: {
+      justifySelf: "center",
+      alignSelf: "center",
+      maxWidth: "1500px",
+      maxHeight: "1000px",
       width: "100%",
       display: "grid",
       gridTemplateRows: "auto-fill",

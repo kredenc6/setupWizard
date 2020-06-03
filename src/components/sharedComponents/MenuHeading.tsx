@@ -1,20 +1,33 @@
 import React from "react";
-import { Typography, TypographyProps } from "@material-ui/core";
-import { withStyles } from "@material-ui/core/styles";
+import { Paper, Typography, TypographyProps } from "@material-ui/core";
+import { createStyles, makeStyles } from "@material-ui/core/styles";
 import capitalizeFirstLetter from "../../miscellaneous/capitalizeFirstLetter";
 
 interface Props extends TypographyProps {
+  serverStateComponent: JSX.Element;
   text: string;
 };
 
-// const StyledHeading = withStyles(({ spacing }) => ({
-//   root: {
-//     marginBottom: spacing(2)
-//   }
-// }))(Typography);
+const useStyles = makeStyles(theme =>
+  createStyles({
+    menuHeading: {
+      position: "relative",
+      paddingBottom: theme.spacing(1),
+      "z-index": 1
+    }
+  })
+);
 
 export default function MenuHeading(props: Props) {
-  const { text, ...typographyProps } = props;
+  const classes = useStyles();
+  const { serverStateComponent , text, ...typographyProps } = props;
   
-  return <Typography align="center" children={capitalizeFirstLetter(text)} variant="h2" {...typographyProps} />;
+  return (
+    <Paper className={classes.menuHeading}>
+      <Typography align="center" variant="h2" {...typographyProps}>
+        {capitalizeFirstLetter(text)}
+        {serverStateComponent}
+      </Typography>
+    </Paper>
+  );
 };

@@ -31,14 +31,7 @@ const TabPanel= (props: TabPanelProps) => {
   );
 };
 
-const determineLabel = (obj: any, i: number, keysToLabels: string[]) => {
-  for(const key of keysToLabels) {
-    if(obj[key]) return obj[key] as string;
-  }
-  return `index ${i}`;
-};
-
-const ArrayDataComponent = ({ dataArr, handleJsonChange, isVerificationEnabled, moduleSettings }: Props) => {
+export default function ArrayDataComponent({ dataArr, handleJsonChange, isVerificationEnabled, moduleSettings }: Props) {
   const [tabPosition, setTabPosition] = useState(0);
 
   let TabComponents: (JSX.Element | null)[] = [];
@@ -85,4 +78,9 @@ const ArrayDataComponent = ({ dataArr, handleJsonChange, isVerificationEnabled, 
   );
 };
 
-export default ArrayDataComponent;
+function determineLabel (obj: any, i: number, keysToLabels: string[]) {
+  for(const key of keysToLabels) {
+    if(obj[key]) return obj[key] as string;
+  }
+  return `index ${i}`;
+};

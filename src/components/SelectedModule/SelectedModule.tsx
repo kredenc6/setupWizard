@@ -1,16 +1,13 @@
 import React, { useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
 import ObjectDataComponent from "./ObjectDataComponent/ObjectDataComponent";
 import ArrayDataComponent from "./ArrayDataComponent/ArrayDataComponent";
 import ArrayComponent from "./ArrayComponent/ArrayComponent";
+import Submenu from "../sharedComponents/Submenu";
 import capitalizeFirstLetter from "../../miscellaneous/capitalizeFirstLetter";
 import { JsonObjModule, Module, ServerIs, UserInputModuleKeys } from "../../interfaces/interfaces";
 import { SWActions } from "../../sWReducer/sWReducer";
 
-import Submenu from "../MainMenu/Submenu";
-
 interface Props {
-  appTopic: string;
   dispatch: React.Dispatch<SWActions>;
   jsonModuleObj: JsonObjModule;
   moduleName: UserInputModuleKeys;
@@ -18,21 +15,13 @@ interface Props {
   serverState: ServerIs;
 };
 
-const useStyles = makeStyles({
-  selectedModuleSubmenu: {
-    gridTemplateRows: "auto 1fr"
-  }
-});
-
 /** Empty array is returned as false. */
 const isArrObjectArr = (arr: any[]) => {
   if (typeof arr[0] === "object") return true;
   return false;
 };
 
-export default function SelectedInput({ appTopic, dispatch, jsonModuleObj, moduleName, moduleSettings, serverState }: Props) {
-  const classes = useStyles();
-  
+export default function SelectedInput({ dispatch, jsonModuleObj, moduleName, moduleSettings, serverState }: Props) {
   const handleJsonChange = (changedModule: JsonObjModule) => {
     dispatch({ type: "changeJson", payload: { [moduleName]: changedModule } });
   };
@@ -46,7 +35,6 @@ export default function SelectedInput({ appTopic, dispatch, jsonModuleObj, modul
     
   return (
     <Submenu
-      className={classes.selectedModuleSubmenu}
       component={
         Array.isArray(jsonModuleObj) ?
           isArrObjectArr(jsonModuleObj) ?
@@ -68,7 +56,6 @@ export default function SelectedInput({ appTopic, dispatch, jsonModuleObj, modul
             handleJsonObjChange={handleJsonObjChange}
             isVerificationEnabled={serverState === "online"}
             moduleSettings={moduleSettings} />
-        
       }
       heading={capitalizeFirstLetter(moduleName)} />
   );

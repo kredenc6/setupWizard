@@ -1,5 +1,38 @@
+import { createMessage } from "../sWReducer/messageHandlingFunctions";
+import { refreshRepoState } from "../gitFunctions/gitFunctions";
 import { JsonResultObj } from "../interfaces/interfaces";
-import { SaveFileResponse } from "../interfaces/fileInterfaces";
+import { FileStatus, SaveFileResponse } from "../interfaces/fileInterfaces";
+import { SERVER_ADDRESS } from "../initialStates/constants";
+import { SWActions } from "../sWReducer/sWReducer";
+
+export const handleSaveToRepo = async (
+    shouldCommit: boolean,
+    dispatch: React.Dispatch<SWActions>,
+    jsonObj: JsonResultObj,
+    setOpenPrompt: React.Dispatch<React.SetStateAction<boolean>>
+  ): Promise<FileStatus> => {
+
+  const savedSuccessfuly = await saveJson(SERVER_ADDRESS, jsonObj);
+  if(!savedSuccessfuly) {
+    dispatch({
+      type: "addMessage",
+      payload: createMessage("error", `Failed to save ${jsonObj.app_topic}.json to repo. No commits or pushes were handled.`)
+    });
+    return "ready";
+  }
+  dispatch({
+    type: "addMessage",
+    payload: createMessage("success", `${jsonObj.app_topic}.json saved.`)
+  });
+
+  await refreshRepoState(dispatch);
+  
+  if(shouldCommit) {
+    setOpenPrompt(true);
+    return "being commited";
+  }
+  return "ready";
+};
 
 export async function fetchJsonFiles(serverAddress: string, callback?: (jsonObjs: JsonResultObj[]) => void) {
   // TODO: there should probably be a check whether the jsonObj is JsonResultObj
@@ -27,12 +60,13 @@ export async function fetchJsonFiles(serverAddress: string, callback?: (jsonObjs
     });
 }
 
-export async function saveJson(serverAddress: string, jsonObj: JsonResultObj, callback?: (response: SaveFileResponse) => void) {
+export async function saveJson(serverAddress: string, jsonObj: JsonResultObj, callback?: (response: SaveFileResponse) => any) {
+  const fileName = normalizeJsonFileName(`${jsonObj.app_topic}.json`);
   return await
     fetch(`${serverAddress}/saveJson`, {
       method: "POST",
       headers: new Headers({ "Content-Type": "application/json" }),
-      body: JSON.stringify({ name: `${jsonObj.app_topic}.json`, data: jsonObj})
+      body: JSON.stringify({ name: fileName, data: jsonObj})
     })
       .then(response => response.json())
       .then((saveFileResponse: SaveFileResponse) => {
@@ -45,18 +79,18 @@ export async function saveJson(serverAddress: string, jsonObj: JsonResultObj, ca
       })
 }
 
-function normalizeJsonfileName(name: string) {
+export function normalizeJsonFileName(name: string) {
   return name.trim().replace(/\s/g, "_").toLowerCase();
 }
 
 export function downloadJson(jsonObj: JsonResultObj) {
-  const fileName = normalizeJsonfileName(jsonObj.app_topic);
+  const fileName = normalizeJsonFileName(`${jsonObj.app_topic}.json`);
   const json = JSON.stringify(jsonObj, null, 2);
   const blob = new Blob([json],{type:'application/json'});
   const href = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = href;
-  link.download = fileName + ".json";
+  link.download = fileName;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

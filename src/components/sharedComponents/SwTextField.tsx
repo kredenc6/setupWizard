@@ -6,8 +6,9 @@ interface Props {
   inputAdornment?: string;
 };
 
-const StyledTextField = withStyles(({ spacing }) => ({
+const StyledTextField = withStyles(({ spacing, typography }) => ({
   root: {
+    minWidth: `${typography.fontSize * 35}px`,
     margin: `${spacing(1)}px ${spacing(1) / 4}px`
   }
 }))(TextField);

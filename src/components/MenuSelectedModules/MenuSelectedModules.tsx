@@ -1,9 +1,11 @@
 import React from "react";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
+import SimpleBar from "simplebar-react";
 import SelectedModule from "../SelectedModule/SelectedModule";
 import sortObjEntriesAlphabetically from "../../miscellaneous/sortObjEntriesAlphabetically";
 import { JsonObjModule, JsonResultObj, ServerIs, UserInput, UserInputModuleKeys } from "../../interfaces/interfaces";
 import { SWActions } from "../../sWReducer/sWReducer";
+import "simplebar/dist/simplebar.min.css";
 
 interface Props {
   dispatch: React.Dispatch<SWActions>;
@@ -12,14 +14,18 @@ interface Props {
   serverState: ServerIs;
 };
 
-const useStyles = makeStyles(theme =>
+const useStyles = makeStyles(({ spacing }) =>
   createStyles({
+    simplebar: {
+      // a little simplebar hack :)
+      minHeight: "100%",
+      maxHeight: "100%"
+    },
     modulesWrapper: {
       display: "grid",
       gridTemplateColumns: "1fr 1fr",
-      gridGap: theme.spacing(1),
-      padding: `${theme.spacing(2)}px ${theme.spacing(1)}px ${theme.spacing(1)}px`,
-      overflow: "auto"
+      gridGap: spacing(1),
+      padding: spacing(1)
     }
   })
 );
@@ -28,8 +34,7 @@ export default function MenuSelectedModules({ dispatch, jsonObj, modules, server
   const classes = useStyles();
   const SelectedModules = sortObjEntriesAlphabetically(Object.entries(modules))
   .filter(([_, module]) => module.selected)
-  .map(([key, _]) => <SelectedModule 
-    appTopic={jsonObj.app_topic}
+  .map(([key, _]) => <SelectedModule
     dispatch={dispatch}
     jsonModuleObj={jsonObj[key as UserInputModuleKeys] as unknown as JsonObjModule}
     key={key}
@@ -39,8 +44,10 @@ export default function MenuSelectedModules({ dispatch, jsonObj, modules, server
   );
 
   return(
-    <section className={classes.modulesWrapper}>
-      {SelectedModules}
-    </section>
+    <SimpleBar className={classes.simplebar}>
+      <section className={classes.modulesWrapper}>
+        {SelectedModules}
+      </section>
+    </SimpleBar>
   );
 }

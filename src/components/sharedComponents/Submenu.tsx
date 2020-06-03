@@ -1,7 +1,7 @@
 import React from "react";
 import { Paper } from "@material-ui/core";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
-import SubmenuHeading from "../sharedComponents/SubMenuHeading";
+import SubmenuHeading from "./SubMenuHeading";
 
 interface Props {
   className?: string;
@@ -13,7 +13,7 @@ const useStyles = makeStyles(theme =>
   createStyles({
     subMenuWrapper: {
       display: "grid",
-      gridTemplateRows: "auto auto-fill",
+      gridTemplateRows: "auto 1fr",
       padding: theme.spacing(2)
     }
   })

@@ -1,8 +1,10 @@
 import React, { useEffect, useReducer } from 'react';
 import { CssBaseline } from "@material-ui/core";
 import { makeStyles, ThemeProvider } from "@material-ui/core/styles";
+import Menu from "./components/Menu/Menu";
 import MainMenu from "./components/MainMenu/MainMenu";
 import MenuStyles from "./components/MenuStyles/MenuStyles";
+import MenuSelectedModules from "./components/MenuSelectedModules/MenuSelectedModules";
 import MenuJson from "./components/MenuJson/MenuJson";
 import SetupStepper from "./components/SetupStepper/SetupStepper";
 import MessageSnackBar from "./components/sharedComponents/MessageSnackBar";
@@ -15,9 +17,6 @@ import { initialReducerState } from "./initialStates/initialStates";
 import { SERVER_STATUS_CHECK_INTERVAL, SERVER_ADDRESS } from "./initialStates/constants";
 import { refreshRepoState, shouldRepoStateBeRefreshed } from "./gitFunctions/gitFunctions";
 import { MenuInt } from "./interfaces/interfaces";
-
-import Menu from "./components/Menu/Menu";
-import MenuSelectedModules from "./components/MenuSelectedModules/MenuSelectedModules";
 
 const useStyles = makeStyles({
   wizardWrapper: {

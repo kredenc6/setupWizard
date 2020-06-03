@@ -1,9 +1,10 @@
 import React from "react";
-import { Paper } from "@material-ui/core";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
+import SimpleBar from "simplebar-react";
 import ObjectDataComponent from "../../SelectedModule/ObjectDataComponent/ObjectDataComponent";
-import PropertyHeading from "./PropertyHeading";
+import Submenu from "../../sharedComponents/Submenu";
 import { JsonObjKey, JsonResultObj } from "../../../interfaces/interfaces";
+import "simplebar/dist/simplebar.min.css";
 
 interface Props {
   handleJsonChange: (key: JsonObjKey, changedModule: JsonResultObj[JsonObjKey]) => void;
@@ -11,12 +12,16 @@ interface Props {
   restJson: [string, any][];
 };
 
-const useStyles = makeStyles(theme => 
+const useStyles = makeStyles(({ spacing }) => 
   createStyles({
+    restJsonPropsWrapper: {
+      flexGrow: 2,
+      maxHeight: "100%"
+    },
     paperItem: {
-      marginRight: theme.spacing(1),
-      marginBottom: theme.spacing(1),
-      padding: theme.spacing(2)
+      marginRight: spacing(1),
+      marginBottom: spacing(1),
+      padding: spacing(2)
     }
   })
 );
@@ -38,31 +43,35 @@ export default function RestJsonPropsComponent ({ handleJsonChange, isVerificati
 
   const ObjectDataComponents = objectArray.map(([key, value], i) => {
     return(
-      <Paper className={classes.paperItem} key={`${key}${i}`} variant="outlined">
-        <PropertyHeading text={key} />
-        <ObjectDataComponent
-          dataObj={value}
-          handleJsonObjChange={(dataObj: object, keyToValue: string, value: any) => handleJsonChange(
-            key as JsonObjKey,
-            { ...dataObj, [keyToValue]: value }
-          )}
-          isVerificationEnabled={isVerificationEnabled} />
-      </Paper>
+      <Submenu
+        component={
+          <ObjectDataComponent
+            dataObj={value}
+            handleJsonObjChange={(dataObj: object, keyToValue: string, value: any) => handleJsonChange(
+              key as JsonObjKey,
+              { ...dataObj, [keyToValue]: value }
+            )}
+            isVerificationEnabled={isVerificationEnabled} />
+        }
+        className={classes.paperItem}
+        heading={key}
+        key={`${key}${i}`} />
     );
   });
 
   return(
-    <div>
-      <Paper className={classes.paperItem} variant="outlined">
-        <PropertyHeading text="various" />
-        <ObjectDataComponent
-          dataObj={stringAndBooleanObj}
-          handleJsonObjChange={handleGroupedPropsChange}
-          isVerificationEnabled={isVerificationEnabled} />
-      </Paper>
-      <div>
-        {ObjectDataComponents}
-      </div>
-    </div>
+    <SimpleBar className={classes.restJsonPropsWrapper}>
+      <Submenu
+        component={
+          <ObjectDataComponent
+            dataObj={stringAndBooleanObj}
+            handleJsonObjChange={handleGroupedPropsChange}
+            isVerificationEnabled={isVerificationEnabled} />
+        }
+        className={classes.paperItem}
+        heading="various" />
+
+      {ObjectDataComponents}
+    </SimpleBar>
   );
 };

@@ -1,5 +1,6 @@
 import React from "react";
 import StringArrayInput from "../StringArrayInput/StringArrayInput";
+import { makeStyles } from "@material-ui/core/styles";
 import { JsonObjModule, Module } from "../../../interfaces/interfaces";
 
 interface Props {
@@ -10,13 +11,22 @@ interface Props {
   moduleSettings: Module | undefined;
 };
 
-const ArrayComponent = ({ array, handleJsonChange, isVerificationEnabled, label, moduleSettings }: Props) => {
+const useStyles = makeStyles({
+  arrayWrapper: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center"
+  }
+});
+
+export default function ArrayComponent ({ array, handleJsonChange, isVerificationEnabled, label, moduleSettings }: Props) {
+  const classes = useStyles();
   const handleChange = (_: string, newArray: string[] | number[]) => {
     handleJsonChange(newArray);
   };
 
   return(
-    <div>
+    <div className={classes.arrayWrapper}>
       <StringArrayInput
         arr={array}
         handleChange={handleChange}
@@ -26,5 +36,3 @@ const ArrayComponent = ({ array, handleJsonChange, isVerificationEnabled, label,
     </div>
   );
 };
-
-export default ArrayComponent;

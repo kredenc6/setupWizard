@@ -14,7 +14,7 @@ interface Props {
   prefixIndex?: number;
 };
 
-const StringArrayInput = ({ arr, handleChange, isVerificationEnabled, label, moduleSettings, prefixIndex }: Props) => {
+export default function StringArrayInput({ arr, handleChange, isVerificationEnabled, label, moduleSettings, prefixIndex }: Props) {
   const isVerifiableArr = isProxyVerifiable(moduleSettings, label);
   const [componentKeys, setComponentsKeys] = useState<string[]>(createComponentKeys([], arr)); // this component needs a way...
   // to hold unique component keys during rerenders(prevents mixing validation results when using index number as a key)
@@ -95,13 +95,11 @@ const StringArrayInput = ({ arr, handleChange, isVerificationEnabled, label, mod
     );
 
   return(
-    <div>
+    <>
       {StringArrayInputComponents}
-    </div>
+    </>
   );
 };
-
-export default StringArrayInput;
 
 /** returns: [...keyArr + new keys if valueArr.length > keyArr.length] */
 function createComponentKeys(keyArr: string[], valueArr: any[]) {

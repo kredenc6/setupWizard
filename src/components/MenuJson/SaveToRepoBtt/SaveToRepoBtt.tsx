@@ -2,7 +2,7 @@ import React from "react";
 import { Button, Box } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import GitOptions from "../GitOptions/GitOptions";
-import { JsonResultObj, ServerIs } from "../../../interfaces/interfaces";
+import { ServerIs } from "../../../interfaces/interfaces";
 import { GitOpt } from "../../../interfaces/gitInterfaces";
 import { FileStatus } from "../../../interfaces/fileInterfaces";
 import { StatusResult } from "../../../interfaces/simpleGit";
@@ -10,7 +10,7 @@ import { StatusResult } from "../../../interfaces/simpleGit";
 interface Props {
   gitOptions: GitOpt;
   handleClick: () => void;
-  jsonObj: JsonResultObj;
+  fileName: string;
   fileStatus: FileStatus;
   repoState: StatusResult | null;
   serverState: ServerIs;
@@ -29,7 +29,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function SaveButton({ gitOptions, fileStatus, handleClick, repoState, serverState, jsonObj, setGitOptions }: Props) {
+export default function SaveButton({ gitOptions, fileStatus, handleClick, repoState, serverState, fileName, setGitOptions }: Props) {
   const classes = useStyles();
   const disabled = serverState === "offline" || fileStatus !== "ready";
 
@@ -43,7 +43,7 @@ export default function SaveButton({ gitOptions, fileStatus, handleClick, repoSt
         variant="contained"
       >
         {fileStatus === "ready" ?
-            `Save to repo as ${jsonObj.app_topic}.json`
+            `Save to repo as ${fileName}`
           :
             `File is ${fileStatus}.`}
       </Button>

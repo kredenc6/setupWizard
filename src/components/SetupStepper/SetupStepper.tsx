@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { createStyles, makeStyles } from '@material-ui/core/styles';
-import { Stepper} from '@material-ui/core';
+import { Paper, Stepper} from '@material-ui/core';
 import SwStepperButtons from "./SwStepperButtons/SwStepperButtons";
 import SwStepConnector from "./SwStepConnector/SwStepConnector";
 import SwStep from "./SwStep/SwStep";
@@ -15,13 +15,11 @@ interface Props {
 
 const useStyles = makeStyles(theme =>
   createStyles({
-    root: {
-      width: "100%",
-      paddingTop: theme.spacing(1),
-      borderTop: `1px solid ${theme.palette.divider}`
-    },
     stepper: {
-      backgroundColor: `${theme.palette.background.default}`
+      width: "99%",
+      margin: "0 auto",
+      paddingTop: theme.spacing(1),
+      zIndex: 1
     }
   })
 );
@@ -103,7 +101,7 @@ export default function SetupStepper ({ activeStep, dispatch, menuLabels, isNext
   },[activeStep, isNextStepAllowed, isStepComplete]);
 
   return(
-    <div className={ classes.root }>
+    <Paper className={classes.stepper}>
       <SwStepperButtons 
         isFinished={isFinished}
         handleBack={handleBack}
@@ -114,7 +112,6 @@ export default function SetupStepper ({ activeStep, dispatch, menuLabels, isNext
         isNextStepAllowed={isNextStepAllowed} />
       <Stepper
         alternativeLabel
-        className={classes.stepper}
         connector={<SwStepConnector />}
         nonLinear
       >
@@ -133,6 +130,6 @@ export default function SetupStepper ({ activeStep, dispatch, menuLabels, isNext
           );
         })}
       </Stepper>
-    </div>
+    </Paper>
   );
 };
