@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import ColorScheme from "./ColorScheme/ColorScheme";
 import ColorPalette from "./ColorPalette/ColorPalette";
 import ColorToolHeading from "./ColorToolHeading";
@@ -43,12 +43,11 @@ export default function MenuStyles( { dispatch, schemeObj, selectedScheme }: Pro
   const classes = useStyles();
   const [schemeProperty, setSchemeProperty] = useState<"background" | "text">("background");
   const [selectedPalette, setSelectedPalette] = useState<"primary" | "secondary">("primary");
-  const getContrastText = useTheme().palette.getContrastText;
 
   const assignColor = (color: string | null) => {
     // change background scheme
     if(schemeProperty === "background" && color !== null) {
-      const newPalette = createPaletteFromColor(color, getContrastText);
+      const newPalette = createPaletteFromColor(color);
       const newColorScheme = { ...schemeObj, [selectedPalette]: newPalette, name: "custom" };
       const ui_colors = createJsonSchemeObj(newColorScheme);
       dispatch({ type: "changeUserInput", payload: { schemeObj: newColorScheme } });

@@ -37,6 +37,7 @@ export default function SetupWizard() {
   const classes = useStyles();
   const [state, dispatch ] = useReducer(sWReducer, initialReducerState);
 
+  // set server check on mount
   useEffect(() => {
     const serverCheck = new Interval(SERVER_STATUS_CHECK_INTERVAL, async () => {
       dispatch({ type: "setServerState", payload: await getServerState(SERVER_ADDRESS) });
@@ -44,6 +45,7 @@ export default function SetupWizard() {
     dispatch({ type: "setIntervals", payload: { serverCheck } });
   },[]);
 
+  // start/stop server check
   useEffect(() => {
     if(state.intervals.serverCheck && !state.intervals.serverCheck.isRunning) {
       state.intervals.serverCheck.start();
@@ -56,10 +58,12 @@ export default function SetupWizard() {
     }
   },[state.intervals]);
   
+  // notify of changed server status
   useEffect(() => {
     dispatch({ type: "addMessage", payload: createMessage("server", state.serverState) });
   },[state.serverState]);
   
+  // refresh repo status
   useEffect(() => {
     if(shouldRepoStateBeRefreshed(state.jsonFilesState.lastRepoUpdate)) {
       refreshRepoState(dispatch);

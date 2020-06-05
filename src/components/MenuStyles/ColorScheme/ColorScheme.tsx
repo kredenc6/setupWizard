@@ -16,14 +16,11 @@ interface Props {
 const useStyles = makeStyles({
   colorSchemeWrapper: {
     width: "100%",
+    height: "100%",
     display: "flex",
     flexFlow: "row wrap",
-    alignContent: "flex-start"
-  },
-  colorSchemes: {
-    width: "100%",
-    height: "100%",
-    display: "flex", 
+    alignContent: "flex-start",
+    zIndex: 1
   },
   narrowSchemeWrapper: {
     width: "20%"
@@ -43,49 +40,47 @@ export default function ColorScheme(props: Props) {
 
   return(
     <article className={classes.colorSchemeWrapper}>
-      <div className={classes.colorSchemes}>
-        <SchemeContainerLarge
-          active={selectedPalette === "primary" && schemeProperty === "background" ? true : false}
+      <SchemeContainerLarge
+        active={selectedPalette === "primary" && schemeProperty === "background" ? true : false}
+        onClick={() => {
+          setSelectedPalette("primary");
+          setSchemeProperty("background");
+        }}
+        palette={schemeObj.primary}
+        reset={reset}
+        title="Primary" />
+      <SchemeContainerLarge
+        active={selectedPalette === "secondary" && schemeProperty === "background" ? true : false}
+        onClick={() => {
+          setSelectedPalette("secondary");
+          setSchemeProperty("background");
+        }}
+        palette={schemeObj.secondary}
+        reset={reset}
+        title="Secondary" />
+      <div className={classes.narrowSchemeWrapper}>
+        <SchemeContainerNarrow
+          active={selectedPalette === "primary" && schemeProperty === "text" ? true : false}
+          background={schemeObj.primary.main}
+          contrastText={schemeObj.textColorOverride.primary ?
+            schemeObj.textColorOverride.primary : schemeObj.primary.contrastText.main}
           onClick={() => {
             setSelectedPalette("primary");
-            setSchemeProperty("background");
+            setSchemeProperty("text");
           }}
-          palette={schemeObj.primary}
           reset={reset}
-          title="Primary" />
-        <SchemeContainerLarge
-          active={selectedPalette === "secondary" && schemeProperty === "background" ? true : false}
+          title="Text on P" />
+        <SchemeContainerNarrow
+          active={selectedPalette === "secondary" && schemeProperty === "text" ? true : false}
+          background={schemeObj.secondary.main}
+          contrastText={schemeObj.textColorOverride.secondary ?
+            schemeObj.textColorOverride.secondary : schemeObj.secondary.contrastText.main}
           onClick={() => {
             setSelectedPalette("secondary");
-            setSchemeProperty("background");
+            setSchemeProperty("text");
           }}
-          palette={schemeObj.secondary}
           reset={reset}
-          title="Secondary" />
-        <div className={classes.narrowSchemeWrapper}>
-          <SchemeContainerNarrow
-            active={selectedPalette === "primary" && schemeProperty === "text" ? true : false}
-            background={schemeObj.primary.main}
-            contrastText={schemeObj.textColorOverride.primary ?
-              schemeObj.textColorOverride.primary : schemeObj.primary.contrastText.main}
-            onClick={() => {
-              setSelectedPalette("primary");
-              setSchemeProperty("text");
-            }}
-            reset={reset}
-            title="Text on P" />
-          <SchemeContainerNarrow
-            active={selectedPalette === "secondary" && schemeProperty === "text" ? true : false}
-            background={schemeObj.secondary.main}
-            contrastText={schemeObj.textColorOverride.secondary ?
-              schemeObj.textColorOverride.secondary : schemeObj.secondary.contrastText.main}
-            onClick={() => {
-              setSelectedPalette("secondary");
-              setSchemeProperty("text");
-            }}
-            reset={reset}
-            title="Text on S" />
-        </div>
+          title="Text on S" />
       </div>
     </article>
   );

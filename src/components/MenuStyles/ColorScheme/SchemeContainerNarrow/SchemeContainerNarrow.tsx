@@ -1,7 +1,7 @@
 import React from "react";
 import { Box } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import SchemeTextIcon from "../ShemeTextIcon";
+import SchemeTextIcon from "../SchemeTextIcon";
 import SchemeResetButton from "../SchemeResetButton";
 import ColorText from "../ColorText";
 
@@ -36,7 +36,7 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
-const SchemeContainerNarrow  = ({ title, background, contrastText, active, reset, onClick }: Props) => {
+export default function SchemeContainerNarrow({ title, background, contrastText, active, reset, onClick }: Props) {
   const classes = useStyles();
   return(
     <Box className={classes.narrowSchemeContainer} onClick={onClick} boxShadow={active ? 15 : 0}>
@@ -49,5 +49,3 @@ const SchemeContainerNarrow  = ({ title, background, contrastText, active, reset
     </Box>
   );
 };
-
-export default SchemeContainerNarrow;

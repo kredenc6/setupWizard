@@ -1,6 +1,6 @@
 import React from "react";
 import { FormControl, InputLabel, MenuItem, Select } from "@material-ui/core";
-import { createStyles, makeStyles, useTheme } from "@material-ui/core/styles";
+import { createStyles, makeStyles } from "@material-ui/core/styles";
 import presetSchemes from "./presetSchemes.json";
 import { createSchemeObjFromPresetScheme } from "../../../../miscellaneous/colorSchemeFunctions";
 import { JsonScheme } from "../../../../interfaces/interfaces";
@@ -12,11 +12,11 @@ interface Props {
   selectedScheme: string;
 };
 
-const useStyles = makeStyles(theme =>
+const useStyles = makeStyles(({ spacing }) =>
   createStyles({
     presetColorSchemesWrapper: {
       width: "200px",
-      margin: `0 ${theme.spacing(1)}px`
+      margin: `0 ${spacing(1)}px`
     }
   })
 );
@@ -26,14 +26,12 @@ const findPresetSchemeByName: (name: string) => (JsonScheme | undefined) = (name
 };
 
 export default function PresetSchemes ({ dispatch, selectedScheme }: Props) {
-  const theme = useTheme();
-  const classes = useStyles(theme);
-  const getContrastText = theme.palette.getContrastText;
+  const classes = useStyles();
 
   const handleChange = (e: React.ChangeEvent<{name?: string | undefined; value: unknown;}>) => {
     const schemeName = e.target.value as string;
     const presetScheme = findPresetSchemeByName(schemeName) || presetSchemes[0];
-    const newSchemeObj = createSchemeObjFromPresetScheme(presetScheme, getContrastText);
+    const newSchemeObj = createSchemeObjFromPresetScheme(presetScheme);
     
     dispatch({ type: "changeUserInput", payload: { schemeObj: newSchemeObj } });
     dispatch({ type: "changeJson", payload: { ui_colors: presetScheme } });

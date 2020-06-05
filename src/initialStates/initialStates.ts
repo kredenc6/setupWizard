@@ -1,7 +1,6 @@
 import { SwState, UserInput } from "../interfaces/interfaces";
 import { FilesState } from "../interfaces/fileInterfaces";
 import jsonObjFrame from "./jsonObjFrame";
-import theme from "../theme/theme";
 import { getLocalStorageRepoState } from "../gitFunctions/gitFunctions";
 import { createSchemeObjFromPresetScheme } from "../miscellaneous/colorSchemeFunctions";
 
@@ -15,7 +14,7 @@ export const initialFilesState: FilesState = {
 export const initialUserInput: UserInput = {
   resetJsonOnAppTopicChange: true,
   setAlsoAsChannelValues: true,
-  schemeObj: createSchemeObjFromPresetScheme(jsonObjFrame.ui_colors, theme.palette.getContrastText),
+  schemeObj: createSchemeObjFromPresetScheme(jsonObjFrame.ui_colors),
   modules: {
     audio: {
       selected: false,

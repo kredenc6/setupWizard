@@ -1,7 +1,7 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import SchemeResetButton from "../../SchemeResetButton";
-import SchemeTextIcon from "../../ShemeTextIcon";
+import SchemeTextIcon from "../../SchemeTextIcon";
 import ColorText from "../../ColorText";
 
 interface Props {

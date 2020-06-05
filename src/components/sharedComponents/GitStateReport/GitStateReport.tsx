@@ -5,6 +5,7 @@ import GitActions from "./GitActions/GitActions";
 import LastUpdate from "./LastUpdate/LastUpdate";
 import DataDisplay from "../DataDisplay";
 import sortObjEntriesAlphabetically from "../../../miscellaneous/sortObjEntriesAlphabetically";
+import getTheLongestJsonLineLength from "../../../miscellaneous/getTheLongestJsonLineLength";
 import { ServerIs } from "../../../interfaces/interfaces";
 import { StatusResult } from "../../../interfaces/simpleGit";
 import { SWActions } from "../../../sWReducer/sWReducer";
@@ -24,17 +25,19 @@ const useStyles = makeStyles(({ spacing }) =>
       padding: spacing(1),
     },
     jsonWrapper: {
-      width: "auto",
+      // width: "auto",
+      width: ({ jsonCharWidth }: { jsonCharWidth: number }) => `${jsonCharWidth * 5}px`,
       padding: spacing(1)
     }
   })
 );
 
 export default function GitStateReport({ dispatch, jsonFilesState, serverState }: Props) {
-  const classes = useStyles();
+  const { lastRepoUpdate, localRepoState } = jsonFilesState;
+  const normalizedRepoState = normalizeRepoState(localRepoState);
+  const classes = useStyles({ jsonCharWidth: getTheLongestJsonLineLength(JSON.stringify(normalizedRepoState, null, 2)) });
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = Boolean(anchorEl);
-  const { lastRepoUpdate, localRepoState } = jsonFilesState;
 
   const handleClick = (currentTarget: HTMLElement) => {
     if(!anchorEl) setAnchorEl(currentTarget);
@@ -83,7 +86,7 @@ export default function GitStateReport({ dispatch, jsonFilesState, serverState }
             :
               null}
           <LastUpdate timeStamp={lastRepoUpdate} />
-          <DataDisplay classes={{ jsonWrapper: classes.jsonWrapper }} data={normalizeRepoState(localRepoState)} />
+          <DataDisplay classes={{ jsonWrapper: classes.jsonWrapper }} data={normalizedRepoState} />
         </div>
       </Popover>
     </>

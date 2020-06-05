@@ -66,6 +66,7 @@ export default function MenuFileState({ dispatch, jsonFilesState, serverState, s
           onClick={async () => {
             const loadedJsons = await fetchJsonFiles(SERVER_ADDRESS);
             dispatch({ type: "changeJsonFilesState", payload: { loadedJsons } });
+            
           }} />
       </div>
     </article>

@@ -1,6 +1,8 @@
 import { darken, lighten, rgbToHex, Theme } from "@material-ui/core/styles";
 import rgbaToHex from "../miscellaneous/rgbaToHex";
+import theme from "../theme/theme";
 import { Palette, JsonScheme, ColorSchemeInt } from "../interfaces/interfaces";
+const { getContrastText } = theme.palette;
 
 const normalizeColor = (color: string) => {
   if(color.startsWith("#")) {
@@ -12,7 +14,7 @@ const normalizeColor = (color: string) => {
   throw new Error("Unknown color format.");
 };
 
-export const createPaletteFromColor = (background: string, getContrastText: (background: string) => string): Palette => {
+export const createPaletteFromColor = (background: string): Palette => {
   const lightbackground   = rgbToHex( lighten(background, 0.2) ),
         darkbackground    = rgbToHex( darken(background,  0.3) ),
         lightContrastText = normalizeColor( getContrastText(lightbackground) ),
@@ -31,8 +33,7 @@ export const createPaletteFromColor = (background: string, getContrastText: (bac
   };
 };
 
-export const createPaletteFromPresetScheme =
-  (presetScheme: JsonScheme, type: "primary" | "secondary", getContrastText: (background: string) => string): Palette => {
+export const createPaletteFromPresetScheme = (presetScheme: JsonScheme, type: "primary" | "secondary"): Palette => {
     const mainColor = presetScheme[`${type}Color` as keyof JsonScheme];
     
     if(!mainColor) throw new Error(`${type}Color property cannot be an empty string.`);
@@ -65,11 +66,10 @@ export const createSchemeObjFromPalettes =
     };
 };
 
-export const createSchemeObjFromPresetScheme =
-  (presetScheme: JsonScheme, getContrastText: (background: string) => string) => {
+export const createSchemeObjFromPresetScheme = (presetScheme: JsonScheme) => {
     return createSchemeObjFromPalettes(
-      createPaletteFromPresetScheme(presetScheme, "primary", getContrastText),
-      createPaletteFromPresetScheme(presetScheme, "secondary", getContrastText),
+      createPaletteFromPresetScheme(presetScheme, "primary"),
+      createPaletteFromPresetScheme(presetScheme, "secondary"),
       presetScheme.name
     );
 };
@@ -77,8 +77,8 @@ export const createSchemeObjFromPresetScheme =
 export const createSchemeObjFromTheme = (theme: Theme): ColorSchemeInt => {
   return {
     name: "custom",
-    primary: createPaletteFromColor(theme.palette.primary.main, theme.palette.getContrastText),
-    secondary: createPaletteFromColor(theme.palette.secondary.main, theme.palette.getContrastText),
+    primary: createPaletteFromColor(theme.palette.primary.main),
+    secondary: createPaletteFromColor(theme.palette.secondary.main),
     textColorOverride: {
       primary: null,
       secondary: null

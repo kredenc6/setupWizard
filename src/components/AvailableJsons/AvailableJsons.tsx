@@ -5,6 +5,7 @@ import SimpleBar from "simplebar-react";
 import AvailableJsonsAppBar from "./AvailableJsonsAppBar/AvailableJsonsAppBar";
 import JsonCard from "./JsonCard/JsonCard";
 import DataDisplay from "../sharedComponents/DataDisplay";
+import { normalizeJsonFileName } from "../../fileFunctions/fileFunctions";
 import { JsonResultObj } from "../../interfaces/interfaces";
 import { StatusResult } from "../../interfaces/simpleGit";
 import { FilesState } from "../../interfaces/fileInterfaces";
@@ -49,7 +50,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function AvaiableJsons ({ activeJsonObj, handleJsonSelection, jsonFilesState, open, setIsJsonSelectionOpen }: Props) {
+export default function AvaiableJsons({ activeJsonObj, handleJsonSelection, jsonFilesState, open, setIsJsonSelectionOpen }: Props) {
   const classes = useStyles();
   const { loadedJsons, localRepoState: gitState } = jsonFilesState;
   const [selectedJsonObj, setSelectedJsonObj] = useState<JsonResultObj>(activeJsonObj);
@@ -108,11 +109,12 @@ export default function AvaiableJsons ({ activeJsonObj, handleJsonSelection, jso
 
 function getFileGitState(fileName: string, gitState: StatusResult | null) {
   if(!gitState) return [];
+  fileName = normalizeJsonFileName(fileName);
 
   const fileGitState: string[] = [];
   for(let [key, value] of Object.entries(gitState)) {
-    if(Array.isArray(value)) {
-      if(value.includes(fileName)) {
+    if(Array.isArray(value) && typeof value[0] === "string") {
+      if(value.some(gitFileName => gitFileName.includes(fileName))) {
         fileGitState.push(key);
       }
     }

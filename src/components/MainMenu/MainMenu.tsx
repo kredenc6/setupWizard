@@ -5,9 +5,10 @@ import MenuSelectModules from "../MenuSelectModules/MenuSelectModules";
 import MenuTopic from "../MenuTopic/MenuTopic";
 import MenuFileState from "../MenuFileState/MenuFileState";
 import Submenu from "../sharedComponents/Submenu";
+import { createSchemeObjFromPresetScheme } from "../../miscellaneous/colorSchemeFunctions";
+import { SWActions } from "../../sWReducer/sWReducer";
 import { JsonResultObj, ServerIs, UserInput } from "../../interfaces/interfaces";
 import { FilesState } from "../../interfaces/fileInterfaces";
-import { SWActions } from "../../sWReducer/sWReducer";
 
 interface Props {
   dispatch: React.Dispatch<SWActions>;
@@ -82,7 +83,9 @@ export default function MainMenu(props: Props) {
       <AvailableJsons
         activeJsonObj={jsonObj}
         handleJsonSelection={(jsonObj: JsonResultObj) => {
+          const colorSchemeObj = createSchemeObjFromPresetScheme(jsonObj.ui_colors);
           dispatch({ type: "selectJson", payload: jsonObj });
+          dispatch({ type: "changeUserInput", payload: { schemeObj: colorSchemeObj } });
           setIsJsonSelectionOpen(false);
         }}
         jsonFilesState={jsonFilesState}
