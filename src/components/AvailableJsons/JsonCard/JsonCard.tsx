@@ -12,34 +12,33 @@ interface Props {
   selected: boolean;
 };
 
-const useStyles = makeStyles(theme =>
+const useStyles = makeStyles(({ palette, spacing, shadows }) =>
   createStyles({
     card: {
       position: "relative",
-      // minWidth: `${theme.typography.fontSize * 20}px`,
       width: "75%",
-      margin: theme.spacing(1),
+      margin: spacing(1),
       border: ({ active, selected }: { active: boolean, selected: boolean}) => {
         let line = "1px solid ";
-        let color = theme.palette.grey[200];
+        let color = palette.grey[200];
 
         if(active) {
-          color = theme.palette.primary.main;
+          color = palette.primary.main;
         } else
         if(selected) {
-          color = theme.palette.secondary.main;
+          color = palette.secondary.main;
         }
         return `${line}${color}`;
       },
       "&:hover": {
         cursor: "pointer",
-        boxShadow: theme.shadows[4]
+        boxShadow: shadows[4]
       }
     }
   })
 );
 
-const JsonCard = ({ active, handleCardClick, handleCardDblClick, fileGitState, jsonAppTopic, selected }: Props) => {
+export default function JsonCard({ active, handleCardClick, handleCardDblClick, fileGitState, jsonAppTopic, selected }: Props) {
   const classes = useStyles({ active, selected });
   return(
     <Card
@@ -55,5 +54,3 @@ const JsonCard = ({ active, handleCardClick, handleCardDblClick, fileGitState, j
     </Card>
   );
 };
-
-export default JsonCard;

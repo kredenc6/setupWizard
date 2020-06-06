@@ -1,7 +1,7 @@
 import React from "react";
-import { FormControlLabel, Switch, Typography } from "@material-ui/core";
-import { createStyles, makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import SwTextField from "../sharedComponents/SwTextField";
+import TopicChangeSettings from "./TopicChangeSettings/TopicChangeSetting";
 import { SWActions } from "../../sWReducer/sWReducer";
 
 const PLACEHOLDER = "Type your app topic here (min. 2 characters)";
@@ -13,34 +13,18 @@ interface Props {
   value: string;
 };
 
-const useStyles = makeStyles(theme =>
-  createStyles({
-    menuTopic: {
-      "text-align": "center"
-    },
-    textField: {
-      marginTop: "2rem",
-      minWidth: `${PLACEHOLDER.length / 2}rem`
-    },
-    switchWrapper: {
-      display: "inline-flex",
-      flexDirection: "column",
-      marginLeft: theme.spacing(2)
-    }
-  })
-);
+const useStyles = makeStyles({
+  textField: {
+    marginTop: "2rem",
+    minWidth: `${PLACEHOLDER.length / 2}rem`
+  }
+});
 
-const MenuTopic = (props: Props) => {
-  const {
-    dispatch,
-    resetOtherValues,
-    setAsChannelValues,
-    value 
-  } = props;
+export default function MenuTopic({ dispatch, resetOtherValues, setAsChannelValues, value }: Props) {
   const classes = useStyles();
 
   return(
-    <article className={classes.menuTopic}>
+    <article>
       <SwTextField
         autoFocus
         className={classes.textField}
@@ -49,25 +33,10 @@ const MenuTopic = (props: Props) => {
         required
         value={value}
       />
-      <div className={classes.switchWrapper}>
-        <Typography align="left" children="with change:" />
-        <FormControlLabel
-          control={
-            <Switch
-              checked={resetOtherValues}
-              onChange={e => dispatch({ type: "changeUserInput", payload: { resetJsonOnAppTopicChange: e.target.checked } })} />
-          }
-          label="clear other values" />
-        <FormControlLabel
-          control={
-            <Switch
-              checked={setAsChannelValues}
-              onChange={e => dispatch({ type: "changeUserInput", payload: { setAlsoAsChannelValues: e.target.checked } })} />
-          }
-          label="set also as channel values" />
-      </div>
+      <TopicChangeSettings
+        dispatch={dispatch}
+        resetOtherValues={resetOtherValues}
+        setAsChannelValues={setAsChannelValues} />
     </article>
   );
 };
-
-export default MenuTopic;

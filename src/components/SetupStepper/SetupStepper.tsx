@@ -24,7 +24,8 @@ const useStyles = makeStyles(theme =>
   })
 );
 
-export default function SetupStepper ({ activeStep, dispatch, menuLabels, isNextStepAllowed }: Props) {
+// export default function SetupStepper ({ activeStep, dispatch, menuLabels, isNextStepAllowed }: Props) {
+const SetupStepper = React.memo(({ activeStep, dispatch, menuLabels, isNextStepAllowed }: Props) => {
   const classes = useStyles();
   const [completed, setCompleted] = useState(new Set<number>());
   const [isFinished, setIsFinished] = useState(false);
@@ -132,4 +133,12 @@ export default function SetupStepper ({ activeStep, dispatch, menuLabels, isNext
       </Stepper>
     </Paper>
   );
-};
+}, compareProps);
+
+export default SetupStepper;
+
+function compareProps(prevProps: Props, nextProps: Props) {
+  if(prevProps.activeStep !== nextProps.activeStep) return false;
+  if(prevProps.isNextStepAllowed !== nextProps.isNextStepAllowed) return false;
+  return true;
+}

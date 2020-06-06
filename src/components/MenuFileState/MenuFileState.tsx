@@ -17,13 +17,13 @@ interface Props {
   setIsJsonSelectionOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const useStyles = makeStyles(theme => 
+const useStyles = makeStyles(({ palette, spacing, typography }) => 
   createStyles({
     updateBtt: {
-      padding: `${theme.spacing(1) / 2}px`,
-      fontSize: theme.typography.fontSize,
-      fontWeight: theme.typography.fontWeightRegular,
-      color: theme.palette.text.primary,
+      padding: `${spacing(1) / 2}px`,
+      fontSize: typography.fontSize,
+      fontWeight: typography.fontWeightRegular,
+      color: palette.text.primary,
       "&:hover": {
         cursor: "pointer"
       }
@@ -33,13 +33,13 @@ const useStyles = makeStyles(theme =>
       display: "grid",
       gridTemplateColumns: "auto auto",
       gridTemplateRows: "auto auto",
-      gridGap: theme.spacing(1),
-      padding: theme.spacing(1)
+      gridGap: spacing(1),
+      padding: spacing(1)
     }
   })
 );
 
-export default function MenuFileState({ dispatch, jsonFilesState, serverState, setIsJsonSelectionOpen }: Props) {
+const MenuFileState = React.memo(({ dispatch, jsonFilesState, serverState, setIsJsonSelectionOpen }: Props) => {
   const classes = useStyles();
 
   return (
@@ -71,4 +71,6 @@ export default function MenuFileState({ dispatch, jsonFilesState, serverState, s
       </div>
     </article>
   );
-}
+});
+
+export default MenuFileState;

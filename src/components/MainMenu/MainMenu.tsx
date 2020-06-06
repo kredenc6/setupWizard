@@ -116,9 +116,7 @@ export default function MainMenu(props: Props) {
           component={
             <MenuSelectModules
               dispatch={dispatch}
-              jsonObj={jsonObj}
-              modules={userInput.modules}
-              setAsChannelValues={setAsChannelValues} />
+              modules={userInput.modules} />
           }
           heading="Select visible components" />
       </div>

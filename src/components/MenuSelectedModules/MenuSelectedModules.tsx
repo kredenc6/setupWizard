@@ -50,4 +50,4 @@ export default function MenuSelectedModules({ dispatch, jsonObj, modules, server
       </section>
     </SimpleBar>
   );
-}
+};

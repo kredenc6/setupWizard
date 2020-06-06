@@ -35,7 +35,7 @@ const useStyles = makeStyles({
 
 export default function SetupWizard() {
   const classes = useStyles();
-  const [state, dispatch ] = useReducer(sWReducer, initialReducerState);
+  const [state, dispatch] = useReducer(sWReducer, initialReducerState);
 
   // set server check on mount
   useEffect(() => {
@@ -48,7 +48,7 @@ export default function SetupWizard() {
   // start/stop server check
   useEffect(() => {
     if(state.intervals.serverCheck && !state.intervals.serverCheck.isRunning) {
-      state.intervals.serverCheck.start();
+      state.intervals.serverCheck.start(true);
     }
 
     return () => {
@@ -69,6 +69,10 @@ export default function SetupWizard() {
       refreshRepoState(dispatch);
     }
   },[state.jsonFilesState.lastRepoUpdate, state.serverState]);
+
+  useEffect(() => {
+    console.log("rerendered");
+  })
 
   const menus: MenuInt[] = [
     {

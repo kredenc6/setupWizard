@@ -3,7 +3,7 @@ import jsonObjFrame from "../initialStates/jsonObjFrame";
 import { prefixValue } from "../components/sharedComponents/VerifyUrlTextField";
 import determineWebPrefix from "../components/SelectedModule/helpFunctions/determineWebPrefix";
 import { createMessage, placeNewMessage } from "./messageHandlingFunctions";
-import { JsonResultObj, JsonResultObjFillIns, MessageProps, ServerIs, SwState, UserInput } from "../interfaces/interfaces";
+import { JsonResultObj, JsonResultObjFillIns, MessageProps, ServerIs, SwState, UserInput, UserInputModuleKeys } from "../interfaces/interfaces";
 import { FilesState } from "../interfaces/fileInterfaces";
 import Interval from "../classes/Interval";
 
@@ -21,6 +21,7 @@ export type SWActions =
   ActionWithPayload<"addMessage", (MessageProps | null)> |
   ActionWithPayload<"changeJson", Partial<JsonResultObj>> |
   ActionWithPayload<"changeJsonFilesState", Partial<FilesState>> |
+  ActionWithPayload<"changeSelectedModules", { isSelected: boolean, moduleName: UserInputModuleKeys }> |
   ActionWithPayload<"changeTopic", string> |
   ActionWithPayload<"changeUserInput", Partial<UserInput>> |
   ActionWithPayload<"selectJson", JsonResultObj> |
@@ -47,6 +48,10 @@ const sWReducer: Reducer<SwState, SWActions> = (state, action) => {
     case "changeJsonFilesState": {
       const newjsonFilesState = { ...state["jsonFilesState"], ...action.payload };
       return { ...state, jsonFilesState: newjsonFilesState };
+    }
+
+    case "changeSelectedModules": {
+      return handleSelectedComponentsChange(state, action.payload.isSelected, action.payload.moduleName);
     }
 
     case "changeTopic": {
@@ -83,6 +88,7 @@ const sWReducer: Reducer<SwState, SWActions> = (state, action) => {
     }
 
     case "setServerState": {
+      if(state.serverState === action.payload) return state;
       return { ...state, serverState: action.payload };
     }
 
@@ -178,3 +184,26 @@ export function fillInTopicValue(jsonObj: JsonResultObj, modules: UserInput["mod
     this[moduleName] = prePrepedModules[moduleName];
   }
 }
+
+function handleSelectedComponentsChange(state: SwState, isSelected: boolean, moduleName: UserInputModuleKeys) {
+  const { jsonObj, userInput } = state;
+  //adjust userInput
+  const updatedModules = { ...userInput.modules, [moduleName]: { ...userInput.modules[moduleName], selected: isSelected } };
+  const updatedUserInput = { ...userInput, modules: updatedModules };
+  
+  //adjust jsonObj
+  const visible_components = Object.entries(updatedModules)
+  .filter(([_, module]) => module.selected)
+  .map(([key, _]) => key) as UserInputModuleKeys[];
+
+  let newJsonObj = { ...jsonObj, visible_components };
+
+  if(state.userInput.setAlsoAsChannelValues) {
+    const adjustedJsonObj = { ...jsonObj, visible_components }
+    const filledInModules = fillInTopicValue(adjustedJsonObj, userInput.modules, jsonObj.app_topic, true);
+    
+    newJsonObj = { ...newJsonObj, ...filledInModules };
+  }
+
+  return { ...state, userInput: updatedUserInput, jsonObj: newJsonObj };
+};
