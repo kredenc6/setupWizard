@@ -4,10 +4,11 @@ import SimpleBar from "simplebar-react";
 import ObjectDataComponent from "../../SelectedModule/ObjectDataComponent/ObjectDataComponent";
 import Submenu from "../../sharedComponents/Submenu";
 import { JsonObjKey, JsonResultObj } from "../../../interfaces/interfaces";
+import { SWActions } from "../../../sWReducer/sWReducer";
 import "simplebar/dist/simplebar.min.css";
 
 interface Props {
-  handleJsonChange: (key: JsonObjKey, changedModule: JsonResultObj[JsonObjKey]) => void;
+  dispatch: React.Dispatch<SWActions>;
   isVerificationEnabled: boolean;
   restJson: [string, any][];
 };
@@ -26,8 +27,13 @@ const useStyles = makeStyles(({ spacing }) =>
   })
 );
 
-export default function RestJsonPropsComponent ({ handleJsonChange, isVerificationEnabled, restJson }: Props) {
+export default function RestJsonPropsComponent ({ dispatch, isVerificationEnabled, restJson }: Props) {
   const classes = useStyles();
+
+  const handleJsonChange = (key: JsonObjKey, changedModule: JsonResultObj[JsonObjKey]) => {
+    dispatch({ type: "changeJson", payload: { [key]: changedModule } });
+  };
+
   const handleGroupedPropsChange = (_: object, key: string, value: any) => {
     handleJsonChange(key as JsonObjKey, value);
   };

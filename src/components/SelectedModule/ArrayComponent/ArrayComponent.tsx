@@ -1,13 +1,13 @@
 import React from "react";
 import StringArrayInput from "../StringArrayInput/StringArrayInput";
 import { makeStyles } from "@material-ui/core/styles";
-import { JsonObjModule, Module } from "../../../interfaces/interfaces";
+import { JsonObjModule, JsonResultObj, Module } from "../../../interfaces/interfaces";
 
 interface Props {
   array: string[];
   handleJsonChange: (changedModule: JsonObjModule) => void;
   isVerificationEnabled: boolean;
-  label: string;
+  label: keyof JsonResultObj;
   moduleSettings: Module | undefined;
 };
 

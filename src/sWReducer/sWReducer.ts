@@ -7,7 +7,6 @@ import { JsonResultObj, JsonResultObjFillIns, MessageProps, ServerIs, SwState, U
 import { FilesState } from "../interfaces/fileInterfaces";
 import Interval from "../classes/Interval";
 
-
 interface Action<S extends string> {
   type: S;
 }
@@ -47,16 +46,19 @@ const sWReducer: Reducer<SwState, SWActions> = (state, action) => {
     
     case "changeJsonFilesState": {
       const newjsonFilesState = { ...state["jsonFilesState"], ...action.payload };
-      return { ...state, jsonFilesState: newjsonFilesState };
+      return  { ...state, jsonFilesState: newjsonFilesState };
     }
 
     case "changeSelectedModules": {
-      return handleSelectedComponentsChange(state, action.payload.isSelected, action.payload.moduleName);
+      const updatedState = handleSelectedComponentsChange(state, action.payload.isSelected, action.payload.moduleName);
+      const isNextStepAllowed = allowNextStepFromMainMenu(updatedState.userInput.modules, updatedState.jsonObj.app_topic);
+      return { ...updatedState, isNextStepAllowed };
     }
 
     case "changeTopic": {
       const updatedState = handleTopicChange(action.payload, state);
-      return updatedState;
+      const isNextStepAllowed = allowNextStepFromMainMenu(updatedState.userInput.modules, updatedState.jsonObj.app_topic);
+      return { ...updatedState, isNextStepAllowed };
     }
 
     case "changeUserInput": {
@@ -71,7 +73,8 @@ const sWReducer: Reducer<SwState, SWActions> = (state, action) => {
 
     case "selectJson": {
       const updatedState = handleJsonSelection(action.payload, state);
-      return updatedState;
+      const isNextStepAllowed = allowNextStepFromMainMenu(updatedState.userInput.modules, updatedState.jsonObj.app_topic);
+      return { ...updatedState, isNextStepAllowed };
     }
 
     case "setActiveStep": {
@@ -207,3 +210,16 @@ function handleSelectedComponentsChange(state: SwState, isSelected: boolean, mod
 
   return { ...state, userInput: updatedUserInput, jsonObj: newJsonObj };
 };
+
+function allowNextStepFromMainMenu(modules: UserInput["modules"], appTopic: string) {
+  //BUG? it's possible to have module prop "shwow_in_app" value true and the "visible_components" json prop
+  // without the module
+  const isAtLeastOneModuleSelected = (modules: UserInput["modules"]) => {
+    return Object.entries(modules).some(([_, module]) => {
+      return module.selected;
+    });
+  };
+  const isAppTopicValid = (appTopic: string) => appTopic.trim().length >= 2;
+  
+  return isAtLeastOneModuleSelected(modules) && isAppTopicValid(appTopic);
+}

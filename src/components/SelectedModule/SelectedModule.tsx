@@ -21,7 +21,7 @@ const isArrObjectArr = (arr: any[]) => {
   return false;
 };
 
-export default function SelectedInput({ dispatch, jsonModuleObj, moduleName, moduleSettings, serverState }: Props) {
+const SelectedInput = React.memo(({ dispatch, jsonModuleObj, moduleName, moduleSettings, serverState }: Props) => {
   const handleJsonChange = (changedModule: JsonObjModule) => {
     dispatch({ type: "changeJson", payload: { [moduleName]: changedModule } });
   };
@@ -32,7 +32,7 @@ export default function SelectedInput({ dispatch, jsonModuleObj, moduleName, mod
   useEffect(() => {
     dispatch({ type: "setIsNextStepAllowed", payload: true });
   },[dispatch]);
-    
+
   return (
     <Submenu
       component={
@@ -59,4 +59,6 @@ export default function SelectedInput({ dispatch, jsonModuleObj, moduleName, mod
       }
       heading={capitalizeFirstLetter(moduleName)} />
   );
-};
+});
+
+export default SelectedInput;

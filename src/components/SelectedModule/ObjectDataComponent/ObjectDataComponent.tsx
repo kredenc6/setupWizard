@@ -97,5 +97,5 @@ function turnObjToFormComponents
       );
     }
   }
-    return { TextFieldComponents, CheckboxComponents, StringArrayInputComponents };
+  return { TextFieldComponents, CheckboxComponents, StringArrayInputComponents };
 }

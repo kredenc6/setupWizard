@@ -25,7 +25,6 @@ const useStyles = makeStyles(({ spacing }) =>
       padding: spacing(1),
     },
     jsonWrapper: {
-      // width: "auto",
       width: ({ jsonCharWidth }: { jsonCharWidth: number }) => `${jsonCharWidth * 5}px`,
       padding: spacing(1)
     }
@@ -50,7 +49,11 @@ export default function GitStateReport({ dispatch, jsonFilesState, serverState }
 
   return(
     <>
-      <Badge badgeContent={localRepoState?.ahead || localRepoState?.behind ? "!" : 0} color="error">
+      <Badge
+        badgeContent={localRepoState?.ahead || localRepoState?.behind ? "!" : 0}
+        color="error"
+        invisible={serverState === "offline"}
+      >
         <Button
           color="primary"
           children="git state"

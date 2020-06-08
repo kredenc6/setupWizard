@@ -37,6 +37,7 @@ export default function MenuSelectedModules({ dispatch, jsonObj, modules, server
   .map(([key, _]) => <SelectedModule
     dispatch={dispatch}
     jsonModuleObj={jsonObj[key as UserInputModuleKeys] as unknown as JsonObjModule}
+    // jsonModuleObj={{ [key as UserInputModuleKeys]: jsonObj[key as UserInputModuleKeys] }}
     key={key}
     moduleSettings={modules[key as UserInputModuleKeys]}
     moduleName={key as UserInputModuleKeys}

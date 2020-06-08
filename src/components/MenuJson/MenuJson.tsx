@@ -9,11 +9,10 @@ import PromptCommitMessage from "../sharedComponents/GitStateReport/GitActions/P
 import ClearJsonBtt from "./ClearJsonBtt/ClearJsonBtt";
 import { downloadJson, handleSaveToRepo, normalizeJsonFileName } from "../../fileFunctions/fileFunctions";
 import { handleCommit, handlePush } from "../../gitFunctions/gitFunctions";
-import { JsonObjKey, JsonResultObj, ServerIs, UserInput } from "../../interfaces/interfaces";
+import { JsonResultObj, ServerIs, UserInput } from "../../interfaces/interfaces";
 import { GitOpt } from "../../interfaces/gitInterfaces";
 import { FilesState } from "../../interfaces/fileInterfaces";
 import { SWActions } from "../../sWReducer/sWReducer";
-
 
 interface Props {
   dispatch: React.Dispatch<SWActions>;
@@ -61,10 +60,6 @@ export default function MenuJson({ dispatch, jsonFilesState, jsonObj, serverStat
   });
   const fileName = normalizeJsonFileName(`${jsonObj.app_topic}.json`);
 
-  const handleJsonChange = (key: JsonObjKey, changedModule: JsonResultObj[JsonObjKey]) => {
-    dispatch({ type: "changeJson", payload: { [key]: changedModule } });
-  };
-
   useEffect(() => {
     if(jsonFilesState.localRepoState?.conflicted.length) {
       setGitOptions({ commit: false, push: false });
@@ -91,7 +86,7 @@ export default function MenuJson({ dispatch, jsonFilesState, jsonObj, serverStat
         setOpen={setOpenPrompt}
         value={commitMessage} />
       <RestJsonPropsComponent
-        handleJsonChange={handleJsonChange}
+        dispatch={dispatch}
         isVerificationEnabled={serverState === "online" ? true : false}
         restJson={restJsonProps} />
       <div className={classes.buttonsWrapper}>

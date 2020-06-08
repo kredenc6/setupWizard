@@ -9,7 +9,7 @@ const MIN_LENGTH_FOR_VERIF = 3;
 
 interface Props {
   handleTextFieldChange: (value: string) => void;
-  isNextInput? : boolean;
+  isNextInput?: boolean;
   isVerificationEnabled: boolean;
   webPrefix?: string;
 };

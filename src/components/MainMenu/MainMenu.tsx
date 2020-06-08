@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import AvailableJsons from "../AvailableJsons/AvailableJsons";
 import MenuSelectModules from "../MenuSelectModules/MenuSelectModules";
@@ -50,14 +50,6 @@ const useStyles = makeStyles(theme =>
   })
 );
 
-const isAtLeastOneModuleSelected = (modules: UserInput["modules"]) => {
-  return Object.entries(modules).some(([_, module]) => {
-    return module.selected;
-  });
-};
-
-const isAppTopicValid = (appTopic: string) => appTopic.trim().length >= 2;
-
 export default function MainMenu(props: Props) {
   const [isJsonSelectionOpen, setIsJsonSelectionOpen] = useState(false);
   const {
@@ -70,13 +62,6 @@ export default function MainMenu(props: Props) {
     userInput
   } = props;
   const classes = useStyles();
-
-  //BUG? it's possible to have module prop "shwow_in_app" value true and the "visible_components" json prop
-  // without the module
-  useEffect(() => {
-    const isAllowed = isAtLeastOneModuleSelected(userInput.modules) && isAppTopicValid(jsonObj.app_topic);
-    dispatch({ type: "setIsNextStepAllowed", payload: isAllowed });
-  },[dispatch, jsonObj, userInput]);
 
   return (
     <section className={classes.mainMenu}>

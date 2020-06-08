@@ -54,4 +54,4 @@ export default function SaveButton({ gitOptions, fileStatus, handleClick, repoSt
         setGitOptions={setGitOptions} />
     </Box>
   );
-};
+}
