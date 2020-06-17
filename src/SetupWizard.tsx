@@ -70,10 +70,6 @@ export default function SetupWizard() {
     }
   },[state.jsonFilesState.lastRepoUpdate, state.serverState]);
 
-  useEffect(() => {
-    console.log("rerendered");
-  })
-
   const menus: MenuInt[] = [
     {
       label: "Main menu",

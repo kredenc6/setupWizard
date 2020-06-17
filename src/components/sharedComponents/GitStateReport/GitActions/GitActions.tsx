@@ -8,7 +8,7 @@ import { handleCommit, handleMerge, handlePush, refreshRepoState } from "../../.
 import { ServerIs } from "../../../../interfaces/interfaces";
 import { StatusResult } from "../../../../interfaces/simpleGit";
 import { SWActions } from "../../../../sWReducer/sWReducer";
-import { FilesState } from "../../../../interfaces/fileInterfaces";
+import { FilesState, FileStatus } from "../../../../interfaces/fileInterfaces";
 
 interface Props {
   dispatch: React.Dispatch<SWActions>;
@@ -19,7 +19,8 @@ interface Props {
 const OPTIONS = ["commit", "push", "merge", "merge and push"];
 
 export default function SplitButton({ dispatch, jsonFilesState, serverState }: Props) {
-  const localRepoState = jsonFilesState.localRepoState as StatusResult;
+  const localRepoState = jsonFilesState.localRepoState!;
+  const fileStatus = jsonFilesState.fileStatus;
   const [openButtonGroup, setOpenButtonGroup] = useState(false);
   const [openCommitPrompt, setOpenCommitPrompt] = useState(false);
   const [commitMessage, setCommitMessage] = useState("");
@@ -29,16 +30,28 @@ export default function SplitButton({ dispatch, jsonFilesState, serverState }: P
 
   const handleClick = async () => {
     if(OPTIONS[selectedIndex] === "commit") {
-      await handleCommit({ commitMessage, dispatch, localRepoState });
+      dispatch({ type: "changeJsonFilesState", payload: { fileStatus: "being commited" } });
+      const fileStatus = await handleCommit({ commitMessage, dispatch, localRepoState });
+      dispatch({ type: "changeJsonFilesState", payload: { fileStatus } });
     }
+
     if(OPTIONS[selectedIndex] === "push") {
-      await handlePush(dispatch);
+      dispatch({ type: "changeJsonFilesState", payload: { fileStatus: "being pushed" } });
+      const fileStatus = await handlePush(dispatch);
+      dispatch({ type: "changeJsonFilesState", payload: { fileStatus } });
     }
+
     if(OPTIONS[selectedIndex] === "merge") {
+      // TODO add and implement merge fileStatus for better interactivity 
       await handleMerge(dispatch);
     }
+
     if(OPTIONS[selectedIndex] === "merge and push") {
-      if( await handleMerge(dispatch) ) await handlePush(dispatch);
+      if( await handleMerge(dispatch) ) {
+        dispatch({ type: "changeJsonFilesState", payload: { fileStatus: "being pushed" } });
+        const fileStatus = await handlePush(dispatch);
+        dispatch({ type: "changeJsonFilesState", payload: { fileStatus } });
+      }
     }
   };
   
@@ -70,7 +83,12 @@ export default function SplitButton({ dispatch, jsonFilesState, serverState }: P
         sendCommit={() => handleClick()}
         value={commitMessage} />
       <Grid item xs={12}>
-        <ButtonGroup color="primary" disabled={isButtonGroupDisabled(localRepoState)} ref={anchorRef} variant="contained">
+        <ButtonGroup
+          color="primary"
+          disabled={isButtonGroupDisabled(localRepoState, fileStatus)}
+          ref={anchorRef} 
+          variant="contained"
+        >
           {conflicted ?
               <Button>Conflicted!</Button>
             :
@@ -148,7 +166,7 @@ function isOptionDisabled(option: string, localRepoState: StatusResult) {
   return false;
 }
 
-function isButtonGroupDisabled(localRepoState: StatusResult) {
+function isButtonGroupDisabled(localRepoState: StatusResult, fileStatus: FileStatus) {
   return !Boolean(
     localRepoState.ahead +
     localRepoState.behind +
@@ -158,7 +176,8 @@ function isButtonGroupDisabled(localRepoState: StatusResult) {
     localRepoState.modified.length +
     localRepoState.renamed.length +
     localRepoState.staged.length
-  ) || Boolean(localRepoState.conflicted.length);
+  ) || Boolean(localRepoState.conflicted.length)
+    || fileStatus !== "ready";
 }
 
 function isCommitBttDisabled(localRepoState: StatusResult) {

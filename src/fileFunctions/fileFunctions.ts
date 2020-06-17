@@ -26,7 +26,6 @@ export const handleSaveToRepo = async (
   });
 
   await refreshRepoState(dispatch);
-  
   if(shouldCommit) {
     setOpenPrompt(true);
     return "being commited";

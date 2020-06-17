@@ -1,7 +1,7 @@
 import { createMessage } from "../sWReducer/messageHandlingFunctions";
 import { MergeSummary, StatusResult } from "../interfaces/simpleGit";
 import { LocalStorageRepoState, FileStatus } from "../interfaces/fileInterfaces";
-import { CommitResponse, PushResponse, GitOpt } from "../interfaces/gitInterfaces";
+import { CommitResponse, GitOpt, PushResponse } from "../interfaces/gitInterfaces";
 import { SWActions } from "../sWReducer/sWReducer";
 import { REMOTE_REPO_CHECK_INTERVAL, SERVER_ADDRESS } from "../initialStates/constants";
 
@@ -41,7 +41,7 @@ export const handleCommit =
   const messageText = commitResponse ? `${commitResponse.commitedFilesCount} file(s) commited.` : "Commit failed.";
   dispatch({ type: "addMessage", payload: createMessage(messageType, messageText) });
   
-  refreshRepoState(dispatch);
+  await refreshRepoState(dispatch);
   
   if(commitResponse && gitOptions?.push) {
     return "being pushed";
@@ -59,10 +59,14 @@ export const handlePush = async (dispatch: React.Dispatch<SWActions>): Promise<F
   return "ready";
 };
 
-export async function refreshRepoState(dispatch: React.Dispatch<SWActions>) {
-  return fetchRepoStatus(SERVER_ADDRESS)
+export async function refreshRepoState(dispatch: React.Dispatch<SWActions>, autoMerge=true) {
+  await fetchRepoStatus(SERVER_ADDRESS)
     .then(state => {
       if(state) {
+        if(autoMerge && state.behind) {
+          handleMerge(dispatch);
+          return;
+        }
         const timeStamp = Date.now();
         localStorage.setItem("repoState", JSON.stringify({ timeStamp, state }));
         dispatch({ type: "changeJsonFilesState", payload: { localRepoState: state, lastRepoUpdate: timeStamp } });

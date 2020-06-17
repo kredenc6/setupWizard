@@ -1,7 +1,7 @@
 import { JsonResultObj } from "./interfaces";
 import { StatusResult } from "./simpleGit";
 
-export type FileStatus = "ready" | "being commited" | "being pushed";
+export type FileStatus = "ready" | "being saved" | "being commited" | "being pushed";
 
 export interface FilesState {
   lastRepoUpdate: number;

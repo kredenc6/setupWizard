@@ -50,9 +50,11 @@ export default function GitStateReport({ dispatch, jsonFilesState, serverState }
   return(
     <>
       <Badge
-        badgeContent={localRepoState?.ahead || localRepoState?.behind ? "!" : 0}
+        badgeContent="!"
         color="error"
-        invisible={serverState === "offline"}
+        invisible={
+          !(localRepoState?.ahead || localRepoState?.behind) ||
+          serverState === "offline"}
       >
         <Button
           color="primary"

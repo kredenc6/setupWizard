@@ -15,7 +15,7 @@ export default function LastUpdate({ timeStamp }: Props) {
   const minutes = `0${lastUpdate.getMinutes()}`.slice(-2);
 
   return (
-    <Typography>
+    <Typography align="center">
       {`Last repo update: ${date}. ${MONTHS[month]} ${hours}:${minutes}`}
     </Typography>
   );

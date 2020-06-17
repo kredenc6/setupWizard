@@ -75,11 +75,10 @@ export default function MenuJson({ dispatch, jsonFilesState, jsonObj, serverStat
         handleChange={(value: string) => setCommitMessage(value)}
         open={openPrompt}
         sendCommit={async () => {
-          dispatch({
-            type: "changeJsonFilesState",
-            payload: { fileStatus: await handleCommit({ dispatch, commitMessage, localRepoState, gitOptions }) }
-          });
-          if(gitOptions.push) {
+          const fileStatus = await handleCommit({ dispatch, commitMessage, localRepoState, gitOptions });
+          dispatch({ type: "changeJsonFilesState", payload: { fileStatus } });
+          
+          if(gitOptions.push && fileStatus === "being pushed") {
             dispatch({ type: "changeJsonFilesState", payload: { fileStatus: await handlePush(dispatch) } });
           }
         }}
@@ -101,12 +100,13 @@ export default function MenuJson({ dispatch, jsonFilesState, jsonObj, serverStat
         <SaveToRepoBtt
           gitOptions={gitOptions}
           fileStatus={fileStatus}
-          handleClick={async () =>
+          handleClick={async () => {
+            dispatch({ type: "changeJsonFilesState", payload: { fileStatus: "being saved" } });
             dispatch({
               type: "changeJsonFilesState",
               payload: { fileStatus: await handleSaveToRepo(gitOptions.commit, dispatch, jsonObj, setOpenPrompt) }
             })
-          }
+          }}
           fileName={fileName}
           repoState={localRepoState}
           serverState={serverState}
