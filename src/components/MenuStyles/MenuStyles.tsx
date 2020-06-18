@@ -24,9 +24,6 @@ const useStyles = makeStyles({
   },
   left: {
     flexGrow: 1,
-    display: "flex",
-    flexFlow: "row wrap",
-    justifyContent: "space-around"
   },
   right: {
     width: "600px",
@@ -34,8 +31,12 @@ const useStyles = makeStyles({
     gridTemplateRows: "min-content auto min-content 280px",
     overflow: "hidden"
   },
-  userInterface: {
-    alignSelf: "flex-start"
+  leftContent: {
+    height: "100%",
+    display: "flex",
+    flexFlow: "column nowrap",
+    justifyContent: "space-evenly",
+    alignItems: "center"
   }
 });
 
@@ -58,7 +59,7 @@ export default function MenuStyles( { dispatch, schemeObj, selectedScheme }: Pro
       const newColorScheme = {
         ...schemeObj,
         textColorOverride: { ...schemeObj.textColorOverride, [selectedPalette]: color },
-        name: "cutom"
+        name: "custom"
        };
       const ui_colors = createJsonSchemeObj(newColorScheme);
       dispatch({ type: "changeUserInput", payload: { schemeObj: newColorScheme } });
@@ -75,8 +76,10 @@ export default function MenuStyles( { dispatch, schemeObj, selectedScheme }: Pro
     <section className={classes.menuStyles}>
       <div className={classes.left}>
         <ColorToolHeading text="user interfaces" />
-        <PresetSchemes dispatch={dispatch} selectedScheme={selectedScheme} />
-        <UI1 className={classes.userInterface} schemeObj={schemeObj} />
+        <div className={classes.leftContent}>
+          <PresetSchemes dispatch={dispatch} selectedScheme={selectedScheme} />
+          <UI1 schemeObj={schemeObj} />
+        </div>
       </div>
       <div className={classes.right}>
         <ColorToolHeading text="color palette" />
