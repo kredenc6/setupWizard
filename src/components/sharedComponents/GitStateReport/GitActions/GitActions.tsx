@@ -110,7 +110,7 @@ export default function SplitButton({ dispatch, jsonFilesState, serverState }: P
             <ArrowDropDownIcon />
           </Button>
         </ButtonGroup>
-        <Tooltip arrow title="refresh">
+        <Tooltip arrow placement="right" title="refresh">
           <IconButton
             color="secondary"
             disabled={serverState === "offline"}

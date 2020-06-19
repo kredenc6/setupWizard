@@ -44,7 +44,6 @@ export const initialUserInput: UserInput = {
     },
     twitter: {
       selected: false,
-      VERIFY_BY_PROXY: ["url"],
       WEB_PREFIX: ["https://www.twitter.com/"]
     },
     videos: {

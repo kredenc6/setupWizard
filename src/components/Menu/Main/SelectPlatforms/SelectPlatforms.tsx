@@ -1,5 +1,5 @@
 import React from "react";
-import { Checkbox, FormControlLabel, FormGroup } from "@material-ui/core";
+import { Checkbox, FormControlLabel, FormGroup, Tooltip } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import sortObjEntriesAlphabetically from "../../../../miscellaneous/sortObjEntriesAlphabetically";
 import { UserInput, UserInputPlatformKeys } from "../../../../interfaces/variousInterfaces";
@@ -23,24 +23,40 @@ const SelectPlatforms = React.memo(({ dispatch, platforms }: Props) => {
   const classes = useStyles();
 
   const FormLabelComponents = sortObjEntriesAlphabetically(Object.entries(platforms))
-    .map(([key, platform]) => (
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={platform.selected}
-            onChange={e => {
-              dispatch({
-                type: "changeSelectedPlatforms",
-                payload: {
-                  isSelected: e.target.checked,
-                  platformName: e.target.name as UserInputPlatformKeys
-                }
-              })
-            }}
-            name={key} />}
-        key={key}
-        label={key} />
-    )
+    .map(([key, platform]) => {
+      if(key === "events") {
+        return (
+          <Tooltip arrow placement="right" title="not yet supported">
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={false}
+                  disabled={true}
+                  name={key} />}
+              key={key}
+              label={key} />
+          </Tooltip>
+        );
+      }
+      return (
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={platform.selected}
+              onChange={e => {
+                dispatch({
+                  type: "changeSelectedPlatforms",
+                  payload: {
+                    isSelected: e.target.checked,
+                    platformName: e.target.name as UserInputPlatformKeys
+                  }
+                })
+              }}
+              name={key} />}
+          key={key}
+          label={key} />
+      );
+    }
   );
 
   return(
