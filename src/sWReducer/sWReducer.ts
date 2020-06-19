@@ -1,7 +1,7 @@
 import { Reducer } from "react";
 import jsonObjFrame from "../initialStates/jsonObjFrame";
 import { prefixValue } from "../components/sharedComponents/VerifyUrlTextField";
-import determineWebPrefix from "../components/SelectedModule/helpFunctions/determineWebPrefix";
+import determineWebPrefix from "../components/Menu/SelectedModules/SelectedModule/helpFunctions/determineWebPrefix";
 import { createMessage, placeNewMessage } from "./messageHandlingFunctions";
 import { JsonResultObj, JsonResultObjFillIns, MessageProps, ServerIs, SwState, UserInput, UserInputModuleKeys } from "../interfaces/interfaces";
 import { FilesState } from "../interfaces/fileInterfaces";

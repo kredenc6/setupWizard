@@ -2,8 +2,7 @@ import React from "react";
 import { Paper } from "@material-ui/core";
 import { createStyles, makeStyles } from "@material-ui/core";
 import SimpleBar from "simplebar-react";
-import "simplebar/dist/simplebar.min.css";
-
+import "../../../node_modules/simplebar/dist/simplebar.min.css";
 interface Props {
   classes: {
     jsonWrapper: string;

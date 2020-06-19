@@ -2,10 +2,10 @@ import React, { useEffect, useReducer } from 'react';
 import { CssBaseline } from "@material-ui/core";
 import { makeStyles, ThemeProvider } from "@material-ui/core/styles";
 import Menu from "./components/Menu/Menu";
-import MainMenu from "./components/MainMenu/MainMenu";
-import MenuStyles from "./components/MenuStyles/MenuStyles";
-import MenuSelectedModules from "./components/MenuSelectedModules/MenuSelectedModules";
-import MenuJson from "./components/MenuJson/MenuJson";
+import Main from "./components/Menu/Main/Main";
+import Styles from "./components/Menu/Styles/Styles";
+import SelectedModules from "./components/Menu/SelectedModules/SelectedModules";
+import Json from "./components/Menu/Json/Json";
 import SetupStepper from "./components/SetupStepper/SetupStepper";
 import MessageSnackBar from "./components/sharedComponents/MessageSnackBar";
 import theme from "./theme/theme";
@@ -74,7 +74,7 @@ export default function SetupWizard() {
     {
       label: "Main menu",
       component: <Menu
-        component={<MainMenu
+        component={<Main
           dispatch={dispatch}
           jsonFilesState={state.jsonFilesState}
           jsonObj={state.jsonObj}
@@ -88,7 +88,7 @@ export default function SetupWizard() {
     },
     {
       label: "Color scheme",
-      component: <MenuStyles
+      component: <Styles
         dispatch={dispatch}
         schemeObj={state.userInput.schemeObj}
         selectedScheme={state.userInput.schemeObj.name} />
@@ -96,7 +96,7 @@ export default function SetupWizard() {
     {
       label: "Selected modules",
       component: <Menu
-        component={<MenuSelectedModules
+        component={<SelectedModules
           dispatch={dispatch}
           jsonObj={state.jsonObj}
           modules={state.userInput.modules}
@@ -108,7 +108,7 @@ export default function SetupWizard() {
     {
       label: "config.json",
       component: <Menu
-        component={<MenuJson
+        component={<Json
           dispatch={dispatch}
           jsonFilesState={state.jsonFilesState}
           jsonObj={state.jsonObj}

@@ -9,7 +9,7 @@ import { normalizeJsonFileName } from "../../fileFunctions/fileFunctions";
 import { JsonResultObj } from "../../interfaces/interfaces";
 import { StatusResult } from "../../interfaces/simpleGit";
 import { FilesState } from "../../interfaces/fileInterfaces";
-import "simplebar/dist/simplebar.min.css";
+import "../../../node_modules/simplebar/dist/simplebar.min.css";
 
 interface Props {
   activeJsonObj: JsonResultObj;
