@@ -18,7 +18,7 @@ interface ActionWithPayload<S extends string, P> extends Action<S> {
 
 export type SWActions = 
   Action<"messageDelivered"> |
-  ActionWithPayload<"addMessage", (MessageProps | null)> |
+  ActionWithPayload<"addMessage", (MessageProps)> |
   ActionWithPayload<"changeJson", Partial<JsonResultObj>> |
   ActionWithPayload<"changeJsonFilesState", Partial<FilesState>> |
   ActionWithPayload<"changeSelectedModules", { isSelected: boolean, moduleName: UserInputModuleKeys }> |
@@ -36,7 +36,6 @@ const sWReducer: Reducer<SwState, SWActions> = (state, action) => {
   switch(action.type) {
     
     case "addMessage": {
-      if(!action.payload) return state;
       return { ...state, ...placeNewMessage(action.payload, state) };
     }
 

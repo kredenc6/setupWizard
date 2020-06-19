@@ -58,8 +58,9 @@ export interface SwState {
   intervals: IntervalsObj;
 };
 
+export type MessageType = AlertProps["severity"];
+
 export interface MessageProps {
   text: string;
-  topic: string;
-  type: AlertProps["severity"];
+  type: MessageType;
 };

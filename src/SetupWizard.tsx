@@ -60,7 +60,11 @@ export default function SetupWizard() {
   
   // notify of changed server status
   useEffect(() => {
-    dispatch({ type: "addMessage", payload: createMessage("server", state.serverState) });
+    if(state.serverState === "online") {
+      dispatch({ type: "addMessage", payload: createMessage("info", "Server is online.") });
+    } else {
+      dispatch({ type: "addMessage", payload: createMessage("warning", "Server is offline.") });
+    }
   },[state.serverState]);
   
   // refresh repo status

@@ -14,9 +14,9 @@ interface HandleCommitProps {
 
 export const handleMerge = async (dispatch: React.Dispatch<SWActions>) => {
   const mergeSummary = await mergeRemoteRepo(SERVER_ADDRESS);
-  const messageTopic = mergeSummary ? "success" : "warning";
+  const messageType = mergeSummary ? "success" : "warning";
   const messageText = mergeSummary? "Merge successful." : "Merge failed.";
-  dispatch({ type: "addMessage", payload: createMessage(messageTopic, messageText) });
+  dispatch({ type: "addMessage", payload: createMessage(messageType, messageText) });
   refreshRepoState(dispatch);
   return mergeSummary;
 };
