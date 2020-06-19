@@ -1,4 +1,4 @@
-import { JsonResultObj } from "./interfaces";
+import { JsonResultObj } from "./jsonInterfaces";
 import { StatusResult } from "./simpleGit";
 
 export type FileStatus = "ready" | "being saved" | "being commited" | "being pushed";

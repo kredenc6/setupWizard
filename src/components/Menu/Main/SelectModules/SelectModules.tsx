@@ -2,7 +2,7 @@ import React from "react";
 import { Checkbox, FormControlLabel, FormGroup } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import sortObjEntriesAlphabetically from "../../../../miscellaneous/sortObjEntriesAlphabetically";
-import { UserInput, UserInputModuleKeys } from "../../../../interfaces/interfaces";
+import { UserInput, UserInputModuleKeys } from "../../../../interfaces/variousInterfaces";
 import { SWActions } from "../../../../sWReducer/sWReducer";
 
 interface Props {

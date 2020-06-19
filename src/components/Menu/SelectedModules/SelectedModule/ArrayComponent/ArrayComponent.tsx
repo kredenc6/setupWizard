@@ -1,7 +1,8 @@
 import React from "react";
 import StringArrayInput from "../StringArrayInput/StringArrayInput";
 import { makeStyles } from "@material-ui/core/styles";
-import { JsonObjModule, JsonResultObj, Module } from "../../../../../interfaces/interfaces";
+import { Module } from "../../../../../interfaces/variousInterfaces";
+import { JsonObjModule, JsonResultObj } from "../../../../../interfaces/jsonInterfaces";
 
 interface Props {
   array: string[];

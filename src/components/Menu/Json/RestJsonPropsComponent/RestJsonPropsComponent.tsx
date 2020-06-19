@@ -3,7 +3,7 @@ import { createStyles, makeStyles } from "@material-ui/core/styles";
 import SimpleBar from "simplebar-react";
 import ObjectDataComponent from "../../../Menu/SelectedModules/SelectedModule/ObjectDataComponent/ObjectDataComponent";
 import Submenu from "../../../sharedComponents/Submenu";
-import { JsonObjKey, JsonResultObj } from "../../../../interfaces/interfaces";
+import { JsonObjKey, JsonResultObj } from "../../../../interfaces/jsonInterfaces";
 import { SWActions } from "../../../../sWReducer/sWReducer";
 import "simplebar/dist/simplebar.min.css";
 

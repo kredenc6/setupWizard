@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { AppBar, Box, Tab, Tabs, Typography } from "@material-ui/core";
 import ObjectDataComponent from "../ObjectDataComponent/ObjectDataComponent";
-import { JsonObjModule, Module } from "../../../../../interfaces/interfaces";
+import { Module } from "../../../../../interfaces/variousInterfaces";
+import { JsonObjModule } from "../../../../../interfaces/jsonInterfaces";
 
 interface Props {
   dataArr: any[];

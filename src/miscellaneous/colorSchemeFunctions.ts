@@ -1,7 +1,7 @@
 import { darken, lighten, rgbToHex, Theme } from "@material-ui/core/styles";
 import rgbaToHex from "../miscellaneous/rgbaToHex";
 import theme from "../theme/theme";
-import { Palette, JsonScheme, ColorSchemeInt } from "../interfaces/interfaces";
+import { Palette, JsonColorScheme, ColorSchemeInt } from "../interfaces/colorSchemeInterfaces";
 const { getContrastText } = theme.palette;
 
 const normalizeColor = (color: string) => {
@@ -33,14 +33,14 @@ export const createPaletteFromColor = (background: string): Palette => {
   };
 };
 
-export const createPaletteFromPresetScheme = (presetScheme: JsonScheme, type: "primary" | "secondary"): Palette => {
-    const mainColor = presetScheme[`${type}Color` as keyof JsonScheme];
+export const createPaletteFromPresetScheme = (presetScheme: JsonColorScheme, type: "primary" | "secondary"): Palette => {
+    const mainColor = presetScheme[`${type}Color` as keyof JsonColorScheme];
     
     if(!mainColor) throw new Error(`${type}Color property cannot be an empty string.`);
 
-    const lightColor     = presetScheme[`${type}LightColor` as keyof JsonScheme] || rgbToHex( lighten(mainColor, 0.2) );
-    const darkColor      = presetScheme[`${type}DarkColor`  as keyof JsonScheme] || rgbToHex( darken(mainColor,  0.3) );
-    const mainTextColor  = presetScheme[`${type}TextColor`  as keyof JsonScheme] || getContrastText(mainColor);
+    const lightColor     = presetScheme[`${type}LightColor` as keyof JsonColorScheme] || rgbToHex( lighten(mainColor, 0.2) );
+    const darkColor      = presetScheme[`${type}DarkColor`  as keyof JsonColorScheme] || rgbToHex( darken(mainColor,  0.3) );
+    const mainTextColor  = presetScheme[`${type}TextColor`  as keyof JsonColorScheme] || getContrastText(mainColor);
     const lightTextColor = getContrastText(lightColor);
     const darkTextColor  = getContrastText(darkColor);
 
@@ -66,7 +66,7 @@ export const createSchemeObjFromPalettes =
     };
 };
 
-export const createSchemeObjFromPresetScheme = (presetScheme: JsonScheme) => {
+export const createSchemeObjFromPresetScheme = (presetScheme: JsonColorScheme) => {
     return createSchemeObjFromPalettes(
       createPaletteFromPresetScheme(presetScheme, "primary"),
       createPaletteFromPresetScheme(presetScheme, "secondary"),
@@ -86,7 +86,7 @@ export const createSchemeObjFromTheme = (theme: Theme): ColorSchemeInt => {
   };
 };
 
-export const createJsonSchemeObj = (schemeObj: ColorSchemeInt): JsonScheme => {
+export const createJsonColorSchemeObj = (schemeObj: ColorSchemeInt): JsonColorScheme => {
   return {
     name: schemeObj.name,
     primaryColor: schemeObj.primary.main,

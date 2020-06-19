@@ -1,5 +1,5 @@
 import React from "react";
-import { Classes } from "../../../../interfaces/interfaces";
+import { Classes } from "../../../../interfaces/variousInterfaces";
 
 interface Shades {
   [propName: string]: string;

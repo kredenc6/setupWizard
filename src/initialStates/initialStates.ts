@@ -1,4 +1,4 @@
-import { SwState, UserInput } from "../interfaces/interfaces";
+import { SwState, UserInput } from "../interfaces/variousInterfaces";
 import { FilesState } from "../interfaces/fileInterfaces";
 import jsonObjFrame from "./jsonObjFrame";
 import { getLocalStorageRepoState } from "../gitFunctions/gitFunctions";

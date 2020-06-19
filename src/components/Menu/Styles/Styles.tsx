@@ -4,9 +4,9 @@ import ColorScheme from "./ColorScheme/ColorScheme";
 import ColorPalette from "./ColorPalette/ColorPalette";
 import ColorToolHeading from "./ColorToolHeading";
 import UI1 from "./UserInterfaces/UI1";
-import { createJsonSchemeObj, createPaletteFromColor } from "../../../miscellaneous/colorSchemeFunctions";
+import { createJsonColorSchemeObj, createPaletteFromColor } from "../../../miscellaneous/colorSchemeFunctions";
 import PresetSchemes from "./ColorScheme/PresetSchemes/PresetSchemes";
-import { ColorSchemeInt } from "../../../interfaces/interfaces";
+import { ColorSchemeInt } from "../../../interfaces/colorSchemeInterfaces";
 import { SWActions } from "../../../sWReducer/sWReducer";
 
 
@@ -50,7 +50,7 @@ export default function Styles( { dispatch, schemeObj, selectedScheme }: Props) 
     if(schemeProperty === "background" && color !== null) {
       const newPalette = createPaletteFromColor(color);
       const newColorScheme = { ...schemeObj, [selectedPalette]: newPalette, name: "custom" };
-      const ui_colors = createJsonSchemeObj(newColorScheme);
+      const ui_colors = createJsonColorSchemeObj(newColorScheme);
       dispatch({ type: "changeUserInput", payload: { schemeObj: newColorScheme } });
       dispatch({ type: "changeJson", payload: { ui_colors } });
     }
@@ -61,7 +61,7 @@ export default function Styles( { dispatch, schemeObj, selectedScheme }: Props) 
         textColorOverride: { ...schemeObj.textColorOverride, [selectedPalette]: color },
         name: "custom"
        };
-      const ui_colors = createJsonSchemeObj(newColorScheme);
+      const ui_colors = createJsonColorSchemeObj(newColorScheme);
       dispatch({ type: "changeUserInput", payload: { schemeObj: newColorScheme } });
       dispatch({ type: "changeJson", payload: { ui_colors } });
     }

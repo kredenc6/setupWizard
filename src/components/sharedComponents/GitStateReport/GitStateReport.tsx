@@ -6,7 +6,7 @@ import LastUpdate from "./LastUpdate/LastUpdate";
 import DataDisplay from "../DataDisplay";
 import sortObjEntriesAlphabetically from "../../../miscellaneous/sortObjEntriesAlphabetically";
 import getTheLongestJsonLineLength from "../../../miscellaneous/getTheLongestJsonLineLength";
-import { ServerIs } from "../../../interfaces/interfaces";
+import { ServerIs } from "../../../interfaces/variousInterfaces";
 import { StatusResult } from "../../../interfaces/simpleGit";
 import { SWActions } from "../../../sWReducer/sWReducer";
 import { FilesState } from "../../../interfaces/fileInterfaces";

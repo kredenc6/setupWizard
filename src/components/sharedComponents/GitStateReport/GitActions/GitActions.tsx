@@ -5,7 +5,7 @@ import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import SyncIcon from '@material-ui/icons/Sync';
 import PromptCommitMessage from "./PromptCommitMsg/PromptCommitMsg";
 import { handleCommit, handleMerge, handlePush, refreshRepoState } from "../../../../gitFunctions/gitFunctions";
-import { ServerIs } from "../../../../interfaces/interfaces";
+import { ServerIs } from "../../../../interfaces/variousInterfaces";
 import { StatusResult } from "../../../../interfaces/simpleGit";
 import { SWActions } from "../../../../sWReducer/sWReducer";
 import { FilesState, FileStatus } from "../../../../interfaces/fileInterfaces";

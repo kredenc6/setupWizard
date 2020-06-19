@@ -3,7 +3,8 @@ import jsonObjFrame from "../initialStates/jsonObjFrame";
 import { prefixValue } from "../components/sharedComponents/VerifyUrlTextField";
 import determineWebPrefix from "../components/Menu/SelectedModules/SelectedModule/helpFunctions/determineWebPrefix";
 import { createMessage, placeNewMessage } from "./messageHandlingFunctions";
-import { JsonResultObj, JsonResultObjFillIns, MessageProps, ServerIs, SwState, UserInput, UserInputModuleKeys } from "../interfaces/interfaces";
+import { MessageProps, ServerIs, SwState, UserInput, UserInputModuleKeys } from "../interfaces/variousInterfaces";
+import { JsonResultObj, JsonResultObjFillIns } from "../interfaces/jsonInterfaces";
 import { FilesState } from "../interfaces/fileInterfaces";
 import Interval from "../classes/Interval";
 

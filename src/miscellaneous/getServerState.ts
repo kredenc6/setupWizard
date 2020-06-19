@@ -1,4 +1,4 @@
-import { ServerIs } from "../interfaces/interfaces";
+import { ServerIs } from "../interfaces/variousInterfaces";
 
 export default function getServerState(serverAddress: string): Promise<ServerIs> {
   return fetch(serverAddress)

@@ -1,4 +1,4 @@
-import { JsonResultObj } from "../interfaces/interfaces";
+import { JsonResultObj } from "../interfaces/jsonInterfaces";
 
 const jsonObjFrame: JsonResultObj = {
   "title": "",

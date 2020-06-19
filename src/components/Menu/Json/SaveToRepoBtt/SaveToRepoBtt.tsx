@@ -2,7 +2,7 @@ import React from "react";
 import { Button, Box } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import GitOptions from "../GitOptions/GitOptions";
-import { ServerIs } from "../../../../interfaces/interfaces";
+import { ServerIs } from "../../../../interfaces/variousInterfaces";
 import { GitOpt } from "../../../../interfaces/gitInterfaces";
 import { FileStatus } from "../../../../interfaces/fileInterfaces";
 import { StatusResult } from "../../../../interfaces/simpleGit";

@@ -1,4 +1,4 @@
-import { Module } from "../../../../../interfaces/interfaces";
+import { Module } from "../../../../../interfaces/variousInterfaces";
 
 export default function determineWebPrefix(moduleSettings: Module | undefined, prefixIndex: number | undefined) {
   if(moduleSettings && moduleSettings.WEB_PREFIX) {

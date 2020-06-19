@@ -2,7 +2,7 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import SchemeContentLarge from "./SchemeContentLarge/SchemeContentLarge";
 import SchemeContentSmall from "./SchemeContentSmall/SchemeContentSmall";
-import { Palette } from "../../../../../interfaces/interfaces";
+import { Palette } from "../../../../../interfaces/colorSchemeInterfaces";
 
 import { Box } from "@material-ui/core";
 

@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Chip } from "@material-ui/core";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import MenuHeading from "../sharedComponents/MenuHeading";
-import { ServerIs } from "../../interfaces/interfaces";
+import { ServerIs } from "../../interfaces/variousInterfaces";
 
 interface Props {
   component: JSX.Element;

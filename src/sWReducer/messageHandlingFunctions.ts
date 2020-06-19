@@ -1,4 +1,4 @@
-import { MessageProps, SwState } from "../interfaces/interfaces";
+import { MessageProps, SwState } from "../interfaces/variousInterfaces";
 
 // TODO createMessage can be simplified?
 export function createMessage(topic: string, value: any): MessageProps | null {

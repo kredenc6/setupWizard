@@ -6,7 +6,7 @@ import GitStateReport from "../../../sharedComponents/GitStateReport/GitStateRep
 import AvailableJsonsButton from "../../../Menu/Main/AvailableJsonsButton";
 import { fetchJsonFiles, loadJsons } from "../../../../fileFunctions/fileFunctions";
 import { SERVER_ADDRESS } from "../../../../initialStates/constants";
-import { ServerIs } from "../../../../interfaces/interfaces";
+import { ServerIs } from "../../../../interfaces/variousInterfaces";
 import { FilesState } from "../../../../interfaces/fileInterfaces";
 import { SWActions } from "../../../../sWReducer/sWReducer";
 

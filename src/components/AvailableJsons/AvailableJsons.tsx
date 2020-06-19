@@ -6,7 +6,7 @@ import AvailableJsonsAppBar from "./AvailableJsonsAppBar/AvailableJsonsAppBar";
 import JsonCard from "./JsonCard/JsonCard";
 import DataDisplay from "../sharedComponents/DataDisplay";
 import { normalizeJsonFileName } from "../../fileFunctions/fileFunctions";
-import { JsonResultObj } from "../../interfaces/interfaces";
+import { JsonResultObj } from "../../interfaces/jsonInterfaces";
 import { StatusResult } from "../../interfaces/simpleGit";
 import { FilesState } from "../../interfaces/fileInterfaces";
 import "../../../node_modules/simplebar/dist/simplebar.min.css";

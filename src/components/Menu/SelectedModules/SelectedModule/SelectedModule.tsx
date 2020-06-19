@@ -4,7 +4,8 @@ import ArrayDataComponent from "./ArrayDataComponent/ArrayDataComponent";
 import ArrayComponent from "./ArrayComponent/ArrayComponent";
 import Submenu from "../../../sharedComponents/Submenu";
 import capitalizeFirstLetter from "../../../../miscellaneous/capitalizeFirstLetter";
-import { JsonObjModule, Module, ServerIs, UserInputModuleKeys } from "../../../../interfaces/interfaces";
+import { Module, ServerIs, UserInputModuleKeys } from "../../../../interfaces/variousInterfaces";
+import { JsonObjModule } from "../../../../interfaces/jsonInterfaces";
 import { SWActions } from "../../../../sWReducer/sWReducer";
 
 interface Props {

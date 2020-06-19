@@ -2,7 +2,7 @@ import React from "react";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
 import { Fab, Slider } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
-import { ColorSchemeInt } from "../../../../interfaces/interfaces";
+import { ColorSchemeInt } from "../../../../interfaces/colorSchemeInterfaces";
 
 interface Props {
   schemeObj: ColorSchemeInt;

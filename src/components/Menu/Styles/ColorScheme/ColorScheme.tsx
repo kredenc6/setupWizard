@@ -2,7 +2,7 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import SchemeContainerLarge from "./SchemeContainerLarge/SchemeContainerLarge";
 import SchemeContainerNarrow from "./SchemeContainerNarrow/SchemeContainerNarrow";
-import { ColorSchemeInt } from "../../../../interfaces/interfaces";
+import { ColorSchemeInt } from "../../../../interfaces/colorSchemeInterfaces";
 
 interface Props {
   reset: (color: string | null) => void;

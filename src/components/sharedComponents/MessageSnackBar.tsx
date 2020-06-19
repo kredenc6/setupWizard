@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Snackbar } from "@material-ui/core";
 import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
 import { SHOW_PENDING_MESSAGE_INTERVAL } from "../../initialStates/constants";
-import { MessageProps } from "../../interfaces/interfaces";
+import { MessageProps } from "../../interfaces/variousInterfaces";
 import { SWActions } from "../../sWReducer/sWReducer";
 
 interface Props {

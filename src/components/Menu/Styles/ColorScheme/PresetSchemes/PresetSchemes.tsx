@@ -3,7 +3,7 @@ import { FormControl, InputLabel, MenuItem, Select } from "@material-ui/core";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import presetSchemes from "./presetSchemes.json";
 import { createSchemeObjFromPresetScheme } from "../../../../../miscellaneous/colorSchemeFunctions";
-import { JsonScheme } from "../../../../../interfaces/interfaces";
+import { JsonColorScheme } from "../../../../../interfaces/colorSchemeInterfaces";
 import { SWActions } from "../../../../../sWReducer/sWReducer";
 
 
@@ -21,7 +21,7 @@ const useStyles = makeStyles(({ spacing }) =>
   })
 );
 
-const findPresetSchemeByName: (name: string) => (JsonScheme | undefined) = (name: string) => {
+const findPresetSchemeByName: (name: string) => (JsonColorScheme | undefined) = (name: string) => {
   return presetSchemes.find(presetScheme => presetScheme.name === name);
 };
 

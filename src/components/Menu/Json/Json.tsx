@@ -9,7 +9,8 @@ import PromptCommitMessage from "../../sharedComponents/GitStateReport/GitAction
 import ClearJsonBtt from "./ClearJsonBtt/ClearJsonBtt";
 import { downloadJson, handleSaveToRepo, normalizeJsonFileName } from "../../../fileFunctions/fileFunctions";
 import { handleCommit, handlePush } from "../../../gitFunctions/gitFunctions";
-import { JsonResultObj, ServerIs, UserInput } from "../../../interfaces/interfaces";
+import { ServerIs, UserInput } from "../../../interfaces/variousInterfaces";
+import { JsonResultObj } from "../../../interfaces/jsonInterfaces";
 import { GitOpt } from "../../../interfaces/gitInterfaces";
 import { FilesState } from "../../../interfaces/fileInterfaces";
 import { SWActions } from "../../../sWReducer/sWReducer";

@@ -7,7 +7,8 @@ import FileState from "./FileState/FileState";
 import Submenu from "../../sharedComponents/Submenu";
 import { createSchemeObjFromPresetScheme } from "../../../miscellaneous/colorSchemeFunctions";
 import { SWActions } from "../../../sWReducer/sWReducer";
-import { JsonResultObj, ServerIs, UserInput } from "../../../interfaces/interfaces";
+import { ServerIs, UserInput } from "../../../interfaces/variousInterfaces";
+import { JsonResultObj } from "../../../interfaces/jsonInterfaces";
 import { FilesState } from "../../../interfaces/fileInterfaces";
 
 interface Props {

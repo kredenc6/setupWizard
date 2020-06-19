@@ -3,7 +3,8 @@ import { createStyles, makeStyles } from "@material-ui/core/styles";
 import SimpleBar from "simplebar-react";
 import SelectedModule from "./SelectedModule/SelectedModule";
 import sortObjEntriesAlphabetically from "../../../miscellaneous/sortObjEntriesAlphabetically";
-import { JsonObjModule, JsonResultObj, ServerIs, UserInput, UserInputModuleKeys } from "../../../interfaces/interfaces";
+import { ServerIs, UserInput, UserInputModuleKeys } from "../../../interfaces/variousInterfaces";
+import { JsonObjModule, JsonResultObj } from "../../../interfaces/jsonInterfaces";
 import { SWActions } from "../../../sWReducer/sWReducer";
 import "../../../../node_modules/simplebar/dist/simplebar.min.css";
 

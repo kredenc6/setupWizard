@@ -16,7 +16,7 @@ import { createMessage } from "./sWReducer/messageHandlingFunctions";
 import { initialReducerState } from "./initialStates/initialStates";
 import { SERVER_STATUS_CHECK_INTERVAL, SERVER_ADDRESS } from "./initialStates/constants";
 import { refreshRepoState, shouldRepoStateBeRefreshed } from "./gitFunctions/gitFunctions";
-import { MenuInt } from "./interfaces/interfaces";
+import { MenuInt } from "./interfaces/variousInterfaces";
 
 const useStyles = makeStyles({
   wizardWrapper: {

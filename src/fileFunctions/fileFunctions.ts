@@ -1,6 +1,6 @@
 import { createMessage } from "../sWReducer/messageHandlingFunctions";
 import { refreshRepoState } from "../gitFunctions/gitFunctions";
-import { JsonResultObj } from "../interfaces/interfaces";
+import { JsonResultObj } from "../interfaces/jsonInterfaces";
 import { FileStatus, SaveFileResponse } from "../interfaces/fileInterfaces";
 import { SERVER_ADDRESS } from "../initialStates/constants";
 import { SWActions } from "../sWReducer/sWReducer";
