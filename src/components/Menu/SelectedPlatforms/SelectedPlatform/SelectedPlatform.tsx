@@ -4,15 +4,15 @@ import ArrayDataComponent from "./ArrayDataComponent/ArrayDataComponent";
 import ArrayComponent from "./ArrayComponent/ArrayComponent";
 import Submenu from "../../../sharedComponents/Submenu";
 import capitalizeFirstLetter from "../../../../miscellaneous/capitalizeFirstLetter";
-import { Module, ServerIs, UserInputModuleKeys } from "../../../../interfaces/variousInterfaces";
-import { JsonObjModule } from "../../../../interfaces/jsonInterfaces";
+import { Platform, ServerIs, UserInputPlatformKeys } from "../../../../interfaces/variousInterfaces";
+import { JsonObjPlatform } from "../../../../interfaces/jsonInterfaces";
 import { SWActions } from "../../../../sWReducer/sWReducer";
 
 interface Props {
   dispatch: React.Dispatch<SWActions>;
-  jsonModuleObj: JsonObjModule;
-  moduleName: UserInputModuleKeys;
-  moduleSettings: Module;
+  jsonPlatformObj: JsonObjPlatform;
+  platformName: UserInputPlatformKeys;
+  platformSettings: Platform;
   serverState: ServerIs;
 };
 
@@ -22,9 +22,9 @@ const isArrObjectArr = (arr: any[]) => {
   return false;
 };
 
-const SelectedInput = React.memo(({ dispatch, jsonModuleObj, moduleName, moduleSettings, serverState }: Props) => {
-  const handleJsonChange = (changedModule: JsonObjModule) => {
-    dispatch({ type: "changeJson", payload: { [moduleName]: changedModule } });
+const SelectedInput = React.memo(({ dispatch, jsonPlatformObj, platformName, platformSettings, serverState }: Props) => {
+  const handleJsonChange = (changedPlatform: JsonObjPlatform) => {
+    dispatch({ type: "changeJson", payload: { [platformName]: changedPlatform } });
   };
   
   const handleJsonObjChange = (dataObj: object, key: string, value: any) => handleJsonChange({ ...dataObj, [key]: value });
@@ -37,28 +37,28 @@ const SelectedInput = React.memo(({ dispatch, jsonModuleObj, moduleName, moduleS
   return (
     <Submenu
       component={
-        Array.isArray(jsonModuleObj) ?
-          isArrObjectArr(jsonModuleObj) ?
+        Array.isArray(jsonPlatformObj) ?
+          isArrObjectArr(jsonPlatformObj) ?
             <ArrayDataComponent
-              dataArr={jsonModuleObj}
+              dataArr={jsonPlatformObj}
               handleJsonChange={handleJsonChange}
               isVerificationEnabled={serverState === "online"}
-              moduleSettings={moduleSettings} />
+              platformSettings={platformSettings} />
             :
             <ArrayComponent
-              array={jsonModuleObj as string[]}
+              array={jsonPlatformObj as string[]}
               handleJsonChange={handleJsonChange}
               isVerificationEnabled={serverState === "online"}
-              label={moduleName}
-              moduleSettings={moduleSettings} />
+              label={platformName}
+              platformSettings={platformSettings} />
           :
           <ObjectDataComponent
-            dataObj={jsonModuleObj}
+            dataObj={jsonPlatformObj}
             handleJsonObjChange={handleJsonObjChange}
             isVerificationEnabled={serverState === "online"}
-            moduleSettings={moduleSettings} />
+            platformSettings={platformSettings} />
       }
-      heading={capitalizeFirstLetter(moduleName)} />
+      heading={capitalizeFirstLetter(platformName)} />
   );
 });
 

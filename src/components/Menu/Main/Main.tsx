@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import AvailableJsons from "../../AvailableJsons/AvailableJsons";
-import SelectModules from "./SelectModules/SelectModules";
+import SelectPlatforms from "./SelectPlatforms/SelectPlatforms";
 import Topic from "./Topic/Topic";
 import FileState from "./FileState/FileState";
 import Submenu from "../../sharedComponents/Submenu";
@@ -100,9 +100,9 @@ export default function Main(props: Props) {
         </div>
         <Submenu
           component={
-            <SelectModules
+            <SelectPlatforms
               dispatch={dispatch}
-              modules={userInput.modules} />
+              platforms={userInput.platforms} />
           }
           heading="Select visible components" />
       </div>

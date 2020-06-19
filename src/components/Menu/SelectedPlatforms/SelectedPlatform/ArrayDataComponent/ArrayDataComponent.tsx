@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { AppBar, Box, Tab, Tabs, Typography } from "@material-ui/core";
 import ObjectDataComponent from "../ObjectDataComponent/ObjectDataComponent";
-import { Module } from "../../../../../interfaces/variousInterfaces";
-import { JsonObjModule } from "../../../../../interfaces/jsonInterfaces";
+import { Platform } from "../../../../../interfaces/variousInterfaces";
+import { JsonObjPlatform } from "../../../../../interfaces/jsonInterfaces";
 
 interface Props {
   dataArr: any[];
-  handleJsonChange: (changedModule: JsonObjModule) => void;
+  handleJsonChange: (changedPlatform: JsonObjPlatform) => void;
   isVerificationEnabled: boolean;
-  moduleSettings: Module | undefined;
+  platformSettings: Platform | undefined;
 };
 
 interface TabPanelProps {
@@ -32,7 +32,7 @@ const TabPanel= (props: TabPanelProps) => {
   );
 };
 
-export default function ArrayDataComponent({ dataArr, handleJsonChange, isVerificationEnabled, moduleSettings }: Props) {
+export default function ArrayDataComponent({ dataArr, handleJsonChange, isVerificationEnabled, platformSettings }: Props) {
   const [tabPosition, setTabPosition] = useState(0);
 
   let TabComponents: (JSX.Element | null)[] = [];
@@ -57,7 +57,7 @@ export default function ArrayDataComponent({ dataArr, handleJsonChange, isVerifi
           handleJsonObjChange={handleJsonObjChange}
           prefixIndex={i}
           isVerificationEnabled={isVerificationEnabled}
-          moduleSettings={moduleSettings}
+          platformSettings={platformSettings}
           skipProperties={KEYS_TO_LABELS} />
       </TabPanel>
     );

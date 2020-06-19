@@ -1,9 +1,9 @@
 import { Reducer } from "react";
 import jsonObjFrame from "../initialStates/jsonObjFrame";
 import { prefixValue } from "../components/sharedComponents/VerifyUrlTextField";
-import determineWebPrefix from "../components/Menu/SelectedModules/SelectedModule/helpFunctions/determineWebPrefix";
+import determineWebPrefix from "../components/Menu/SelectedPlatforms/SelectedPlatform/helpFunctions/determineWebPrefix";
 import { createMessage, placeNewMessage } from "./messageHandlingFunctions";
-import { MessageProps, ServerIs, SwState, UserInput, UserInputModuleKeys } from "../interfaces/variousInterfaces";
+import { MessageProps, ServerIs, SwState, UserInput, UserInputPlatformKeys } from "../interfaces/variousInterfaces";
 import { JsonResultObj, JsonResultObjFillIns } from "../interfaces/jsonInterfaces";
 import { FilesState } from "../interfaces/fileInterfaces";
 import Interval from "../classes/Interval";
@@ -21,7 +21,7 @@ export type SWActions =
   ActionWithPayload<"addMessage", (MessageProps)> |
   ActionWithPayload<"changeJson", Partial<JsonResultObj>> |
   ActionWithPayload<"changeJsonFilesState", Partial<FilesState>> |
-  ActionWithPayload<"changeSelectedModules", { isSelected: boolean, moduleName: UserInputModuleKeys }> |
+  ActionWithPayload<"changeSelectedPlatforms", { isSelected: boolean, platformName: UserInputPlatformKeys }> |
   ActionWithPayload<"changeTopic", string> |
   ActionWithPayload<"changeUserInput", Partial<UserInput>> |
   ActionWithPayload<"selectJson", JsonResultObj> |
@@ -49,15 +49,15 @@ const sWReducer: Reducer<SwState, SWActions> = (state, action) => {
       return  { ...state, jsonFilesState: newjsonFilesState };
     }
 
-    case "changeSelectedModules": {
-      const updatedState = handleSelectedComponentsChange(state, action.payload.isSelected, action.payload.moduleName);
-      const isNextStepAllowed = allowNextStepFromMainMenu(updatedState.userInput.modules, updatedState.jsonObj.app_topic);
+    case "changeSelectedPlatforms": {
+      const updatedState = handleSelectedComponentsChange(state, action.payload.isSelected, action.payload.platformName);
+      const isNextStepAllowed = allowNextStepFromMainMenu(updatedState.userInput.platforms, updatedState.jsonObj.app_topic);
       return { ...updatedState, isNextStepAllowed };
     }
 
     case "changeTopic": {
       const updatedState = handleTopicChange(action.payload, state);
-      const isNextStepAllowed = allowNextStepFromMainMenu(updatedState.userInput.modules, updatedState.jsonObj.app_topic);
+      const isNextStepAllowed = allowNextStepFromMainMenu(updatedState.userInput.platforms, updatedState.jsonObj.app_topic);
       return { ...updatedState, isNextStepAllowed };
     }
 
@@ -73,7 +73,7 @@ const sWReducer: Reducer<SwState, SWActions> = (state, action) => {
 
     case "selectJson": {
       const updatedState = handleJsonSelection(action.payload, state);
-      const isNextStepAllowed = allowNextStepFromMainMenu(updatedState.userInput.modules, updatedState.jsonObj.app_topic);
+      const isNextStepAllowed = allowNextStepFromMainMenu(updatedState.userInput.platforms, updatedState.jsonObj.app_topic);
       return { ...updatedState, isNextStepAllowed };
     }
 
@@ -105,121 +105,121 @@ const sWReducer: Reducer<SwState, SWActions> = (state, action) => {
 export default sWReducer;
 
 function handleJsonSelection(newJsonObj: JsonResultObj, state: SwState): SwState {
-  const newModules: UserInput["modules"] = JSON.parse(JSON.stringify(state.userInput.modules));
-  // find out which modules in json are visible(selected) so it can be transeferd into userInput
-  for(const moduleName of Object.keys(state.userInput.modules)) {
-    const isSelected = newJsonObj.visible_components.includes(moduleName as keyof UserInput["modules"]);
-    newModules[moduleName as keyof UserInput["modules"]].selected = isSelected; // the transfer
+  const newPlatforms: UserInput["platforms"] = JSON.parse(JSON.stringify(state.userInput.platforms));
+  // find out which platforms in json are visible(selected) so it can be transeferd into userInput
+  for(const platformName of Object.keys(state.userInput.platforms)) {
+    const isSelected = newJsonObj.visible_components.includes(platformName as keyof UserInput["platforms"]);
+    newPlatforms[platformName as keyof UserInput["platforms"]].selected = isSelected; // the transfer
   };
   return {
     ...state,
     jsonObj: newJsonObj,
-    userInput: { ...state["userInput"], modules: newModules }
+    userInput: { ...state["userInput"], platforms: newPlatforms }
   };
 }
 
 function handleTopicChange(value: string, state: SwState) {
   const { jsonFilesState, jsonObj, userInput } = state;
   const appTopicIndex = jsonFilesState.loadedJsons.findIndex(loadedJson => loadedJson.app_topic === value);
-  const fillModules = userInput.setAlsoAsChannelValues;
+  const fillPlatforms = userInput.setAlsoAsChannelValues;
   
   if(appTopicIndex !== -1) { // if some loaded json alredy has this app topic set it as active
     return handleJsonSelection(jsonFilesState.loadedJsons[appTopicIndex], state);
   }
 
   if(userInput.resetJsonOnAppTopicChange) {
-    const newJson: JsonResultObj = { ...jsonObjFrame, ...fillInTopicValue(jsonObj, userInput.modules, value, fillModules) };
+    const newJson: JsonResultObj = { ...jsonObjFrame, ...fillInTopicValue(jsonObj, userInput.platforms, value, fillPlatforms) };
     return handleJsonSelection(newJson, state);
   } else {
-    const changedJson: JsonResultObj = { ...jsonObj, ...fillInTopicValue(jsonObj, userInput.modules, value, fillModules) };
+    const changedJson: JsonResultObj = { ...jsonObj, ...fillInTopicValue(jsonObj, userInput.platforms, value, fillPlatforms) };
     return { ...state, jsonObj: changedJson };
   }
 }
 
-export function fillInTopicValue(jsonObj: JsonResultObj, modules: UserInput["modules"], value: string, toModules = false) {
-  if(!toModules) {
+export function fillInTopicValue(jsonObj: JsonResultObj, platforms: UserInput["platforms"], value: string, toPlatforms = false) {
+  if(!toPlatforms) {
     return { 
       app_topic: value,
       twitter: [ { ...jsonObj["twitter"][0], channel_name: value } ]
      };
   }
 
-  const prePrepedModules: JsonResultObjFillIns = {
+  const prePrepedPlatforms: JsonResultObjFillIns = {
     app_topic: value,
     audio: [ ...jsonObj.audio.map((audioObj, i) => {
-      return { ...audioObj, queries: [ prefixValue(determineWebPrefix(modules.audio, i), value) ] }
+      return { ...audioObj, queries: [ prefixValue(determineWebPrefix(platforms.audio, i), value) ] }
     })],
     books: [ ...jsonObj.books.map((bookObj, i) => {
-      return { ...bookObj, queries: [ prefixValue(determineWebPrefix(modules.books, i), value) ] }
+      return { ...bookObj, queries: [ prefixValue(determineWebPrefix(platforms.books, i), value) ] }
     })],
     facebook: {
       ...jsonObj.facebook,
-      channel: prefixValue(determineWebPrefix(modules.facebook, 0), value)
+      channel: prefixValue(determineWebPrefix(platforms.facebook, 0), value)
     },
     instagram: {
       ...jsonObj.instagram,
-      main_channel: prefixValue(determineWebPrefix(modules.instagram, 0), value)
+      main_channel: prefixValue(determineWebPrefix(platforms.instagram, 0), value)
     },
     reddit: {
       ...jsonObj.reddit,
-      sub_reddit: prefixValue(determineWebPrefix(modules.reddit, 0), value)
+      sub_reddit: prefixValue(determineWebPrefix(platforms.reddit, 0), value)
     },
     videos:    [ ...jsonObj.videos.map((videoObj, i) => {
-      return { ...videoObj, queries: [ prefixValue(determineWebPrefix(modules.videos, i), value) ] }
+      return { ...videoObj, queries: [ prefixValue(determineWebPrefix(platforms.videos, i), value) ] }
     })],
     twitter:   [{
       ...jsonObj["twitter"][0],
       channel_name: value,
-      url: prefixValue(determineWebPrefix(modules.twitter, 0), value)
+      url: prefixValue(determineWebPrefix(platforms.twitter, 0), value)
     }]
   };
 
-  const selectedModulesObj: Partial<JsonResultObjFillIns> = { app_topic: value };
-  jsonObj.visible_components.forEach(module => {
-    if(module !== "websites" && module !=="events") {
-      assingSelectedModule.call(selectedModulesObj, module);
+  const selectedPlatformsObj: Partial<JsonResultObjFillIns> = { app_topic: value };
+  jsonObj.visible_components.forEach(platform => {
+    if(platform !== "websites" && platform !=="events") {
+      assingSelectedPlatform.call(selectedPlatformsObj, platform);
     }
   })
   
-  return selectedModulesObj;
+  return selectedPlatformsObj;
 
-  function assingSelectedModule<K extends keyof JsonResultObjFillIns>(this: Partial<JsonResultObjFillIns>, moduleName: K) {
-    this[moduleName] = prePrepedModules[moduleName];
+  function assingSelectedPlatform<K extends keyof JsonResultObjFillIns>(this: Partial<JsonResultObjFillIns>, platformName: K) {
+    this[platformName] = prePrepedPlatforms[platformName];
   }
 }
 
-function handleSelectedComponentsChange(state: SwState, isSelected: boolean, moduleName: UserInputModuleKeys) {
+function handleSelectedComponentsChange(state: SwState, isSelected: boolean, platformName: UserInputPlatformKeys) {
   const { jsonObj, userInput } = state;
   //adjust userInput
-  const updatedModules = { ...userInput.modules, [moduleName]: { ...userInput.modules[moduleName], selected: isSelected } };
-  const updatedUserInput = { ...userInput, modules: updatedModules };
+  const updatedPlatforms = { ...userInput.platforms, [platformName]: { ...userInput.platforms[platformName], selected: isSelected } };
+  const updatedUserInput = { ...userInput, platforms: updatedPlatforms };
   
   //adjust jsonObj
-  const visible_components = Object.entries(updatedModules)
-  .filter(([_, module]) => module.selected)
-  .map(([key, _]) => key) as UserInputModuleKeys[];
+  const visible_components = Object.entries(updatedPlatforms)
+  .filter(([_, platform]) => platform.selected)
+  .map(([key, _]) => key) as UserInputPlatformKeys[];
 
   let newJsonObj = { ...jsonObj, visible_components };
 
   if(state.userInput.setAlsoAsChannelValues) {
     const adjustedJsonObj = { ...jsonObj, visible_components }
-    const filledInModules = fillInTopicValue(adjustedJsonObj, userInput.modules, jsonObj.app_topic, true);
+    const filledInPlatforms = fillInTopicValue(adjustedJsonObj, userInput.platforms, jsonObj.app_topic, true);
     
-    newJsonObj = { ...newJsonObj, ...filledInModules };
+    newJsonObj = { ...newJsonObj, ...filledInPlatforms };
   }
 
   return { ...state, userInput: updatedUserInput, jsonObj: newJsonObj };
 };
 
-function allowNextStepFromMainMenu(modules: UserInput["modules"], appTopic: string) {
-  //BUG? it's possible to have module prop "shwow_in_app" value true and the "visible_components" json prop
-  // without the module
-  const isAtLeastOneModuleSelected = (modules: UserInput["modules"]) => {
-    return Object.entries(modules).some(([_, module]) => {
-      return module.selected;
+function allowNextStepFromMainMenu(platforms: UserInput["platforms"], appTopic: string) {
+  //BUG? it's possible to have platform prop "show_in_app" value true and the "visible_components" json prop
+  // without the platform - Rik has the say how to implement this
+  const isAtLeastOnePlatformSelected = (platforms: UserInput["platforms"]) => {
+    return Object.entries(platforms).some(([_, platform]) => {
+      return platform.selected;
     });
   };
   const isAppTopicValid = (appTopic: string) => appTopic.trim().length >= 2;
   
-  return isAtLeastOneModuleSelected(modules) && isAppTopicValid(appTopic);
+  return isAtLeastOnePlatformSelected(platforms) && isAppTopicValid(appTopic);
 }

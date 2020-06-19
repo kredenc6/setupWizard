@@ -55,7 +55,7 @@ export default function Json({ dispatch, jsonFilesState, jsonObj, serverState, u
   const classes = useStyles();
   const restJsonProps = Object.entries(jsonObj)
     .filter(([key, _]) => {
-      return !Object.keys(userInput.modules) // skip modules...
+      return !Object.keys(userInput.platforms) // skip platforms...
         .concat(["visible_components", "app_topic", "ui_colors"]) // and these properties
         .includes(key); // condition or filter method
   });

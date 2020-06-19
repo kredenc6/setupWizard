@@ -1,17 +1,17 @@
 import React from "react";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import SimpleBar from "simplebar-react";
-import SelectedModule from "./SelectedModule/SelectedModule";
+import SelectedPlatform from "./SelectedPlatform/SelectedPlatform";
 import sortObjEntriesAlphabetically from "../../../miscellaneous/sortObjEntriesAlphabetically";
-import { ServerIs, UserInput, UserInputModuleKeys } from "../../../interfaces/variousInterfaces";
-import { JsonObjModule, JsonResultObj } from "../../../interfaces/jsonInterfaces";
+import { ServerIs, UserInput, UserInputPlatformKeys } from "../../../interfaces/variousInterfaces";
+import { JsonObjPlatform, JsonResultObj } from "../../../interfaces/jsonInterfaces";
 import { SWActions } from "../../../sWReducer/sWReducer";
 import "../../../../node_modules/simplebar/dist/simplebar.min.css";
 
 interface Props {
   dispatch: React.Dispatch<SWActions>;
   jsonObj: JsonResultObj;
-  modules: UserInput['modules'];
+  platforms: UserInput["platforms"];
   serverState: ServerIs;
 };
 
@@ -22,7 +22,7 @@ const useStyles = makeStyles(({ spacing }) =>
       minHeight: "100%",
       maxHeight: "100%"
     },
-    modulesWrapper: {
+    platformsWrapper: {
       display: "grid",
       gridTemplateColumns: "1fr 1fr",
       gridGap: spacing(1),
@@ -31,23 +31,23 @@ const useStyles = makeStyles(({ spacing }) =>
   })
 );
 
-export default function SelectedModules({ dispatch, jsonObj, modules, serverState }: Props) {
+export default function SelectedPlatforms({ dispatch, jsonObj, platforms, serverState }: Props) {
   const classes = useStyles();
-  const SelectedModules = sortObjEntriesAlphabetically(Object.entries(modules))
-  .filter(([_, module]) => module.selected)
-  .map(([key, _]) => <SelectedModule
+  const SelectedPlatforms = sortObjEntriesAlphabetically(Object.entries(platforms))
+  .filter(([_, platform]) => platform.selected)
+  .map(([key, _]) => <SelectedPlatform
     dispatch={dispatch}
-    jsonModuleObj={jsonObj[key as UserInputModuleKeys] as unknown as JsonObjModule}
+    jsonPlatformObj={jsonObj[key as UserInputPlatformKeys] as unknown as JsonObjPlatform}
     key={key}
-    moduleSettings={modules[key as UserInputModuleKeys]}
-    moduleName={key as UserInputModuleKeys}
+    platformSettings={platforms[key as UserInputPlatformKeys]}
+    platformName={key as UserInputPlatformKeys}
     serverState={serverState} />
   );
 
   return(
     <SimpleBar className={classes.simplebar}>
-      <section className={classes.modulesWrapper}>
-        {SelectedModules}
+      <section className={classes.platformsWrapper}>
+        {SelectedPlatforms}
       </section>
     </SimpleBar>
   );

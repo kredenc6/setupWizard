@@ -15,7 +15,7 @@ export const initialUserInput: UserInput = {
   resetJsonOnAppTopicChange: true,
   setAlsoAsChannelValues: true,
   schemeObj: createSchemeObjFromPresetScheme(jsonObjFrame.ui_colors),
-  modules: {
+  platforms: {
     audio: {
       selected: false,
       VERIFY_BY_PROXY: ["queries"],

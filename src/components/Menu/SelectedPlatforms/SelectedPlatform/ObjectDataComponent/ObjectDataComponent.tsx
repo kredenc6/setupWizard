@@ -5,14 +5,14 @@ import SwTextField from "../../../../sharedComponents/SwTextField";
 import VerifyUrlTextField from "../../../../sharedComponents/VerifyUrlTextField";
 import isProxyVerifiable from "../helpFunctions/isProxyVerifiable";
 import determineWebPrefix from "../helpFunctions/determineWebPrefix";
-import { Module } from "../../../../../interfaces/variousInterfaces";
+import { Platform } from "../../../../../interfaces/variousInterfaces";
 
 interface Props {
   dataObj: object;
   handleJsonObjChange: (dataObj: object, key: string, value: any) => void
   prefixIndex?: number;
   isVerificationEnabled: boolean;
-  moduleSettings?: Module;
+  platformSettings?: Platform;
   skipProperties?: string[];
 };
 
@@ -25,12 +25,12 @@ const useStyles = makeStyles({
 });
 
 export default function ObjectDataComponent(
-  { dataObj, handleJsonObjChange, prefixIndex, isVerificationEnabled, moduleSettings, skipProperties }: Props) {
+  { dataObj, handleJsonObjChange, prefixIndex, isVerificationEnabled, platformSettings, skipProperties }: Props) {
   const classes = useStyles();
   const handleChange = (key: string, value: any) => {
     handleJsonObjChange(dataObj, key, value);
   };
-  const Components = turnObjToFormComponents(dataObj, handleChange, moduleSettings, skipProperties, isVerificationEnabled, prefixIndex);
+  const Components = turnObjToFormComponents(dataObj, handleChange, platformSettings, skipProperties, isVerificationEnabled, prefixIndex);
 
   return(
     <div className={classes.objectDataWrapper}>
@@ -42,7 +42,7 @@ export default function ObjectDataComponent(
 };
 
 function turnObjToFormComponents
-  (obj: object, handleChange: (key: string, value: any) => void, moduleSettings: Module | undefined,
+  (obj: object, handleChange: (key: string, value: any) => void, platformSettings: Platform | undefined,
   skipProperties: string[] | undefined, isVerificationEnabled: boolean, prefixIndex: number | undefined) {
   const TextFieldComponents: JSX.Element[] = [];
   const CheckboxComponents: JSX.Element[] = [];
@@ -51,11 +51,11 @@ function turnObjToFormComponents
     if(skipProperties && skipProperties.includes(key)) continue;
     if(typeof value === "string") {
       TextFieldComponents.push(
-        isProxyVerifiable(moduleSettings, key) ?
+        isProxyVerifiable(platformSettings, key) ?
           <VerifyUrlTextField
             key={`textField${key}`}
             handleTextFieldChange={value => handleChange(key, value)}
-            webPrefix={determineWebPrefix(moduleSettings, prefixIndex)}
+            webPrefix={determineWebPrefix(platformSettings, prefixIndex)}
             isVerificationEnabled={isVerificationEnabled}
             label={key}
             name={key}
@@ -92,7 +92,7 @@ function turnObjToFormComponents
           isVerificationEnabled={isVerificationEnabled}
           key={`strArr${key}`}
           label={key}
-          moduleSettings={moduleSettings}
+          platformSettings={platformSettings}
           prefixIndex={prefixIndex} />
       );
     }

@@ -1,4 +1,4 @@
-import { UserInput, UserInputModuleKeys } from "./variousInterfaces";
+import { UserInput, UserInputPlatformKeys } from "./variousInterfaces";
 import { JsonColorScheme } from "./colorSchemeInterfaces";
 
 export interface JsonResultObj {
@@ -14,7 +14,7 @@ export interface JsonResultObj {
     ad_mob_ad_unit_id: string;
   };
   ui_colors: JsonColorScheme;
-  visible_components: Array<keyof UserInput["modules"]>
+  visible_components: Array<keyof UserInput["platforms"]>
   facebook: {
     channel: string;
   };
@@ -61,7 +61,7 @@ export interface VideoItem extends MediaItem {
 
 export type JsonObjKey = keyof JsonResultObj;
 
-export type JsonObjModule = JsonResultObj[UserInputModuleKeys];
+export type JsonObjPlatform = JsonResultObj[UserInputPlatformKeys];
 
 export type JsonResultObjFillIns =
   Pick<JsonResultObj, "app_topic" | "audio" | "books" | "facebook" | "instagram" | "reddit" | "videos" | "twitter">;

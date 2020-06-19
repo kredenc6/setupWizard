@@ -4,7 +4,7 @@ import { makeStyles, ThemeProvider } from "@material-ui/core/styles";
 import Menu from "./components/Menu/Menu";
 import Main from "./components/Menu/Main/Main";
 import Styles from "./components/Menu/Styles/Styles";
-import SelectedModules from "./components/Menu/SelectedModules/SelectedModules";
+import SelectedPlatforms from "./components/Menu/SelectedPlatforms/SelectedPlatforms";
 import Json from "./components/Menu/Json/Json";
 import SetupStepper from "./components/SetupStepper/SetupStepper";
 import MessageSnackBar from "./components/sharedComponents/MessageSnackBar";
@@ -98,15 +98,15 @@ export default function SetupWizard() {
         selectedScheme={state.userInput.schemeObj.name} />
     },
     {
-      label: "Selected modules",
+      label: "Selected platforms",
       component: <Menu
-        component={<SelectedModules
+        component={<SelectedPlatforms
           dispatch={dispatch}
           jsonObj={state.jsonObj}
-          modules={state.userInput.modules}
+          platforms={state.userInput.platforms}
           serverState={state.serverState} />
         }
-        headingText="Selected modules"
+        headingText="Selected platforms"
         serverState={state.serverState} />
     },
     {

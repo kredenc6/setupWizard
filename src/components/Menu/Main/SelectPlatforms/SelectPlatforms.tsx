@@ -2,12 +2,12 @@ import React from "react";
 import { Checkbox, FormControlLabel, FormGroup } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import sortObjEntriesAlphabetically from "../../../../miscellaneous/sortObjEntriesAlphabetically";
-import { UserInput, UserInputModuleKeys } from "../../../../interfaces/variousInterfaces";
+import { UserInput, UserInputPlatformKeys } from "../../../../interfaces/variousInterfaces";
 import { SWActions } from "../../../../sWReducer/sWReducer";
 
 interface Props {
   dispatch: React.Dispatch<SWActions>;
-  modules: UserInput["modules"];
+  platforms: UserInput["platforms"];
 };
 
 const useStyles = makeStyles({
@@ -19,21 +19,21 @@ const useStyles = makeStyles({
   }
 });
 
-const SelectModules = React.memo(({ dispatch, modules }: Props) => {
+const SelectPlatforms = React.memo(({ dispatch, platforms }: Props) => {
   const classes = useStyles();
 
-  const FormLabelComponents = sortObjEntriesAlphabetically(Object.entries(modules))
-    .map(([key, module]) => (
+  const FormLabelComponents = sortObjEntriesAlphabetically(Object.entries(platforms))
+    .map(([key, platform]) => (
       <FormControlLabel
         control={
           <Checkbox
-            checked={module.selected}
+            checked={platform.selected}
             onChange={e => {
               dispatch({
-                type: "changeSelectedModules",
+                type: "changeSelectedPlatforms",
                 payload: {
                   isSelected: e.target.checked,
-                  moduleName: e.target.name as UserInputModuleKeys
+                  platformName: e.target.name as UserInputPlatformKeys
                 }
               })
             }}
@@ -53,13 +53,13 @@ const SelectModules = React.memo(({ dispatch, modules }: Props) => {
   );
 }, compareProps);
 
-export default SelectModules;
+export default SelectPlatforms;
 
 
 function compareProps(prevProps: Props, nextProps: Props) {
-  const prevModuleEntries = Object.entries(prevProps.modules);
-  for(const [key, value] of prevModuleEntries) {
-    if(value.selected !== nextProps.modules[key as UserInputModuleKeys].selected) return false;
+  const prevPlatformEntries = Object.entries(prevProps.platforms);
+  for(const [key, value] of prevPlatformEntries) {
+    if(value.selected !== nextProps.platforms[key as UserInputPlatformKeys].selected) return false;
   }
   return true;
 }

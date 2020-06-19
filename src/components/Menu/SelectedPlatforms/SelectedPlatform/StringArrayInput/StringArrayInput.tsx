@@ -3,19 +3,19 @@ import SwTextField from "../../../../sharedComponents/SwTextField";
 import VerifyUrlTextField from "../../../../sharedComponents/VerifyUrlTextField";
 import isProxyVerifiable from "../helpFunctions/isProxyVerifiable";
 import determineWebPrefix from "../helpFunctions/determineWebPrefix";
-import { Module } from "../../../../../interfaces/variousInterfaces";
+import { Platform } from "../../../../../interfaces/variousInterfaces";
 
 interface Props {
   arr: string[];
   handleChange: (key: string, value: any) => void;
   isVerificationEnabled: boolean;
   label: string;
-  moduleSettings: Module | undefined;
+  platformSettings: Platform | undefined;
   prefixIndex?: number;
 };
 
-export default function StringArrayInput({ arr, handleChange, isVerificationEnabled, label, moduleSettings, prefixIndex }: Props) {
-  const isVerifiableArr = isProxyVerifiable(moduleSettings, label);
+export default function StringArrayInput({ arr, handleChange, isVerificationEnabled, label, platformSettings, prefixIndex }: Props) {
+  const isVerifiableArr = isProxyVerifiable(platformSettings, label);
   const [componentKeys, setComponentsKeys] = useState<string[]>(createComponentKeys([], arr)); // this component needs a way...
   // to hold unique component keys during rerenders(prevents mixing validation results when using index number as a key)
   const [arrColumnPosition, setArrColumnPosition] = useState(-1); // arrColumnPosition state allows to keep track of which...
@@ -60,7 +60,7 @@ export default function StringArrayInput({ arr, handleChange, isVerificationEnab
           key={componentKeys[i]}
           label={label}
           handleTextFieldChange={value => handleTextFieldChange(i, value)}
-          webPrefix={determineWebPrefix(moduleSettings, prefixIndex)}
+          webPrefix={determineWebPrefix(platformSettings, prefixIndex)}
           isVerificationEnabled={isVerificationEnabled}
           onBlur={e => handleTextFieldBlur(i, e.target.value)}
           value={value} />
@@ -81,7 +81,7 @@ export default function StringArrayInput({ arr, handleChange, isVerificationEnab
       handleTextFieldChange={value => addToJsonArr(arr.length, value)}
       isNextInput={true}
       isVerificationEnabled={isVerificationEnabled}
-      webPrefix={determineWebPrefix(moduleSettings, prefixIndex)}
+      webPrefix={determineWebPrefix(platformSettings, prefixIndex)}
       key="nextInput"
       label={label}
       value="" />

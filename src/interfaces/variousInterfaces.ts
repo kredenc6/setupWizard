@@ -12,27 +12,27 @@ export interface UserInput {
   resetJsonOnAppTopicChange: boolean;
   setAlsoAsChannelValues: boolean;
   schemeObj: ColorSchemeInt;
-  modules: {
-    audio: Module;
-    books: Module;
-    events: Module;
-    facebook: Module;
-    instagram: Module;
-    reddit: Module;
-    twitter: Module;
-    videos: Module;
-    websites: Module;
+  platforms: {
+    audio: Platform;
+    books: Platform;
+    events: Platform;
+    facebook: Platform;
+    instagram: Platform;
+    reddit: Platform;
+    twitter: Platform;
+    videos: Platform;
+    websites: Platform;
   }
 };
 
-export interface Module {
+export interface Platform {
   [propName: string]: any;
   selected: boolean;
   VERIFY_BY_PROXY?: string[];
   WEB_PREFIX?: string[];
 };
 
-export type UserInputModuleKeys = keyof UserInput["modules"];
+export type UserInputPlatformKeys = keyof UserInput["platforms"];
 
 export interface MenuInt {
   label: string;

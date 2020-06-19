@@ -14,7 +14,7 @@ export default function ClearJsonBtt() {
   const classes = useStyles();
   return(
     <Button className={classes.clearJsonBtt} color="primary" disabled variant="outlined">
-      Clear values from unused modules before saving
+      Clear values from unused platforms before saving
     </Button>
   );
 }

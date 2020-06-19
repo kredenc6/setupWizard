@@ -1,7 +1,7 @@
 import React from "react";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import SimpleBar from "simplebar-react";
-import ObjectDataComponent from "../../../Menu/SelectedModules/SelectedModule/ObjectDataComponent/ObjectDataComponent";
+import ObjectDataComponent from "../../SelectedPlatforms/SelectedPlatform/ObjectDataComponent/ObjectDataComponent";
 import Submenu from "../../../sharedComponents/Submenu";
 import { JsonObjKey, JsonResultObj } from "../../../../interfaces/jsonInterfaces";
 import { SWActions } from "../../../../sWReducer/sWReducer";
@@ -30,8 +30,8 @@ const useStyles = makeStyles(({ spacing }) =>
 export default function RestJsonPropsComponent ({ dispatch, isVerificationEnabled, restJson }: Props) {
   const classes = useStyles();
 
-  const handleJsonChange = (key: JsonObjKey, changedModule: JsonResultObj[JsonObjKey]) => {
-    dispatch({ type: "changeJson", payload: { [key]: changedModule } });
+  const handleJsonChange = (key: JsonObjKey, changedPlatform: JsonResultObj[JsonObjKey]) => {
+    dispatch({ type: "changeJson", payload: { [key]: changedPlatform } });
   };
 
   const handleGroupedPropsChange = (_: object, key: string, value: any) => {
