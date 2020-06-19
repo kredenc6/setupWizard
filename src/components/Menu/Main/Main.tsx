@@ -104,7 +104,7 @@ export default function Main(props: Props) {
               dispatch={dispatch}
               platforms={userInput.platforms} />
           }
-          heading="Select visible components" />
+          heading="Select platforms" />
       </div>
     </section>
   );

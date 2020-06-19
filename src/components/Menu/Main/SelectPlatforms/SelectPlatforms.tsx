@@ -12,7 +12,8 @@ interface Props {
 
 const useStyles = makeStyles({
   formWrapper: {
-    display: "flex"
+    display: "flex",
+    minWidth: "30rem"
   },
   leftPlaceholder: {
     width: "42%"
