@@ -3,6 +3,7 @@ import { TextFieldProps } from "@material-ui/core";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import SwTextField from "./SwTextField";
 import { SERVER_ADDRESS } from "../../initialStates/constants";
+import { prefixValue, unprefixValue } from "../../prefixFunctions/prefixFunctions";
 
 const VERIFICATION_DELAY = 2000;
 const MIN_LENGTH_FOR_VERIF = 3;
@@ -130,17 +131,17 @@ const VerifyUrlTextField = (props: Props & TextFieldProps) => {
 
 export default VerifyUrlTextField;
 
-function unprefixValue(prefix: string | undefined, value: string) {
-  if(prefix && value.startsWith(prefix)) return value.substring(prefix.length);
-  return value;
-}
+// export function unprefixValue(prefix: string | undefined, value: string) {
+//   if(prefix && value.startsWith(prefix)) return value.substring(prefix.length);
+//   return value;
+// }
 
-export function prefixValue(prefix: string | undefined, value: string) {
-  return value.length > 0 ?
-    (prefix || "") + value
-    :
-    value; // don't prefix an empty value - textField removal logic is based on an empty string
-}
+// export function prefixValue(prefix: string | undefined, value: string) {
+//   return value.length > 0 ?
+//     (prefix || "") + value
+//     :
+//     value; // don't prefix an empty value - textField removal logic is based on an empty string
+// }
 
 function sendToVerify(
   url: string,

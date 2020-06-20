@@ -67,6 +67,7 @@ export default function StringArrayInput({ arr, handleChange, isVerificationEnab
       :
         <SwTextField
           autoFocus={i === arrColumnPosition}
+          inputAdornment={determineWebPrefix(platformSettings, prefixIndex)}
           color="secondary"
           key={`${i}${label}`}
           label={label}
@@ -88,6 +89,7 @@ export default function StringArrayInput({ arr, handleChange, isVerificationEnab
   :
     <SwTextField
       color="secondary"
+      inputAdornment={determineWebPrefix(platformSettings, prefixIndex)}
       key="nextInput"
       label={label}
       onChange={e => addToJsonArr(arr.length, e.target.value)}

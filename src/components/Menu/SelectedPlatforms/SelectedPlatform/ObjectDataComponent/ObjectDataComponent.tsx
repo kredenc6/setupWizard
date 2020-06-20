@@ -62,6 +62,7 @@ function turnObjToFormComponents
             value={value} />
         :
           <SwTextField
+            inputAdornment={determineWebPrefix(platformSettings, prefixIndex)}
             key={`textField${key}`}
             onChange={e => handleChange(key, e.target.value)}
             label={key}

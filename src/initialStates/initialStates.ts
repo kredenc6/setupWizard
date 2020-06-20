@@ -18,7 +18,7 @@ export const initialUserInput: UserInput = {
   platforms: {
     audio: {
       selected: false,
-      VERIFY_BY_PROXY: ["queries"],
+      VERIFY_BY_PROXY: ["blocked_tracks", "queries"],
       WEB_PREFIX: ["https://www.soundcloud.com/"]
     },
     books: {
@@ -48,7 +48,7 @@ export const initialUserInput: UserInput = {
     },
     videos: {
       selected: false,
-      VERIFY_BY_PROXY: ["queries"],
+      VERIFY_BY_PROXY: ["blocked_videos", "queries"],
       WEB_PREFIX: ["https://www.youtube.com/", "https://vimeo.com/"]
     },
     websites: {

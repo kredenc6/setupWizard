@@ -27,14 +27,13 @@ const SelectPlatforms = React.memo(({ dispatch, platforms }: Props) => {
     .map(([key, platform]) => {
       if(key === "events") {
         return (
-          <Tooltip arrow placement="right" title="not yet supported">
+          <Tooltip arrow key={key} placement="right" title="not yet supported">
             <FormControlLabel
               control={
                 <Checkbox
                   checked={false}
                   disabled={true}
                   name={key} />}
-              key={key}
               label={key} />
           </Tooltip>
         );

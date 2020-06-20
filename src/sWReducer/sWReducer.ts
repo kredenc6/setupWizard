@@ -1,6 +1,6 @@
 import { Reducer } from "react";
 import jsonObjFrame from "../initialStates/jsonObjFrame";
-import { prefixValue } from "../components/sharedComponents/VerifyUrlTextField";
+import { prefixValue } from "../prefixFunctions/prefixFunctions";
 import determineWebPrefix from "../components/Menu/SelectedPlatforms/SelectedPlatform/helpFunctions/determineWebPrefix";
 import { createMessage, placeNewMessage } from "./messageHandlingFunctions";
 import { MessageProps, ServerIs, SwState, UserInput, UserInputPlatformKeys } from "../interfaces/variousInterfaces";
